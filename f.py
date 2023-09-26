@@ -223,7 +223,32 @@ def interpret(fname="source"):
         print(nl,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
         cmd.append(" ΤΟΤΕ")
       pcmd+=xpr(cmd[4:-10])+"):"
-    elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDWHILE
+    elif(cmd[:3]==list("ΓΙΑ")):           #FOR
+      block=True
+      pcmd="for "
+      pos1=4
+      while(pos1<len(cmd)):
+        if(cmd[pos1:pos1+3]==list("ΑΠΟ")):
+          break
+        pos1+=1      
+      pcmd+=xpr(cmd[4:pos1])+" in range("
+      pos2=pos1+4
+      while(pos2<len(cmd)):
+        if(cmd[pos2:pos2+5]==list("ΜΕΧΡΙ")):
+          break
+        pos2+=1
+      pcmd+=xpr(cmd[pos1+4:pos2])+","
+      pos3=pos2+6
+      while(pos3<len(cmd)):
+        if(cmd[pos3:pos3+7]==list("ΜΕ_ΒΗΜΑ")):
+          break
+        pos3+=1
+      pos4=pos3+8
+      if("ΜΕ_ΒΗΜΑ" in line):
+        pcmd+=xpr(cmd[pos2+6:pos3])+"+1,"+xpr(cmd[pos4:])+"):"
+      else:
+        pcmd+=xpr(cmd[pos2+6:])+"+1):"
+    elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
       deblock=True
     elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
       fblock=True
