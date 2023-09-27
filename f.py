@@ -250,12 +250,12 @@ def interpret(fname="source"):
         pcmd+=xpr(cmd[pos2+6:])+"+1):"
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
       deblock=True
-    elif(cmd[:15]=list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DOWHILE
+    elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DO
       block=True
       pcmd="while(True):"
-    elif(cmd[:11]=list("ΜΕΧΡΙΣ_ΟΤΟΥ")):
+    elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #WHILE
       deblock=True
-      pcmd="if("+xpr("".join(cmd[12:])+"):\n"+" "*(nsp+2)+"break"
+      pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
     elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
       fblock=True
       block=True
