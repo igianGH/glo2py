@@ -159,13 +159,13 @@ def interpret(fname="source"):
     cmd=[c for c in line][:-1]
     if(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
       pcmd="print("+xpr(cmd[6:])+")"
-    elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES
+    elif(not fblock and cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES
       vars=line[10:-1].split(",")
       pcmd=",".join(vars)+"="
       for v in vars:
         pcmd+="0,"
       pcmd=pcmd[:-1]
-    elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):
+    elif(not fblock and cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):
       vars=line[13:-1].split(",")
       pcmd=",".join(vars)+"="
       for v in vars:
@@ -173,7 +173,7 @@ def interpret(fname="source"):
       pcmd=pcmd[:-1]
       if fblock:
         pcmd="#"+pcmd
-    elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):
+    elif(not fblock and cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):
       vars=line[12:-1].split(",")
       pcmd=",".join(vars)+"="
       for v in vars:
@@ -181,7 +181,7 @@ def interpret(fname="source"):
       pcmd=pcmd[:-1]
       if fblock:
         pcmd="#"+pcmd
-    elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):
+    elif(not fblock and cmd[:8]==list("ΛΟΓΙΚΕΣ:")):
       vars=line[9:-1].split(",")
       pcmd=",".join(vars)+"="
       for v in vars:
@@ -273,7 +273,7 @@ def interpret(fname="source"):
       pcmd+=fname
       pcmd+=xpr(cmd[len(fname):tpos])+":"
     elif(fblock and fname in line):             #RETURN
-      pcmd="return"+xpr(cmd[len(fname):])[2:]
+      pcmd="return "+xpr(cmd[len(fname):])[2:]
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
       deblock=True
       fblock=False
