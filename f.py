@@ -230,7 +230,7 @@ def interpret(fname="source"):
       while(pos1<len(cmd)):
         if(cmd[pos1:pos1+3]==list("ΑΠΟ")):
           break
-        pos1+=1      
+        pos1+=1
       pcmd+=xpr(cmd[4:pos1])+" in range("
       pos2=pos1+4
       while(pos2<len(cmd)):
@@ -261,13 +261,17 @@ def interpret(fname="source"):
       block=True
       pcmd="def "
       cmd=cmd[10:]
+      for tpos in range(len(cmd)):
+        if(cmd[tpos]==":"):
+          cmd[tpos]="!"
+          break
       fname=""
       for i in cmd:
         if(i=="("):
           break
         fname+=i
       pcmd+=fname
-      pcmd+=xpr(cmd[len(fname):])+":"
+      pcmd+=xpr(cmd[len(fname):tpos])+":"
     elif(fblock and fname in line):             #RETURN
       pcmd="return"+xpr(cmd[len(fname):])[2:]
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
