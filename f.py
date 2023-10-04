@@ -30,11 +30,17 @@ s0="".join(r.choices(letters,k=r.randrange(100,1000)))
 def Rinput(v):
   #v variable
   global letters
-  if type(v)==int:
+  if v==int:
     v=(r.randrange(-100,100))
-  if type(v)==float:
+  elif v==float:
     v=(r.random()*r.randrange(-100,100))
-  if type(v)==str:
+  elif v==str:
+    v=("".join(r.choices(letters,k=r.randrange(1,10))))
+  elif type(v)==int:
+    v=(r.randrange(-100,100))
+  elif type(v)==float:
+    v=(r.random()*r.randrange(-100,100))
+  elif type(v)==str:
     v=("".join(r.choices(letters,k=r.randrange(1,10))))
   print(">διαβάστηκε το",v)
   return v
@@ -154,12 +160,12 @@ def interpret(fname="source"):
   nl=0
   block=deblock=fblock=pblock=False
   fout.write("import random as r\nimport math as m\nimport f as f\n\n")
-  fout.write("letters=[chr(ord(\"a\")+i) for i in range(26)]\n")
-  fout.write("letters+=[chr(ord(\"A\")+i) for i in range(26)]\n")
-  fout.write("letters+=[chr(ord(\"α\")+i) for i in range(25)]\n")
-  fout.write("letters+=[chr(ord(\"Α\")+i) for i in range(25) if i!=17]\n")
-  fout.write("i0=r.randrange(-10**10,10**10)\nf0=i0/r.randrange(1,10**10)\n")
-  fout.write("s0=\"\".join(r.choices(letters,k=r.randrange(100,1000)))\n\n")
+  #fout.write("letters=[chr(ord(\"a\")+i) for i in range(26)]\n")
+  #fout.write("letters+=[chr(ord(\"A\")+i) for i in range(26)]\n")
+  #fout.write("letters+=[chr(ord(\"α\")+i) for i in range(25)]\n")
+  #fout.write("letters+=[chr(ord(\"Α\")+i) for i in range(25) if i!=17]\n")
+  #fout.write("i0=r.randrange(-10**10,10**10)\nf0=i0/r.randrange(1,10**10)\n")
+  #fout.write("s0=\"\".join(r.choices(letters,k=r.randrange(100,1000)))\n\n")
   for line in fin:
     pcmd=""
     nl+=1
@@ -172,22 +178,22 @@ def interpret(fname="source"):
       vars=line[10:-1].split(",")
       pcmd=""
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=i0\n"+" "*(nsp)
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
     elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):
       vars=line[13:-1].split(",")
       pcmd=""
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=f0\n"+" "*(nsp)
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
     elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):
       vars=line[12:-1].split(",")
       pcmd=""
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=s0\n"+" "*(nsp)
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
     elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):
       vars=line[9:-1].split(",")
       pcmd=""
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=False\n"+" "*(nsp)
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=bool\n"+" "*(nsp)
     elif(cmd[:7]==list("ΔΙΑΒΑΣΕ")):      #INPUT
       vars=line[8:-1].split(",")
       pcmd=",".join(vars)+"="
