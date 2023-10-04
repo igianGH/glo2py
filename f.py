@@ -503,7 +503,8 @@ def interpret(fname="source"):
       #for a in vargs:
       #  pcmd+=" "*(nsp+2)+fname+"_V.add("+a+")\n"
       for a in vargs:
-        pcmd+=" "*(nsp+2)+a+"=f.ΤΙΜΗ("+a+"_)\n"
+        pcmd+=" "*(nsp+2)+a+"="+a+"_\n"
+        #f.ΤΙΜΗ("+a+"_)\n"
       pcmd=pcmd[:-1]
     elif(fblock and fname in line):             #RETURN
       pcmd="return "+xpr(cmd[len(fname):])[2:]
