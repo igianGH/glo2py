@@ -1,22 +1,245 @@
 import random as r
-Dint,Dfl,Dstr,Dlg={},{},{},{}
-def type(v):
-  x=str(v)
-  tnu=True
-  for c in x:
-    if c not in "-0123456789.":
-      tnu=False
-      break
-  if tnu:
-    s=x.count("-")
-    if(s>1 or (s==1 and x[0]!="-")):
-      return "str"
-    p=x.count(".")
-    if(p==0):
-      return "int"
-    if(p==1):
-      return "fl"
-  return "str"
+
+iset,fset,cset,bset={},{},{},{}
+def ΤΥΠΟΣ(v):
+  global iset,fset,cset,bset
+  if(v in iset):
+    return int
+  if(v in fset):
+    return float
+  if(v in bset):
+    return bool
+  return str
+
+def ΤΙΜΗ(v):
+  if type(v) in {stat,var}:
+    return v.timi
+  return v
+
+class stat:
+  def __init__(self,timi):
+    self.timi=timi
+    self.typos=type(timi)
+
+class var:
+  def __init__(self,typos):
+    self.typos=typos
+
+  def ins(self,timi):
+    if(type(timi)==self.typos):
+      self.timi=timi
+    else:
+      print("λάθος τύπος δεδομένων")
+
+  def __add__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self + v_
+      if self.typos==other.typos and self.typos!=str:
+        vtemp=var(self.typos)
+        vtemp.ins(self.timi + other.timi)
+        return vtemp
+      if {self.typos,other.typos}=={float,int}:
+        vtemp=var(float)
+        vtemp.ins(self.timi + other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __sub__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self - v_
+      if self.typos==other.typos and self.typos!=str:
+        vtemp=var(self.typos)
+        vtemp.ins(self.timi - other.timi)
+        return vtemp
+      if {self.typos,other.typos}=={float,int}:
+        vtemp=var(float)
+        vtemp.ins(self.timi - other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __mul__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self * v_
+      if self.typos==other.typos and self.typos!=str:
+        vtemp=var(self.typos)
+        vtemp.ins(self.timi * other.timi)
+        return vtemp
+      if {self.typos,other.typos}=={float,int}:
+        vtemp=var(float)
+        vtemp.ins(self.timi * other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __truediv__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self / v_
+      if self.typos==other.typos and self.typos!=str:
+        vtemp=var(self.typos)
+        vtemp.ins(self.timi / other.timi)
+        return vtemp
+      if {self.typos,other.typos}=={float,int}:
+        vtemp=var(float)
+        vtemp.ins(self.timi / other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __floordiv__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self // v_
+      if {self.typos,other.typos}=={int}:
+        vtemp=var(int)
+        vtemp.ins(self.timi // other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __mod__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self % v_
+      if {self.typos,other.typos}=={int}:
+        vtemp=var(int)
+        vtemp.ins(self.timi % other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __pow__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self ** v_
+      if self.typos==other.typos and self.typos!=str:
+        vtemp=var(self.typos)
+        vtemp.ins(self.timi ** other.timi)
+        return vtemp
+      if {self.typos,other.typos}=={float,int}:
+        vtemp=var(float)
+        vtemp.ins(self.timi ** other.timi)
+        return vtemp
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __lt__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self < v_
+      if self.typos==other.typos:
+        return self.timi < other.timi
+      if {self.typos,other.typos}=={float,int}:
+        return self.timi < other.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __gt__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self > v_
+      if self.typos==other.typos:
+        return self.timi > other.timi
+      if {self.typos,other.typos}=={float,int}:
+        return self.timi > other.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __le__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self <= v_
+      if self.typos==other.typos:
+        return self.timi <= other.timi
+      if {self.typos,other.typos}=={float,int}:
+        return self.timi <= other.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __ge__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self >= v_
+      if self.typos==other.typos:
+        return self.timi >= other.timi
+      if {self.typos,other.typos}=={float,int}:
+        return self.timi >= other.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __eq__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self == v_
+      if self.typos==other.typos:
+        return self.timi == other.timi
+      if {self.typos,other.typos}=={float,int}:
+        return self.timi == other.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __ne__(self,other):
+    try:
+      if type(other) not in {stat,var}:
+        v_=var(type(other))
+        v_.ins(other)
+        return self != v_
+      if self.typos==other.typos:
+        return self.timi != other.timi
+      if {self.typos,other.typos}=={float,int}:
+        return self.timi != other.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
+
+  def __neg__(self):
+    try:
+      if self.typos in {float,int}:
+        return -self.timi
+      print("λάθος τύπος δεδομένων")
+    except:
+      print("λάθος τύπος δεδομένων")
 
 l=[chr(ord("a")+i) for i in range(26)]
 l+=[chr(ord("A")+i) for i in range(26)]
@@ -24,16 +247,26 @@ l+=[chr(ord("α")+i) for i in range(25)]
 l+=[chr(ord("Α")+i) for i in range(25) if i!=17]
 letters=l
 
+def _print(*t):
+  s=""
+  for i in t:
+    if type(i) in {var,stat}:
+      s+=str(i.timi)
+    else:
+      s+=str(i)
+    s+=" "
+  print(s)
+
 def Rinput(v):
   #v variable
   global letters
-  if type(v)=="int":
-    v=r.randrange(-100,100)
-  if type(v)=="fl":
-    v=r.random()*r.randrange(-100,100)
-  if type(v)=="str":
-    v="".join(r.choices(letters,k=r.randrange(1,10)))
-  print(">διαβάστηκε το",v)
+  if v.typos==int:    #type(v)==int:
+    v.ins(r.randrange(-100,100))
+  if v.typos==float:  #type(v)==float:
+    v.ins(r.random()*r.randrange(-100,100))
+  if v.typos==str:    #type(v)==str:
+    v.ins("".join(r.choices(letters,k=r.randrange(1,10))))
+  print(">διαβάστηκε το",ΤΙΜΗ(v))
   return v
 
 def TCinput(prompt=">"):
@@ -158,37 +391,27 @@ def interpret(fname="source"):
     line=" ".join(line)
     cmd=[c for c in line][:-1]
     if(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
-      pcmd="print("+xpr(cmd[6:])+")"
-    elif(not fblock and cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES
+      pcmd="f._print("+xpr(cmd[6:])+")"
+    elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES
       vars=line[10:-1].split(",")
-      pcmd=",".join(vars)+"="
+      pcmd=""
       for v in vars:
-        pcmd+="0,"
-      pcmd=pcmd[:-1]
-    elif(not fblock and cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=f.var(int)\n"+" "*(nsp)
+    elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):
       vars=line[13:-1].split(",")
-      pcmd=",".join(vars)+"="
+      pcmd=""
       for v in vars:
-        pcmd+="0.0,"
-      pcmd=pcmd[:-1]
-      if fblock:
-        pcmd="#"+pcmd
-    elif(not fblock and cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=f.var(float)\n"+" "*(nsp)
+    elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):
       vars=line[12:-1].split(",")
-      pcmd=",".join(vars)+"="
+      pcmd=""
       for v in vars:
-        pcmd+="\"Α\","
-      pcmd=pcmd[:-1]
-      if fblock:
-        pcmd="#"+pcmd
-    elif(not fblock and cmd[:8]==list("ΛΟΓΙΚΕΣ:")):
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=f.var(str)\n"+" "*(nsp)
+    elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):
       vars=line[9:-1].split(",")
-      pcmd=",".join(vars)+"="
+      pcmd=""
       for v in vars:
-        pcmd+="False,"
-      pcmd=pcmd[:-1]
-      if fblock:
-        pcmd="#"+pcmd
+        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=f.var(bool)\n"+" "*(nsp)
     elif(cmd[:7]==list("ΔΙΑΒΑΣΕ")):      #INPUT
       vars=line[8:-1].split(",")
       pcmd=",".join(vars)+"="
@@ -253,7 +476,7 @@ def interpret(fname="source"):
     elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DO
       block=True
       pcmd="while(True):"
-    elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #WHILE
+    elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
       deblock=True
       pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
     elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
@@ -270,8 +493,18 @@ def interpret(fname="source"):
         if(i=="("):
           break
         fname+=i
-      pcmd+=fname
-      pcmd+=xpr(cmd[len(fname):tpos])+":"
+      pcmd+=fname+"("
+      vargs="".join(cmd[len(fname)+1:tpos-1]).split(",")
+      for a in vargs:
+        pcmd+=a+"_,"
+      pcmd=pcmd[:-1]+"):\n"
+      #pcmd+=xpr(cmd[len(fname):tpos])+":"
+      #pcmd+=" "*(nsp+2)+fname+"_V={}\n"
+      #for a in vargs:
+      #  pcmd+=" "*(nsp+2)+fname+"_V.add("+a+")\n"
+      for a in vargs:
+        pcmd+=" "*(nsp+2)+a+"=f.ΤΙΜΗ("+a+"_)\n"
+      pcmd=pcmd[:-1]
     elif(fblock and fname in line):             #RETURN
       pcmd="return "+xpr(cmd[len(fname):])[2:]
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
