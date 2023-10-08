@@ -11,13 +11,6 @@ def ΤΥΠΟΣ(v):
     return bool
   return str
 
-def ΤΙΜΗ(v):
-  if type(v) in {stat,var}:
-    return v.timi
-  return v
-
-
-
 l=[chr(ord("a")+i) for i in range(26)]
 l+=[chr(ord("A")+i) for i in range(26)]
 l+=[chr(ord("α")+i) for i in range(25)]
@@ -63,9 +56,17 @@ def TCinput(prompt=">"):
       return float(temp)
   return temp
 
+def printD2(A):
+  for r in range(1,A.shape[0]):
+    row=""
+    for c in range(1,A.shape[1]):
+      row+=str(A[r][c])+" "
+    print(row)
+
 def xpr(s):
   #s list of characters
   pcmd=""
+  sarr=False
   while(s!=[]):
     if(s[0] in "\"\'"):
       pcmd+="\""
@@ -77,12 +78,21 @@ def xpr(s):
           break
         else:
           pcmd+=s[0]
-    if(s==[]):
-      break
-    if(s[0]=="!"):
+      if(s==[]):
+        break
+    elif(s[0]=="["):
+      sarr=True
+      pcmd+=s.pop(0)
+    elif(s[0]=="]"):
+      sarr=False
+      pcmd+=s.pop(0)
+    elif(s[0]=="," and sarr):
+      pcmd+="]["
+      s.pop(0)
+    elif(s[0]=="!"):
       pcmd+="#"
       s.pop(0)
-    if(s[:4]==list(" ΟΧΙ")):
+    elif(s[:4]==list(" ΟΧΙ")):
       pcmd+=" not"
       s=s[4:]
     elif(s[:4]==list(" ΚΑΙ")):
@@ -152,53 +162,141 @@ def xpr(s):
       pcmd+=s.pop(0)
   return(pcmd)
 
-def interpret(fname="source"):
+def interpret(fname="source",randIN=True):
   global i0,f0,s0
   fin=open(fname,'r')
   fout=open("source.py",'w')
   nsp=0
   nl=0
   block=deblock=fblock=pblock=False
-  fout.write("import random as r\nimport math as m\nimport f as f\n\n")
-  #fout.write("letters=[chr(ord(\"a\")+i) for i in range(26)]\n")
-  #fout.write("letters+=[chr(ord(\"A\")+i) for i in range(26)]\n")
-  #fout.write("letters+=[chr(ord(\"α\")+i) for i in range(25)]\n")
-  #fout.write("letters+=[chr(ord(\"Α\")+i) for i in range(25) if i!=17]\n")
-  #fout.write("i0=r.randrange(-10**10,10**10)\nf0=i0/r.randrange(1,10**10)\n")
-  #fout.write("s0=\"\".join(r.choices(letters,k=r.randrange(100,1000)))\n\n")
+  fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
   for line in fin:
     pcmd=""
+    for i in range(len(line)):
+      if(line[i]=="!"):
+        line=line[:i]   #line[:i]+"#"+line[i+1:]
+        break
     nl+=1
     line=[w for w in line.split(" ") if w!=""]
     line=" ".join(line)
     cmd=[c for c in line][:-1]
-    if(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
+    if(cmd[:7]==list("ΓΡΑΨΕ_Π")):       #printD2
+      pcmd="f.printD2("+xpr(cmd[8:])+")"
+    if(cmd[:6]==list("ΓΡΑΨΕ_")):       #PRINT_end
+      pcmd="print("+xpr(cmd[7:])+",end=\" \")"
+    elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
       pcmd="print("+xpr(cmd[6:])+")"
-    elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES
+    elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
       vars=line[10:-1].split(",")
       pcmd=""
+      arr=False
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
-    elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):
+        if("[" in v):          
+          vname="".join(v.split("[")[0])
+          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+          arr=True
+          dim=1
+          pcmd+=vname+"=np.array((1+"+vdim1+")*["
+          if("]" in v):
+            arr=False
+            pcmd+="int"+("]")+")\n"+" "*(nsp)
+        elif("]" in v):
+          dim+=1
+          arr=False
+          pcmd+="(1+"+v[:-1]+")*[int"+("]")*dim+")\n"+" "*(nsp)
+        elif(arr):
+          dim+=1
+          pcmd+="(1+"+v+")*["
+        else:
+          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
+    elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):   #TYPES FLOAT
       vars=line[13:-1].split(",")
       pcmd=""
+      arr=False
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
-    elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):
+        if("[" in v):          
+          vname="".join(v.split("[")[0])
+          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+          arr=True
+          dim=1
+          pcmd+=vname+"=np.array((1+"+vdim1+")*["
+          if("]" in v):
+            arr=False
+            pcmd+="float"+("]")+")\n"+" "*(nsp)
+        elif("]" in v):
+          dim+=1
+          arr=False
+          pcmd+="(1+"+v[:-1]+")*[float"+("]")*dim+")\n"+" "*(nsp)
+        elif(arr):
+          dim+=1
+          pcmd+="(1+"+v+")*["
+        else:
+          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
+    elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):   #TYPES STR
       vars=line[12:-1].split(",")
       pcmd=""
+      arr=False
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
-    elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):
+        if("[" in v):          
+          vname="".join(v.split("[")[0])
+          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+          arr=True
+          dim=1
+          pcmd+=vname+"=np.array((1+"+vdim1+")*["
+          if("]" in v):
+            arr=False
+            pcmd+="str"+("]")+")\n"+" "*(nsp)
+        elif("]" in v):
+          dim+=1
+          arr=False
+          pcmd+="(1+"+v[:-1]+")*[str"+("]")*dim+")\n"+" "*(nsp)
+        elif(arr):
+          dim+=1
+          pcmd+="(1+"+v+")*["
+        else:
+          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
+    elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):   #TYPES BOOL
       vars=line[9:-1].split(",")
       pcmd=""
+      arr=False
       for v in vars:
-        pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=bool\n"+" "*(nsp)
+        if("[" in v):          
+          vname="".join(v.split("[")[0])
+          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+          arr=True
+          dim=1
+          pcmd+=vname+"=np.array((1+"+vdim1+")*["
+          if("]" in v):
+            arr=False
+            pcmd+="bool"+("]")+")\n"+" "*(nsp)
+        elif("]" in v):
+          dim+=1
+          arr=False
+          pcmd+="(1+"+v[:-1]+")*[bool"+("]")*dim+")\n"+" "*(nsp)
+        elif(arr):
+          dim+=1
+          pcmd+="(1+"+v+")*["
+        else:
+          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=bool\n"+" "*(nsp)
     elif(cmd[:7]==list("ΔΙΑΒΑΣΕ")):      #INPUT
-      vars=line[8:-1].split(",")
+      temp=list(line[8:-1])
+      parr=False
+      for i in range(len(temp)):
+        if(temp[i]=='['):
+          parr=True
+        elif(parr and temp[i]==','):
+          temp[i]=']['
+        elif(temp[i]==']'):
+          parr=False
+      temp="".join(temp)
+      vars=temp.split(",")
       pcmd=",".join(vars)+"="
       for v in vars:
-        pcmd+="f.Rinput("+str(v)+"),"
+        pcmd+=("f.Rinput("+str(v)+"),")*(randIN)+"f.TCinput(),"*(1-randIN)
       pcmd=pcmd[:-1]
     elif(cmd[:2]==list("ΑΝ")):           #IF
       block=True
