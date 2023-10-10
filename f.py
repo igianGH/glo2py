@@ -460,9 +460,12 @@ def interpret(fname="source",randIN=True):
       for v in pV:
         pcmd+=v+"[0],"
       pcmd=pcmd[:-1]
-    else:
+    elif(pblock):
       pcmd=xpr(cmd,pblock,vargs)
-    if(pcmd not in ["","\n"]):
+    else:
+      pcmd=xpr(cmd)
+
+    if(pcmd not in ["","\n"]):        # save line
       fout.write(nsp*" "+pcmd+"\n")
     if(block):
       nsp+=2
