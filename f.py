@@ -23,15 +23,15 @@ def Rinput(v):
   if v==int:
     v=(r.randrange(-10**9,10**9))
   elif v==float:
-    v=(r.random()*r.randrange(-100,100))
+    v=(r.random()*r.randrange(-10000,10000))
   elif v==str:
-    v=("".join(r.choices(letters,k=r.randrange(1,10))))
+    v=("".join(r.choices(letters,k=r.randrange(1,6))))
   elif type(v)==int:
-    v=(r.randrange(-100,100))
+    v=(r.randrange(-10**9,10**9))
   elif type(v)==float:
-    v=(r.random()*r.randrange(-100,100))
+    v=(r.random()*r.randrange(-10000,10000))
   elif type(v)==str:
-    v=("".join(r.choices(letters,k=r.randrange(1,10))))
+    v=("".join(r.choices(letters,k=r.randrange(1,6))))
   print(">διαβάστηκε το",v)
   return v
 
