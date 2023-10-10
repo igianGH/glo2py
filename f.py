@@ -16,15 +16,12 @@ l+=[chr(ord("A")+i) for i in range(26)]
 l+=[chr(ord("α")+i) for i in range(25)]
 l+=[chr(ord("Α")+i) for i in range(25) if i!=17]
 letters=l
-i0=r.randrange(-10**10,10**10)
-f0=i0/r.randrange(1,10**10)
-s0="".join(r.choices(letters,k=r.randrange(100,1000)))
 
 def Rinput(v):
   #v variable
   global letters
   if v==int:
-    v=(r.randrange(-100,100))
+    v=(r.randrange(-10**9,10**9))
   elif v==float:
     v=(r.random()*r.randrange(-100,100))
   elif v==str:
@@ -63,7 +60,7 @@ def printD2(A):
       row+=str(A[r][c])+" "
     print(row)
 
-def xpr(s):
+def xpr(s,pblock=False,v=[]):
   #s list of characters
   pcmd=""
   sarr=False
@@ -88,9 +85,6 @@ def xpr(s):
       pcmd+=s.pop(0)
     elif(s[0]=="," and sarr):
       pcmd+="]["
-      s.pop(0)
-    elif(s[0]=="!"):
-      pcmd+="#"
       s.pop(0)
     elif(s[:4]==list(" ΟΧΙ")):
       pcmd+=" not"
@@ -159,7 +153,21 @@ def xpr(s):
       pcmd+="#"+"".join(s)
       s=[]
     else:
-      pcmd+=s.pop(0)
+      if(pblock):
+        iINs=False
+        for i in v:
+          if list(i)==s:
+            iINs=True
+            pcmd+=i+"[0]"
+            s=s[len(i):]
+            break
+          elif len(s)>len(i) and list(i)==s[:len(i)] and s[len(i)] in " +-*/^()=<>[":
+            iINs=True
+            pcmd+=i+"[0]"
+            s=s[len(i):]
+            break
+      if(not pblock or not iINs):
+        pcmd+=s.pop(0)
   return(pcmd)
 
 def interpret(fname="source",randIN=True):
@@ -191,7 +199,7 @@ def interpret(fname="source",randIN=True):
       pcmd=""
       arr=False
       for v in vars:
-        if("[" in v):          
+        if("[" in v):
           vname="".join(v.split("[")[0])
           vdim1="".join([c for c in v.split("[")[1] if c!="]"])
           pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
@@ -215,7 +223,7 @@ def interpret(fname="source",randIN=True):
       pcmd=""
       arr=False
       for v in vars:
-        if("[" in v):          
+        if("[" in v):
           vname="".join(v.split("[")[0])
           vdim1="".join([c for c in v.split("[")[1] if c!="]"])
           pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
@@ -239,7 +247,7 @@ def interpret(fname="source",randIN=True):
       pcmd=""
       arr=False
       for v in vars:
-        if("[" in v):          
+        if("[" in v):
           vname="".join(v.split("[")[0])
           vdim1="".join([c for c in v.split("[")[1] if c!="]"])
           pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
@@ -263,7 +271,7 @@ def interpret(fname="source",randIN=True):
       pcmd=""
       arr=False
       for v in vars:
-        if("[" in v):          
+        if("[" in v):
           vname="".join(v.split("[")[0])
           vdim1="".join([c for c in v.split("[")[1] if c!="]"])
           pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
@@ -372,21 +380,88 @@ def interpret(fname="source",randIN=True):
         if(i=="("):
           break
         fname+=i
+      ftypos="".join(cmd[tpos+1:])
+      if ftypos=="ΑΚΕΡΑΙΑ":
+        ftypos=int
+      elif ftypos=="ΠΡΑΓΜΑΤΙΚΗ":
+        ftypos=float
+      elif ftypos=="ΧΑΡΑΚΤΗΡΑΣ":
+        ftypos=str
+      else:         #ΛΟΓΙΚΗ
+        ftypos=bool
+      
       pcmd+=fname+"("
       vargs="".join(cmd[len(fname)+1:tpos-1]).split(",")
       for a in vargs:
         pcmd+=a+","
-      pcmd=pcmd[:-1]+"):\n"
-      pcmd+="  global i0,f0,s0"
+      pcmd=pcmd[:-1]+"):\n  " #function parameter list
+
+      pcmd+="#"+str(ftypos)+"\n  "
+
+      for a in vargs:
+        pcmd+="_"+a+","
+      pcmd=pcmd[:-1]+"="  #backup values
+      for a in vargs:
+        pcmd+=a+","
+      pcmd=pcmd[:-1]
     elif(fblock and fname in line):             #RETURN
-      pcmd="return "+xpr(cmd[len(fname):])[2:]
+      pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]+"\n  "
+      for a in vargs:
+        pcmd+=a+","
+      pcmd=pcmd[:-1]+" = "  #restore values
+      for a in vargs:
+        pcmd+="_"+a+","
+      pcmd=pcmd[:-1]+"\n  "
+      pcmd+="return "+"_"+fname
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
       deblock=True
       fblock=False
       fname=""
-      pcmd=" \n"
+      pcmd="#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"#" \n"
+    elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
+      pblock=True
+      fblock=True
+      block=True
+      pcmd="def "
+      cmd=cmd[11:]
+      fname=""
+      for i in cmd:
+        if(i=="("):
+          break
+        fname+=i
+      pcmd+=fname+"("
+      vargs="".join(cmd[len(fname)+1:-1]).split(",")
+      for a in vargs:
+        pcmd+=a+","
+      pcmd=pcmd[:-1]+"):"
+    elif(cmd[:17]==list("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
+      pblock=False
+      deblock=True
+      fblock=False
+      fname=""
+      pcmd="#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
+    elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
+      for i in range(len(cmd)):
+        if cmd[i]=="(":
+          break
+      fname="".join(cmd[7:i])
+      pV=[v for v in "".join(cmd[i+1:-1]).split(",")]
+      pcmd=""
+      for v in pV:
+        pcmd+=v+","
+      pcmd=pcmd[:-1]+"="
+      for v in pV:
+        pcmd+="["+v+"],"
+      pcmd=pcmd[:-1]+"\n"   #load
+      pcmd+=" "*(nsp)+"".join(cmd[7:])+"\n"+" "*(nsp)   #call
+      for v in pV:    #unload
+        pcmd+=v+","
+      pcmd=pcmd[:-1]+"="
+      for v in pV:
+        pcmd+=v+"[0],"
+      pcmd=pcmd[:-1]
     else:
-      pcmd=xpr(cmd)
+      pcmd=xpr(cmd,pblock,vargs)
     if(pcmd not in ["","\n"]):
       fout.write(nsp*" "+pcmd+"\n")
     if(block):
