@@ -61,10 +61,11 @@ def printD2(A):
     print(row)
 
 def xpr(s,pblock=False,v=[]):
-  #s list of characters
+  # s list of characters
   pcmd=""
   sarr=False
   while(s!=[]):
+    # print( "".join(s) )    # check sequence
     if(s[0] in "\"\'"):
       pcmd+="\""
       while(True):
@@ -171,7 +172,6 @@ def xpr(s,pblock=False,v=[]):
   return(pcmd)
 
 def interpret(fname="source",randIN=True):
-  global i0,f0,s0
   fin=open(fname,'r')
   fout=open("source.py",'w')
   nsp=0
@@ -180,14 +180,19 @@ def interpret(fname="source",randIN=True):
   fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
   for line in fin:
     pcmd=""
-    for i in range(len(line)):
-      if(line[i]=="!"):
-        line=line[:i]   #line[:i]+"#"+line[i+1:]
+    for cmpos in range(len(line)):    #COMMENTS
+      if(line[cmpos]=="!"):
+        line=line[:cmpos]   # line[:cmpos]+"#"+line[cmpos+1:]
+        break
+    for i in range(cmpos-1,5,-1):     # SPACES tail
+      if(line[i] not in " \n"):
+        line=line[:i+1]
         break
     nl+=1
+    # print( nl,line )    # check line
     line=[w for w in line.split(" ") if w!=""]
     line=" ".join(line)
-    cmd=[c for c in line][:-1]
+    cmd=[c for c in line]#[:-1]
     if(cmd[:7]==list("ΓΡΑΨΕ_Π")):       #printD2
       pcmd="f.printD2("+xpr(cmd[8:])+")"
     if(cmd[:6]==list("ΓΡΑΨΕ_")):       #PRINT_end
@@ -195,7 +200,7 @@ def interpret(fname="source",randIN=True):
     elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
       pcmd="print("+xpr(cmd[6:])+")"
     elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
-      vars=line[10:-1].split(",")
+      vars=line[10:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -219,7 +224,7 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
     elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):   #TYPES FLOAT
-      vars=line[13:-1].split(",")
+      vars=line[13:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -243,7 +248,7 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
     elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):   #TYPES STR
-      vars=line[12:-1].split(",")
+      vars=line[12:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -267,7 +272,7 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
     elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):   #TYPES BOOL
-      vars=line[9:-1].split(",")
+      vars=line[9:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -291,7 +296,7 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=bool\n"+" "*(nsp)
     elif(cmd[:7]==list("ΔΙΑΒΑΣΕ")):      #INPUT
-      temp=list(line[8:-1])
+      temp=list(line[8:])
       parr=False
       for i in range(len(temp)):
         if(temp[i]=='['):
@@ -389,7 +394,7 @@ def interpret(fname="source",randIN=True):
         ftypos=str
       else:         #ΛΟΓΙΚΗ
         ftypos=bool
-      
+
       pcmd+=fname+"("
       vargs="".join(cmd[len(fname)+1:tpos-1]).split(",")
       for a in vargs:
@@ -417,7 +422,7 @@ def interpret(fname="source",randIN=True):
       deblock=True
       fblock=False
       fname=""
-      pcmd="#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"#" \n"
+      pcmd="#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
     elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
       pblock=True
       fblock=True
