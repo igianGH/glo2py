@@ -20,18 +20,19 @@ letters=l
 def Rinput(v):
   #v variable
   global letters
+  ndigits=r.randrange(1,9)
   if v==int:
-    v=(r.randrange(-10**9,10**9))
+    v=(r.randrange(-10**ndigits,10**ndigits))
   elif v==float:
-    v=(r.random()*r.randrange(-10000,10000))
+    v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
   elif v==str:
-    v=("".join(r.choices(letters,k=r.randrange(1,6))))
+    v=("".join(r.choices(letters,k=ndigits)))
   elif type(v)==int:
-    v=(r.randrange(-10**9,10**9))
+    v=(r.randrange(-10**ndigits,10**ndigits))
   elif type(v)==float:
-    v=(r.random()*r.randrange(-10000,10000))
+    v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
   elif type(v)==str:
-    v=("".join(r.choices(letters,k=r.randrange(1,6))))
+    v=("".join(r.choices(letters,k=ndigits)))
   print(">διαβάστηκε το",v)
   return v
 
@@ -180,8 +181,10 @@ def interpret(fname="source",randIN=True):
   fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
   for line in fin:
     pcmd=""
+    comment=""
     for cmpos in range(len(line)):    #COMMENTS
       if(line[cmpos]=="!"):
+        comment="   #"+line[cmpos+1:]
         line=line[:cmpos]   # line[:cmpos]+"#"+line[cmpos+1:]
         break
     for i in range(cmpos-1,5,-1):     # SPACES tail
@@ -200,7 +203,11 @@ def interpret(fname="source",randIN=True):
     elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
       pcmd="print("+xpr(cmd[6:])+")"
     elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
-      vars=line[10:].split(",")
+      if(cmd[9]==' '):
+        fvarpos=10
+      else:
+        fvarpos=9
+      vars=line[fvarpos:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -224,7 +231,11 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
     elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):   #TYPES FLOAT
-      vars=line[13:].split(",")
+      if(cmd[12]==' '):
+        fvarpos=13
+      else:
+        fvarpos=12
+      vars=line[fvarpos:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -248,7 +259,11 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
     elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):   #TYPES STR
-      vars=line[12:].split(",")
+      if(cmd[11]==' '):
+        fvarpos=12
+      else:
+        fvarpos=11
+      vars=line[fvarpos:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -272,7 +287,11 @@ def interpret(fname="source",randIN=True):
         else:
           pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
     elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):   #TYPES BOOL
-      vars=line[9:].split(",")
+      if(cmd[8]==' '):
+        fvarpos=9
+      else:
+        fvarpos=8
+      vars=line[fvarpos:].split(",")
       pcmd=""
       arr=False
       for v in vars:
@@ -386,6 +405,8 @@ def interpret(fname="source",randIN=True):
           break
         fname+=i
       ftypos="".join(cmd[tpos+1:])
+      if ftypos[0]==" ":
+        ftypos=ftypos[1:]
       if ftypos=="ΑΚΕΡΑΙΑ":
         ftypos=int
       elif ftypos=="ΠΡΑΓΜΑΤΙΚΗ":
@@ -471,7 +492,7 @@ def interpret(fname="source",randIN=True):
       pcmd=xpr(cmd)
 
     if(pcmd not in ["","\n"]):        # save line
-      fout.write(nsp*" "+pcmd+"\n")
+      fout.write(nsp*" "+pcmd+comment+"\n")
     if(block):
       nsp+=2
       block=False
