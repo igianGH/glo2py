@@ -1,4 +1,5 @@
 import random as r
+import importlib  #reload module
 
 iset,fset,cset,bset={},{},{},{}
 def ΤΥΠΟΣ(v):
@@ -66,7 +67,6 @@ def xpr(s,pblock=False,v=[]):
   pcmd=""
   sarr=False
   while(s!=[]):
-    # print( "".join(s) )    # check sequence
     if(s[0] in "\"\'"):
       pcmd+="\""
       while(True):
@@ -151,7 +151,7 @@ def xpr(s,pblock=False,v=[]):
     elif(s[:2]==list("Ε(")):
       pcmd+="m.exp("
       s=s[2:]
-    elif(s[:4]==list("ΑΡΧΗ") or s[:9]==list("ΠΡΟΓΡΑΜΜΑ") or s[:10]==list("ΜΕΤΑΒΛΗΤΕΣ") or s[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):
+    elif(s[:4]==list("ΑΡΧΗ") or s[:10]==list("ΜΕΤΑΒΛΗΤΕΣ") or s[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):
       pcmd+="#"+"".join(s)
       s=[]
     else:
@@ -173,8 +173,9 @@ def xpr(s,pblock=False,v=[]):
   return(pcmd)
 
 def interpret(fname="source",randIN=True):
+  import importlib
   fin=open(fname,'r')
-  fout=open("source.py",'w')
+  fout=open(fname+".py",'w')
   nsp=0
   nl=0
   block=deblock=fblock=pblock=False
@@ -391,6 +392,9 @@ def interpret(fname="source",randIN=True):
     elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
       deblock=True
       pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
+    elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           #main
+      block=True
+      pcmd="def main():"
     elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
       fblock=True
       block=True
@@ -426,7 +430,7 @@ def interpret(fname="source",randIN=True):
 
       for a in vargs:
         pcmd+="_"+a+","
-      pcmd=pcmd[:-1]+"="  #backup values
+      pcmd=pcmd[:-1]+"="  #backup values for mutable
       for a in vargs:
         pcmd+=a+","
       pcmd=pcmd[:-1]
@@ -501,3 +505,6 @@ def interpret(fname="source",randIN=True):
       deblock=False
   fin.close()
   fout.close()
+  import source
+  importlib.reload(source)
+  source.main()
