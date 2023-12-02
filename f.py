@@ -201,7 +201,6 @@ def interpret(randIN=True,cmp=False,aa=1):
         line=line[:i+1]
         break
     nl+=1
-    # print( nl,line )    # check line
     line=[w for w in line.split(" ") if w!=""]
     line=" ".join(line)
     cmd=[c for c in line]
@@ -368,21 +367,18 @@ def interpret(randIN=True,cmp=False,aa=1):
         print(nl,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
         cmd.append(" ΤΟΤΕ")
       pcmd+=xpr(cmd[4:-10])+"):"
-    elif(cmd[:3]==list("ΓΙΑ")):           #FOR
+    elif(cmd[:3]==list("ΓΙΑ")):           # FOR #
       block=True
-      #pcmd="for "
       pos1=4
       while(pos1<len(cmd)):
         if(cmd[pos1:pos1+3]==list("ΑΠΟ")):
           break
         pos1+=1
-      #pcmd+=xpr(cmd[4:pos1])+" in range("
       pos2=pos1+4
       while(pos2<len(cmd)):
         if(cmd[pos2:pos2+5]==list("ΜΕΧΡΙ")):
           break
         pos2+=1
-      #pcmd+=xpr(cmd[pos1+4:pos2])+","
       pos3=pos2+6
       while(pos3<len(cmd)):
         if(cmd[pos3:pos3+7]==list("ΜΕ_ΒΗΜΑ")):
@@ -390,11 +386,13 @@ def interpret(randIN=True,cmp=False,aa=1):
         pos3+=1
       pos4=pos3+8
       
-      #pcmd="correction=1\n"+" "*nsp
-      #pcmd+="if( "+xpr(cmd[pos2+6:pos3])+"<"+xpr(cmd[pos1+4:pos2])+" ):\n  "+" "*nsp
-      #pcmd+="correction=-1\n"+" "*nsp
-      flag=xpr(cmd[pos2+6:pos3])+"<"+xpr(cmd[pos1+4:pos2])
-      pcmd="correction=1-2*"+flag+"\n"+" "*nsp
+      flag=xpr(cmd[pos2+6:pos3])
+      if(flag[-1]==' '):
+         flag=flag[:-1]
+      flag+="<"+xpr(cmd[pos1+4:pos2])
+      if(flag[-1]==' '):
+        flag=flag[:-1]
+      pcmd="correction=1-2*("+flag+")\n"+" "*nsp
       pcmd+="for "
       pcmd+=xpr(cmd[4:pos1])+" in range("
       pcmd+=xpr(cmd[pos1+4:pos2])+","
@@ -457,8 +455,7 @@ def interpret(randIN=True,cmp=False,aa=1):
         pcmd+=a+","
       pcmd=pcmd[:-1]
     elif(fblock and fname in line):             #RETURN
-      pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]#+"\n  "
-      #pcmd+="return "+"_"+fname
+      pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
       for a in vargs:
         pcmd+=a+","
