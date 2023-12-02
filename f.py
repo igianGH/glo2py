@@ -181,6 +181,21 @@ def interpret(randIN=True,cmp=False,aa=1):
   nl=0
   mblock=block=deblock=fblock=pblock=False
   fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
+  fout.write('''
+def _init(A,B):
+  X=B.split(',')
+  if(A[0]==int):
+    for i in range(1,len(A)):
+      A[i]=int(X[i-1])
+  elif(A[0]==float):
+    for i in range(1,len(A)):
+      A[i]=float(X[i-1])
+  else:
+    A[1:]=X
+
+def _len(A):
+  return len(A)-1
+\n''')
   if(cmp):
     fout.write("fout=open(\"log"+str(aa)+"\",\"w\")\n\n")
     cout="fout.write"
