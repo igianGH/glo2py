@@ -55,7 +55,7 @@ def TCinput(prompt=">"):
       return float(temp)
   return temp
 
-def printD2(A):
+def print2D(A):
   for r in range(1,A.shape[0]):
     row=""
     for c in range(1,A.shape[1]):
@@ -151,7 +151,7 @@ def xpr(s,pblock=False,v=[]):
     elif(s[:2]==list("Ε(")):
       pcmd+="m.exp("
       s=s[2:]
-    elif(s[:4]==list("ΑΡΧΗ") or s[:10]==list("ΜΕΤΑΒΛΗΤΕΣ") or s[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):
+    elif(s[:4]==list("ΑΡΧΗ") or s[:10]==list("ΜΕΤΑΒΛΗΤΕΣ")):
       pcmd+="#"+"".join(s)
       s=[]
     else:
@@ -172,21 +172,29 @@ def xpr(s,pblock=False,v=[]):
         pcmd+=s.pop(0)
   return(pcmd)
 
-def interpret(fname="source",randIN=True):
+def interpret(randIN=True,cmp=False,aa=1):
+  fname="source"
   import importlib
   fin=open(fname,'r')
   fout=open(fname+".py",'w')
   nsp=0
   nl=0
-  block=deblock=fblock=pblock=False
+  mblock=block=deblock=fblock=pblock=False
   fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
+  if(cmp):
+    fout.write("fout=open(\"log"+str(aa)+"\",\"w\")\n\n")
+    cout="fout.write"
+    ct="("
+  else:
+    cout="print"
+    ct="str("
   for line in fin:
     pcmd=""
     comment=""
     for cmpos in range(len(line)):    #COMMENTS
       if(line[cmpos]=="!"):
         comment="   #"+line[cmpos+1:]
-        line=line[:cmpos]   # line[:cmpos]+"#"+line[cmpos+1:]
+        line=line[:cmpos]
         break
     for i in range(cmpos-1,5,-1):     # SPACES tail
       if(line[i] not in " \n"):
@@ -196,13 +204,14 @@ def interpret(fname="source",randIN=True):
     # print( nl,line )    # check line
     line=[w for w in line.split(" ") if w!=""]
     line=" ".join(line)
-    cmd=[c for c in line]#[:-1]
-    if(cmd[:7]==list("ΓΡΑΨΕ_Π")):       #printD2
-      pcmd="f.printD2("+xpr(cmd[8:])+")"
-    if(cmd[:6]==list("ΓΡΑΨΕ_")):       #PRINT_end
+    cmd=[c for c in line]
+    if(cmd[:7]==list("ΓΡΑΨΕ2")):       #print2D
+      pcmd="f.print2D("+xpr(cmd[8:])+")"
+    if(cmd[:6]==list("ΓΡΑΨΕ_")):       #print end=' '
       pcmd="print("+xpr(cmd[7:])+",end=\" \")"
     elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
-      pcmd="print("+xpr(cmd[6:])+")"
+      pcmd=cout+"("+xpr(cmd[6:])+")"
+
     elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
       if(cmd[9]==' '):
         fvarpos=10
@@ -361,27 +370,36 @@ def interpret(fname="source",randIN=True):
       pcmd+=xpr(cmd[4:-10])+"):"
     elif(cmd[:3]==list("ΓΙΑ")):           #FOR
       block=True
-      pcmd="for "
+      #pcmd="for "
       pos1=4
       while(pos1<len(cmd)):
         if(cmd[pos1:pos1+3]==list("ΑΠΟ")):
           break
         pos1+=1
-      pcmd+=xpr(cmd[4:pos1])+" in range("
+      #pcmd+=xpr(cmd[4:pos1])+" in range("
       pos2=pos1+4
       while(pos2<len(cmd)):
         if(cmd[pos2:pos2+5]==list("ΜΕΧΡΙ")):
           break
         pos2+=1
-      pcmd+=xpr(cmd[pos1+4:pos2])+","
+      #pcmd+=xpr(cmd[pos1+4:pos2])+","
       pos3=pos2+6
       while(pos3<len(cmd)):
         if(cmd[pos3:pos3+7]==list("ΜΕ_ΒΗΜΑ")):
           break
         pos3+=1
       pos4=pos3+8
+      
+      #pcmd="correction=1\n"+" "*nsp
+      #pcmd+="if( "+xpr(cmd[pos2+6:pos3])+"<"+xpr(cmd[pos1+4:pos2])+" ):\n  "+" "*nsp
+      #pcmd+="correction=-1\n"+" "*nsp
+      flag=xpr(cmd[pos2+6:pos3])+"<"+xpr(cmd[pos1+4:pos2])
+      pcmd="correction=1-2*"+flag+"\n"+" "*nsp
+      pcmd+="for "
+      pcmd+=xpr(cmd[4:pos1])+" in range("
+      pcmd+=xpr(cmd[pos1+4:pos2])+","
       if("ΜΕ_ΒΗΜΑ" in line):
-        pcmd+=xpr(cmd[pos2+6:pos3])+"+1,"+xpr(cmd[pos4:])+"):"
+        pcmd+=xpr(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
       else:
         pcmd+=xpr(cmd[pos2+6:])+"+1):"
     elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
@@ -392,9 +410,13 @@ def interpret(fname="source",randIN=True):
     elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
       deblock=True
       pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
-    elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           #main
+    elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           # MAIN
       block=True
+      mblock=True
       pcmd="def main():"
+    elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
+      deblock=True
+      pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
     elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
       fblock=True
       block=True
@@ -435,7 +457,9 @@ def interpret(fname="source",randIN=True):
         pcmd+=a+","
       pcmd=pcmd[:-1]
     elif(fblock and fname in line):             #RETURN
-      pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]+"\n  "
+      pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]#+"\n  "
+      #pcmd+="return "+"_"+fname
+    elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
       for a in vargs:
         pcmd+=a+","
       pcmd=pcmd[:-1]+" = "  #restore values
@@ -443,11 +467,10 @@ def interpret(fname="source",randIN=True):
         pcmd+="_"+a+","
       pcmd=pcmd[:-1]+"\n  "
       pcmd+="return "+"_"+fname
-    elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
       deblock=True
       fblock=False
       fname=""
-      pcmd="#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
+      pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
     elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
       pblock=True
       fblock=True
@@ -469,7 +492,7 @@ def interpret(fname="source",randIN=True):
       deblock=True
       fblock=False
       fname=""
-      pcmd="#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
+      pcmd="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
     elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
       for i in range(len(cmd)):
         if cmd[i]=="(":
@@ -507,4 +530,5 @@ def interpret(fname="source",randIN=True):
   fout.close()
   import source
   importlib.reload(source)
-  source.main()
+  if(mblock):
+    source.main()
