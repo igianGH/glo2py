@@ -1,5 +1,6 @@
 import random as r
 import importlib  #reload module
+from contextlib import redirect_stdout
 
 iset,fset,cset,bset={},{},{},{}
 def ΤΥΠΟΣ(v):
@@ -179,7 +180,7 @@ def interpret(randIN=True,cmp=False,aa=1):
   fout=open(fname+".py",'w')
   nsp=0
   nl=0
-  mblock=block=deblock=fblock=pblock=False
+  exe=demblock=mblock=block=deblock=fblock=pblock=False
   fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
   fout.write('''
 def _init(A,B):
@@ -192,355 +193,365 @@ def _init(A,B):
       A[i]=float(X[i-1])
   else:
     A[1:]=X
-
-def _len(A):
-  return len(A)-1
 \n''')
-  if(cmp):
-    fout.write("fout=open(\"log"+str(aa)+"\",\"w\")\n\n")
-    cout="fout.write"
-    ct="("
-  else:
-    cout="print"
-    ct="str("
-  for line in fin:
-    pcmd=""
-    comment=""
-    for cmpos in range(len(line)):    #COMMENTS
-      if(line[cmpos]=="!"):
-        comment="   #"+line[cmpos+1:]
-        line=line[:cmpos]
-        break
-    for i in range(cmpos-1,5,-1):     # SPACES tail
-      if(line[i] not in " \n"):
-        line=line[:i+1]
-        break
-    nl+=1
-    line=[w for w in line.split(" ") if w!=""]
-    line=" ".join(line)
-    cmd=[c for c in line]
-    if(cmd[:7]==list("ΓΡΑΨΕ2")):       #print2D
-      pcmd="f.print2D("+xpr(cmd[8:])+")"
-    if(cmd[:6]==list("ΓΡΑΨΕ_")):       #print end=' '
-      pcmd="print("+xpr(cmd[7:])+",end=\" \")"
-    elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
-      pcmd=cout+"("+xpr(cmd[6:])+")"
-
-    elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
-      if(cmd[9]==' '):
-        fvarpos=10
-      else:
-        fvarpos=9
-      vars=line[fvarpos:].split(",")
+  try:
+    for line in fin:
       pcmd=""
-      arr=False
-      for v in vars:
-        if("[" in v):
-          vname="".join(v.split("[")[0])
-          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
-          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
-          arr=True
-          dim=1
-          pcmd+=vname+"=np.array((1+"+vdim1+")*["
-          if("]" in v):
-            arr=False
-            pcmd+="int"+("]")+")\n"+" "*(nsp)
-        elif("]" in v):
-          dim+=1
-          arr=False
-          pcmd+="(1+"+v[:-1]+")*[int"+("]")*dim+")\n"+" "*(nsp)
-        elif(arr):
-          dim+=1
-          pcmd+="(1+"+v+")*["
+      comment=""
+      for cmpos in range(len(line)):    #COMMENTS
+        if(line[cmpos]=="!"):
+          comment="   #"+line[cmpos+1:]
+          line=line[:cmpos]
+          break
+      for i in range(cmpos-1,5,-1):     # SPACES tail
+        if(line[i] not in " \n"):
+          line=line[:i+1]
+          break
+      nl+=1
+      line=[w for w in line.split(" ") if w!=""]
+      line=" ".join(line)
+      cmd=[c for c in line]
+      if(cmd[:7]==list("ΓΡΑΨΕ2")):       #print2D
+        pcmd="f.print2D("+xpr(cmd[8:])+")"
+      if(cmd[:6]==list("ΓΡΑΨΕ_")):       #print end=' '
+        pcmd="print("+xpr(cmd[7:])+",end=\" \")"
+      elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
+        pcmd="print("+xpr(cmd[6:])+")"
+
+      elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
+        if(cmd[9]==' '):
+          fvarpos=10
         else:
-          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
-    elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):   #TYPES FLOAT
-      if(cmd[12]==' '):
-        fvarpos=13
-      else:
-        fvarpos=12
-      vars=line[fvarpos:].split(",")
-      pcmd=""
-      arr=False
-      for v in vars:
-        if("[" in v):
-          vname="".join(v.split("[")[0])
-          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
-          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
-          arr=True
-          dim=1
-          pcmd+=vname+"=np.array((1+"+vdim1+")*["
-          if("]" in v):
+          fvarpos=9
+        vars=line[fvarpos:].split(",")
+        pcmd=""
+        arr=False
+        for v in vars:
+          if("[" in v):
+            vname="".join(v.split("[")[0])
+            vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+            pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+            arr=True
+            dim=1
+            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            if("]" in v):
+              arr=False
+              pcmd+="int"+("]")+")\n"+" "*(nsp)
+          elif("]" in v):
+            dim+=1
             arr=False
-            pcmd+="float"+("]")+")\n"+" "*(nsp)
-        elif("]" in v):
-          dim+=1
-          arr=False
-          pcmd+="(1+"+v[:-1]+")*[float"+("]")*dim+")\n"+" "*(nsp)
-        elif(arr):
-          dim+=1
-          pcmd+="(1+"+v+")*["
+            pcmd+="(1+"+v[:-1]+")*[int"+("]")*dim+")\n"+" "*(nsp)
+          elif(arr):
+            dim+=1
+            pcmd+="(1+"+v+")*["
+          else:
+            pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
+      elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):   #TYPES FLOAT
+        if(cmd[12]==' '):
+          fvarpos=13
         else:
-          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
-    elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):   #TYPES STR
-      if(cmd[11]==' '):
-        fvarpos=12
-      else:
-        fvarpos=11
-      vars=line[fvarpos:].split(",")
-      pcmd=""
-      arr=False
-      for v in vars:
-        if("[" in v):
-          vname="".join(v.split("[")[0])
-          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
-          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
-          arr=True
-          dim=1
-          pcmd+=vname+"=np.array((1+"+vdim1+")*["
-          if("]" in v):
+          fvarpos=12
+        vars=line[fvarpos:].split(",")
+        pcmd=""
+        arr=False
+        for v in vars:
+          if("[" in v):
+            vname="".join(v.split("[")[0])
+            vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+            pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+            arr=True
+            dim=1
+            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            if("]" in v):
+              arr=False
+              pcmd+="float"+("]")+")\n"+" "*(nsp)
+          elif("]" in v):
+            dim+=1
             arr=False
-            pcmd+="str"+("]")+")\n"+" "*(nsp)
-        elif("]" in v):
-          dim+=1
-          arr=False
-          pcmd+="(1+"+v[:-1]+")*[str"+("]")*dim+")\n"+" "*(nsp)
-        elif(arr):
-          dim+=1
-          pcmd+="(1+"+v+")*["
+            pcmd+="(1+"+v[:-1]+")*[float"+("]")*dim+")\n"+" "*(nsp)
+          elif(arr):
+            dim+=1
+            pcmd+="(1+"+v+")*["
+          else:
+            pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
+      elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):   #TYPES STR
+        if(cmd[11]==' '):
+          fvarpos=12
         else:
-          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
-    elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):   #TYPES BOOL
-      if(cmd[8]==' '):
-        fvarpos=9
-      else:
-        fvarpos=8
-      vars=line[fvarpos:].split(",")
-      pcmd=""
-      arr=False
-      for v in vars:
-        if("[" in v):
-          vname="".join(v.split("[")[0])
-          vdim1="".join([c for c in v.split("[")[1] if c!="]"])
-          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
-          arr=True
-          dim=1
-          pcmd+=vname+"=np.array((1+"+vdim1+")*["
-          if("]" in v):
+          fvarpos=11
+        vars=line[fvarpos:].split(",")
+        pcmd=""
+        arr=False
+        for v in vars:
+          if("[" in v):
+            vname="".join(v.split("[")[0])
+            vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+            pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+            arr=True
+            dim=1
+            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            if("]" in v):
+              arr=False
+              pcmd+="str"+("]")+")\n"+" "*(nsp)
+          elif("]" in v):
+            dim+=1
             arr=False
-            pcmd+="bool"+("]")+")\n"+" "*(nsp)
-        elif("]" in v):
-          dim+=1
-          arr=False
-          pcmd+="(1+"+v[:-1]+")*[bool"+("]")*dim+")\n"+" "*(nsp)
-        elif(arr):
-          dim+=1
-          pcmd+="(1+"+v+")*["
+            pcmd+="(1+"+v[:-1]+")*[str"+("]")*dim+")\n"+" "*(nsp)
+          elif(arr):
+            dim+=1
+            pcmd+="(1+"+v+")*["
+          else:
+            pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
+      elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):   #TYPES BOOL
+        if(cmd[8]==' '):
+          fvarpos=9
         else:
-          pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=bool\n"+" "*(nsp)
-    elif(cmd[:7]==list("ΔΙΑΒΑΣΕ")):      #INPUT
-      temp=list(line[8:])
-      parr=False
-      for i in range(len(temp)):
-        if(temp[i]=='['):
-          parr=True
-        elif(parr and temp[i]==','):
-          temp[i]=']['
-        elif(temp[i]==']'):
-          parr=False
-      temp="".join(temp)
-      vars=temp.split(",")
-      pcmd=",".join(vars)+"="
-      for v in vars:
-        pcmd+=("f.Rinput("+str(v)+"),")*(randIN)+"f.TCinput(),"*(1-randIN)
-      pcmd=pcmd[:-1]
-    elif(cmd[:2]==list("ΑΝ")):           #IF
-      block=True
-      pcmd="if("
-      if(cmd[-4:]!=list("ΤΟΤΕ")):
-        print(nl,":  λείπει η λέξη ΤΟΤΕ\n")
-        cmd.append(" ΤΟΤΕ")
-      pcmd+=xpr(cmd[3:-5])+"):"
-    elif(cmd[:9]==list("ΑΛΛΙΩΣ_ΑΝ")):           #ELIF
-      block=True
-      nsp-=2
-      pcmd="elif("
-      if(cmd[-4:]!=list("ΤΟΤΕ")):
-        print(nl,":  λείπει η λέξη ΤΟΤΕ\n")
-        cmd.append(" ΤΟΤΕ")
-      pcmd+=xpr(cmd[10:-5])+"):"
-    elif(cmd[:6]==list("ΑΛΛΙΩΣ")):           #ELSE
-      block=True
-      nsp-=2
-      pcmd="else:"
-    elif(cmd[:8]==list("ΤΕΛΟΣ_ΑΝ")):    #ENDIF
-      deblock=True
-    elif(cmd[:3]==list("ΟΣΟ")):           #WHILE
-      block=True
-      pcmd="while("
-      if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
-        print(nl,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
-        cmd.append(" ΤΟΤΕ")
-      pcmd+=xpr(cmd[4:-10])+"):"
-    elif(cmd[:3]==list("ΓΙΑ")):           # FOR #
-      block=True
-      pos1=4
-      while(pos1<len(cmd)):
-        if(cmd[pos1:pos1+3]==list("ΑΠΟ")):
-          break
-        pos1+=1
-      pos2=pos1+4
-      while(pos2<len(cmd)):
-        if(cmd[pos2:pos2+5]==list("ΜΕΧΡΙ")):
-          break
-        pos2+=1
-      pos3=pos2+6
-      while(pos3<len(cmd)):
-        if(cmd[pos3:pos3+7]==list("ΜΕ_ΒΗΜΑ")):
-          break
-        pos3+=1
-      pos4=pos3+8
-      
-      flag=xpr(cmd[pos2+6:pos3])
-      if(flag[-1]==' '):
-         flag=flag[:-1]
-      flag+="<"+xpr(cmd[pos1+4:pos2])
-      if(flag[-1]==' '):
-        flag=flag[:-1]
-      pcmd="correction=1-2*("+flag+")\n"+" "*nsp
-      pcmd+="for "
-      pcmd+=xpr(cmd[4:pos1])+" in range("
-      pcmd+=xpr(cmd[pos1+4:pos2])+","
-      if("ΜΕ_ΒΗΜΑ" in line):
-        pcmd+=xpr(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
+          fvarpos=8
+        vars=line[fvarpos:].split(",")
+        pcmd=""
+        arr=False
+        for v in vars:
+          if("[" in v):
+            vname="".join(v.split("[")[0])
+            vdim1="".join([c for c in v.split("[")[1] if c!="]"])
+            pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
+            arr=True
+            dim=1
+            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            if("]" in v):
+              arr=False
+              pcmd+="bool"+("]")+")\n"+" "*(nsp)
+          elif("]" in v):
+            dim+=1
+            arr=False
+            pcmd+="(1+"+v[:-1]+")*[bool"+("]")*dim+")\n"+" "*(nsp)
+          elif(arr):
+            dim+=1
+            pcmd+="(1+"+v+")*["
+          else:
+            pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=bool\n"+" "*(nsp)
+      elif(cmd[:7]==list("ΔΙΑΒΑΣΕ")):      #INPUT
+        temp=list(line[8:])
+        parr=False
+        for i in range(len(temp)):
+          if(temp[i]=='['):
+            parr=True
+          elif(parr and temp[i]==','):
+            temp[i]=']['
+          elif(temp[i]==']'):
+            parr=False
+        temp="".join(temp)
+        vars=temp.split(",")
+        pcmd=",".join(vars)+"="
+        for v in vars:
+          pcmd+=("f.Rinput("+str(v)+"),")*(randIN)+"f.TCinput(),"*(1-randIN)
+        pcmd=pcmd[:-1]
+      elif(cmd[:2]==list("ΑΝ")):           #IF
+        block=True
+        pcmd="if("
+        if(cmd[-4:]!=list("ΤΟΤΕ")):
+          print(nl,":  λείπει η λέξη ΤΟΤΕ\n")
+          cmd.append(" ΤΟΤΕ")
+        pcmd+=xpr(cmd[3:-5])+"):"
+      elif(cmd[:9]==list("ΑΛΛΙΩΣ_ΑΝ")):           #ELIF
+        block=True
+        nsp-=2
+        pcmd="elif("
+        if(cmd[-4:]!=list("ΤΟΤΕ")):
+          print(nl,":  λείπει η λέξη ΤΟΤΕ\n")
+          cmd.append(" ΤΟΤΕ")
+        pcmd+=xpr(cmd[10:-5])+"):"
+      elif(cmd[:6]==list("ΑΛΛΙΩΣ")):           #ELSE
+        block=True
+        nsp-=2
+        pcmd="else:"
+      elif(cmd[:8]==list("ΤΕΛΟΣ_ΑΝ")):    #ENDIF
+        deblock=True
+      elif(cmd[:3]==list("ΟΣΟ")):           #WHILE
+        block=True
+        pcmd="while("
+        if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
+          print(nl,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
+          cmd.append(" ΤΟΤΕ")
+        pcmd+=xpr(cmd[4:-10])+"):"
+      elif(cmd[:3]==list("ΓΙΑ")):           # FOR #
+        block=True
+        pos1=4
+        while(pos1<len(cmd)):
+          if(cmd[pos1:pos1+3]==list("ΑΠΟ")):
+            break
+          pos1+=1
+        pos2=pos1+4
+        while(pos2<len(cmd)):
+          if(cmd[pos2:pos2+5]==list("ΜΕΧΡΙ")):
+            break
+          pos2+=1
+        pos3=pos2+6
+        while(pos3<len(cmd)):
+          if(cmd[pos3:pos3+7]==list("ΜΕ_ΒΗΜΑ")):
+            break
+          pos3+=1
+        pos4=pos3+8
+
+        flag=xpr(cmd[pos2+6:pos3])
+        if(flag[-1]==' '):
+           flag=flag[:-1]
+        flag+="<"+xpr(cmd[pos1+4:pos2])
+        if(flag[-1]==' '):
+          flag=flag[:-1]
+        pcmd="correction=1-2*("+flag+")\n"+" "*nsp
+        pcmd+="for "
+        pcmd+=xpr(cmd[4:pos1])+" in range("
+        pcmd+=xpr(cmd[pos1+4:pos2])+","
+        if("ΜΕ_ΒΗΜΑ" in line):
+          pcmd+=xpr(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
+        else:
+          pcmd+=xpr(cmd[pos2+6:])+"+1):"
+      elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
+        deblock=True
+      elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DO
+        block=True
+        pcmd="while(True):"
+      elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
+        deblock=True
+        pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
+      elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           # MAIN
+        block=True
+        mblock=True
+        exe=True
+        pcmd="def main():\n  try:"
+      elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
+        #deblock=True
+        #mdeblock=True
+        nsp=0
+        pcmd="  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))"
+        pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
+      elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
+        fblock=True
+        block=True
+        pcmd="def "
+        cmd=cmd[10:]
+        for tpos in range(len(cmd)):
+          if(cmd[tpos]==":"):
+            break
+        fname=""
+        for i in cmd:
+          if(i=="("):
+            break
+          fname+=i
+        ftypos="".join(cmd[tpos+1:])
+        if ftypos[0]==" ":
+          ftypos=ftypos[1:]
+        if ftypos=="ΑΚΕΡΑΙΑ":
+          ftypos=int
+        elif ftypos=="ΠΡΑΓΜΑΤΙΚΗ":
+          ftypos=float
+        elif ftypos=="ΧΑΡΑΚΤΗΡΑΣ":
+          ftypos=str
+        else:         #ΛΟΓΙΚΗ
+          ftypos=bool
+
+        pcmd+=fname+"("
+        vargs="".join(cmd[len(fname)+1:tpos-1]).split(",")
+        for a in vargs:
+          pcmd+=a+","
+        pcmd=pcmd[:-1]+"):\n  " #function parameter list
+
+        pcmd+="#"+str(ftypos)+"\n  "
+
+        for a in vargs:
+          pcmd+="_"+a+","
+        pcmd=pcmd[:-1]+"="  #backup values for mutable
+        for a in vargs:
+          pcmd+=a+","
+        pcmd=pcmd[:-1]
+      elif(fblock and fname in line):                   #RETURN
+        pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]
+      elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
+        for a in vargs:
+          pcmd+=a+","
+        pcmd=pcmd[:-1]+" = "  #restore values
+        for a in vargs:
+          pcmd+="_"+a+","
+        pcmd=pcmd[:-1]+"\n  "
+        pcmd+="return "+"_"+fname
+        deblock=True
+        fblock=False
+        fname=""
+        pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
+      elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
+        pblock=True
+        #fblock=True
+        block=True
+        pcmd="def "
+        cmd=cmd[11:]
+        fname=""
+        for i in cmd:
+          if(i=="("):
+            break
+          fname+=i
+        pcmd+=fname+"("
+        vargs="".join(cmd[len(fname)+1:-1]).split(",")
+        for a in vargs:
+          pcmd+=a+","
+        pcmd=pcmd[:-1]+"):"
+      elif(cmd[:17]==list("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
+        pblock=False
+        deblock=True
+        #fblock=False
+        fname=""
+        pcmd="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
+      elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
+        for i in range(len(cmd)):
+          if cmd[i]=="(":
+            break
+        fname="".join(cmd[7:i])
+        pV=[v for v in "".join(cmd[i+1:-1]).split(",")]
+        pcmd=""
+        for v in pV:
+          pcmd+=v+","
+        pcmd=pcmd[:-1]+"="
+        for v in pV:
+          pcmd+="["+v+"],"
+        pcmd=pcmd[:-1]+"\n"                               #load
+        pcmd+=" "*(nsp)+"".join(cmd[7:])+"\n"+" "*(nsp)   #call
+        for v in pV:                                      #unload
+          pcmd+=v+","
+        pcmd=pcmd[:-1]+"="
+        for v in pV:
+          pcmd+=v+"[0],"
+        pcmd=pcmd[:-1]
+      elif(pblock):
+        pcmd=xpr(cmd,pblock,vargs)
       else:
-        pcmd+=xpr(cmd[pos2+6:])+"+1):"
-    elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
-      deblock=True
-    elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DO
-      block=True
-      pcmd="while(True):"
-    elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
-      deblock=True
-      pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
-    elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           # MAIN
-      block=True
-      mblock=True
-      pcmd="def main():"
-    elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
-      deblock=True
-      pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
-    elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
-      fblock=True
-      block=True
-      pcmd="def "
-      cmd=cmd[10:]
-      for tpos in range(len(cmd)):
-        if(cmd[tpos]==":"):
-          break
-      fname=""
-      for i in cmd:
-        if(i=="("):
-          break
-        fname+=i
-      ftypos="".join(cmd[tpos+1:])
-      if ftypos[0]==" ":
-        ftypos=ftypos[1:]
-      if ftypos=="ΑΚΕΡΑΙΑ":
-        ftypos=int
-      elif ftypos=="ΠΡΑΓΜΑΤΙΚΗ":
-        ftypos=float
-      elif ftypos=="ΧΑΡΑΚΤΗΡΑΣ":
-        ftypos=str
-      else:         #ΛΟΓΙΚΗ
-        ftypos=bool
+        pcmd=xpr(cmd)
 
-      pcmd+=fname+"("
-      vargs="".join(cmd[len(fname)+1:tpos-1]).split(",")
-      for a in vargs:
-        pcmd+=a+","
-      pcmd=pcmd[:-1]+"):\n  " #function parameter list
-
-      pcmd+="#"+str(ftypos)+"\n  "
-
-      for a in vargs:
-        pcmd+="_"+a+","
-      pcmd=pcmd[:-1]+"="  #backup values for mutable
-      for a in vargs:
-        pcmd+=a+","
-      pcmd=pcmd[:-1]
-    elif(fblock and fname in line):             #RETURN
-      pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]
-    elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):    #ENDFUNCTION
-      for a in vargs:
-        pcmd+=a+","
-      pcmd=pcmd[:-1]+" = "  #restore values
-      for a in vargs:
-        pcmd+="_"+a+","
-      pcmd=pcmd[:-1]+"\n  "
-      pcmd+="return "+"_"+fname
-      deblock=True
-      fblock=False
-      fname=""
-      pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
-    elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
-      pblock=True
-      fblock=True
-      block=True
-      pcmd="def "
-      cmd=cmd[11:]
-      fname=""
-      for i in cmd:
-        if(i=="("):
-          break
-        fname+=i
-      pcmd+=fname+"("
-      vargs="".join(cmd[len(fname)+1:-1]).split(",")
-      for a in vargs:
-        pcmd+=a+","
-      pcmd=pcmd[:-1]+"):"
-    elif(cmd[:17]==list("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
-      pblock=False
-      deblock=True
-      fblock=False
-      fname=""
-      pcmd="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
-    elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
-      for i in range(len(cmd)):
-        if cmd[i]=="(":
-          break
-      fname="".join(cmd[7:i])
-      pV=[v for v in "".join(cmd[i+1:-1]).split(",")]
-      pcmd=""
-      for v in pV:
-        pcmd+=v+","
-      pcmd=pcmd[:-1]+"="
-      for v in pV:
-        pcmd+="["+v+"],"
-      pcmd=pcmd[:-1]+"\n"   #load
-      pcmd+=" "*(nsp)+"".join(cmd[7:])+"\n"+" "*(nsp)   #call
-      for v in pV:    #unload
-        pcmd+=v+","
-      pcmd=pcmd[:-1]+"="
-      for v in pV:
-        pcmd+=v+"[0],"
-      pcmd=pcmd[:-1]
-    elif(pblock):
-      pcmd=xpr(cmd,pblock,vargs)
-    else:
-      pcmd=xpr(cmd)
-
-    if(pcmd not in ["","\n"]):        # save line
-      fout.write(nsp*" "+pcmd+comment+"\n")
-    if(block):
-      nsp+=2
-      block=False
-    elif(deblock):
-      nsp-=2
-      deblock=False
-  fin.close()
-  fout.close()
+      if(pcmd not in ["","\n"]):              # save line
+        fout.write(nsp*" "+pcmd+comment+"\n")
+      if(block):
+        nsp+=2
+        block=False
+      elif(deblock):
+        nsp-=2
+        deblock=False
+      if(mblock):
+        nsp+=2
+        mblock=False
+      if(demblock):
+        #nsp-=2
+        demblock=False
+    fin.close()
+    fout.close()
+    print("...")
+  except:
+    print("exit with error...\n"+line)
+    return
   import source
   importlib.reload(source)
-  if(mblock):
-    source.main()
+  if(exe):
+    if(cmp):
+      with open('log'+aa,'w') as lfile:
+        with redirect_stdout(lfile):
+          source.main()
+    else:
+      source.main()
