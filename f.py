@@ -181,7 +181,7 @@ def interpret(randIN=True,cmp=False,aa=1):
   nsp=0
   nl=0
   ifN=whN=dwhN=0
-  exe=demblock=mblock=block=deblock=fblock=pblock=False
+  exe=tryblock=mblock=block=deblock=fblock=pblock=False
   errmsg=""
   vargs=[]
   fout.write('''import random as r\nimport math as m\nimport numpy as np\nimport f as f\n
@@ -419,9 +419,9 @@ def _init(A,B):
         pcmd+=xpr(cmd[4:pos1],pblock,vargs)+" in range("
         pcmd+=xpr(cmd[pos1+4:pos2],pblock,vargs)+","
         if("ΜΕ_ΒΗΜΑ" in line):
-          pcmd+=xpr(cmd[pos2+6:pos3],pblock,vargs)+"+correction,"+xpr(cmd[pos4:],pblock,vargs)+"):"#(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
+          pcmd+=xpr(cmd[pos2+6:pos3],pblock,vargs)+"+correction,"+xpr(cmd[pos4:],pblock,vargs)+"):"
         else:
-          pcmd+=xpr(cmd[pos2+6:],pblock,vargs)+" +1):"#(cmd[pos2+6:])+" +1):"
+          pcmd+=xpr(cmd[pos2+6:],pblock,vargs)+" +1):"
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
         whN-=1
         if(whN<0):          
@@ -438,13 +438,19 @@ def _init(A,B):
           errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         deblock=True
-        pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)+"):\n"+" "*(nsp+2)+"break"#(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
-      elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           # MAIN
+        pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
+        pcmd+="):\n"+" "*(nsp+2)+"break"
+      elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):                     # MAIN
+        if(fblock or pblock or tryblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+          raise Exception
         block=True
         mblock=True
+        tryblock=True
         exe=True
         pcmd="def main():\n  try:"
       elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
+        tryblock=False
         if(ifN!=0):
           errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ")
           raise Exception
@@ -455,6 +461,9 @@ def _init(A,B):
         pcmd="  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))"
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
       elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
+        if(fblock or pblock or tryblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+          raise Exception
         fblock=True
         block=True
         pcmd="def "
@@ -514,6 +523,9 @@ def _init(A,B):
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
       elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
+        if(fblock or pblock or tryblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+          raise Exception
         pblock=True
         block=True
         pcmd="def "
@@ -559,16 +571,14 @@ def _init(A,B):
         for v in pV:
           pcmd+=v+"[0],"
         pcmd=pcmd[:-1]
-      #elif(pblock):
-        #pcmd=xpr(cmd,pblock,vargs)
       elif("<--" in line):
-        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+        pcmd=xpr(cmd,pblock,vargs)
       elif("ΜΕΤΑΒΛΗΤΕΣ" in line):
-        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+        pcmd=xpr(cmd,pblock,vargs)
       elif("ΑΡΧΗ" in line):
-        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+        pcmd=xpr(cmd,pblock,vargs)
       elif("_" in line[:1]):
-        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+        pcmd=xpr(cmd,pblock,vargs)
       else:
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
         raise Exception
@@ -585,9 +595,11 @@ def _init(A,B):
         nsp+=2
         mblock=False
 
+    if(fblock+pblock+tryblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
+      errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+      raise Exception
     fin.close()
     fout.close()
-    #print(">")
   except:
     print("[error] "+errmsg+"\n> "+str(nl+1)+". "+line)
     return
@@ -595,7 +607,7 @@ def _init(A,B):
   importlib.reload(source)
   if(exe):
     if(cmp):
-      with open('log'+aa,'w') as lfile:
+      with open('log'+str(aa),'w') as lfile:
         with redirect_stdout(lfile):
           source.main()
     else:
