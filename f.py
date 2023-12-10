@@ -180,9 +180,11 @@ def interpret(randIN=True,cmp=False,aa=1):
   fout=open(fname+".py",'w')
   nsp=0
   nl=0
+  ifN=whN=dwhN=0
   exe=demblock=mblock=block=deblock=fblock=pblock=False
-  fout.write("import random as r\nimport math as m\nimport numpy as np\nimport f as f\n\n")
-  fout.write('''
+  errmsg=""
+  vargs=[]
+  fout.write('''import random as r\nimport math as m\nimport numpy as np\nimport f as f\n
 def _init(A,B):
   X=B.split(',')
   if(A[0]==int):
@@ -211,12 +213,18 @@ def _init(A,B):
       line=[w for w in line.split(" ") if w!=""]
       line=" ".join(line)
       cmd=[c for c in line]
-      if(cmd[:7]==list("ΓΡΑΨΕ2")):       #print2D
-        pcmd="f.print2D("+xpr(cmd[8:])+")"
-      if(cmd[:6]==list("ΓΡΑΨΕ_")):       #print end=' '
-        pcmd="print("+xpr(cmd[7:])+",end=\" \")"
-      elif(cmd[:5]==list("ΓΡΑΨΕ")):       #PRINT
-        pcmd="print("+xpr(cmd[6:])+")"
+
+      if(line in " \n"):
+        pcmd=xpr(cmd,pblock,vargs)
+      elif(line[-1] in ",.@#$%^*(+={}[;:?/|"):
+        errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
+        raise Exception
+      elif(cmd[:7]==list("ΓΡΑΨΕ2")):       #print2D
+        pcmd="f.print2D("+xpr(cmd[8:],pblock,vargs)+")"
+      elif(cmd[:6]==list("ΓΡΑΨΕ_")):       #print(line,end=' ')
+        pcmd="print("+xpr(cmd[7:],pblock,vargs)+",end=\" \")"
+      elif(cmd[:5]==list("ΓΡΑΨΕ")):                             #PRINT
+        pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
 
       elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
         if(cmd[9]==' '):
@@ -347,35 +355,43 @@ def _init(A,B):
           pcmd+=("f.Rinput("+str(v)+"),")*(randIN)+"f.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
       elif(cmd[:2]==list("ΑΝ")):           #IF
+        ifN+=1
         block=True
         pcmd="if("
         if(cmd[-4:]!=list("ΤΟΤΕ")):
-          #print(nl+1,":  λείπει η λέξη ΤΟΤΕ\n")
-          raise Exception #cmd.append(" ΤΟΤΕ")
-        pcmd+=xpr(cmd[3:-5])+"):"
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
+          raise Exception
+        pcmd+=xpr(cmd[3:-5],pblock,vargs)+"):"
       elif(cmd[:9]==list("ΑΛΛΙΩΣ_ΑΝ")):           #ELIF
         block=True
         nsp-=2
         pcmd="elif("
         if(cmd[-4:]!=list("ΤΟΤΕ")):
-          #print(nl+1,":  λείπει η λέξη ΤΟΤΕ\n")
-          raise Exception #cmd.append(" ΤΟΤΕ")
-        pcmd+=xpr(cmd[10:-5])+"):"
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
+          raise Exception
+        pcmd+=xpr(cmd[10:-5],pblock,vargs)+"):"
       elif(cmd[:6]==list("ΑΛΛΙΩΣ")):           #ELSE
         block=True
         nsp-=2
         pcmd="else:"
       elif(cmd[:8]==list("ΤΕΛΟΣ_ΑΝ")):    #ENDIF
+        ifN-=1
+        if(ifN<0):
+          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
+          raise Exception
         deblock=True
       elif(cmd[:3]==list("ΟΣΟ")):           #WHILE
+        whN+=1
         block=True
         pcmd="while("
         if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
-          #print(nl+1,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
-          raise Exception #cmd.append(" ΕΠΑΝΑΛΑΒΕ")
-        pcmd+=xpr(cmd[4:-10])+"):"
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
+          raise Exception
+        pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):"
       elif(cmd[:3]==list("ΓΙΑ")):           # FOR #
+        whN+=1
         if("ΑΠΟ" not in line or "ΜΕΧΡΙ" not in line):
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
           raise Exception
         block=True
         pos1=4
@@ -396,30 +412,45 @@ def _init(A,B):
         pos4=pos3+8
         
         if("ΜΕ_ΒΗΜΑ" in line):
-          pcmd="correction=1-2*("+xpr(cmd[pos4:])+"<0)\n"+" "*nsp
+          pcmd="correction=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
         else:
           pcmd="correction=1\n"+" "*nsp
         pcmd+="for "
-        pcmd+=xpr(cmd[4:pos1])+" in range("
-        pcmd+=xpr(cmd[pos1+4:pos2])+","
+        pcmd+=xpr(cmd[4:pos1],pblock,vargs)+" in range("
+        pcmd+=xpr(cmd[pos1+4:pos2],pblock,vargs)+","
         if("ΜΕ_ΒΗΜΑ" in line):
-          pcmd+=xpr(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
+          pcmd+=xpr(cmd[pos2+6:pos3],pblock,vargs)+"+correction,"+xpr(cmd[pos4:],pblock,vargs)+"):"#(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
         else:
-          pcmd+=xpr(cmd[pos2+6:])+" +1):"
+          pcmd+=xpr(cmd[pos2+6:],pblock,vargs)+" +1):"#(cmd[pos2+6:])+" +1):"
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
+        whN-=1
+        if(whN<0):          
+          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          raise Exception
         deblock=True
       elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DO
+        dwhN+=1
         block=True
         pcmd="while(True):"
       elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
+        dwhN-=1
+        if(dwhN<0):          
+          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          raise Exception
         deblock=True
-        pcmd="if("+xpr(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
+        pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)+"):\n"+" "*(nsp+2)+"break"#(list("".join(cmd[12:])))+"):\n"+" "*(nsp+2)+"break"
       elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):           # MAIN
         block=True
         mblock=True
         exe=True
         pcmd="def main():\n  try:"
       elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
+        if(ifN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ")
+          raise Exception
+        if(dwhN+whN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ")
+          raise Exception
         nsp=0
         pcmd="  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))"
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
@@ -465,6 +496,12 @@ def _init(A,B):
       elif(fblock and fname in line):                   #RETURN
         pcmd="_"+fname+" ="+xpr(cmd[len(fname):])[2:]
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
+        if(ifN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ")
+          raise Exception
+        if(dwhN+whN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ")
+          raise Exception
         for a in vargs:
           pcmd+=a+","
         pcmd=pcmd[:-1]+" = "  #restore values
@@ -492,6 +529,12 @@ def _init(A,B):
           pcmd+=a+","
         pcmd=pcmd[:-1]+"):"
       elif(cmd[:17]==list("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
+        if(ifN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ")
+          raise Exception
+        if(dwhN+whN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ")
+          raise Exception
         pblock=False
         deblock=True
         fname=""
@@ -516,12 +559,19 @@ def _init(A,B):
         for v in pV:
           pcmd+=v+"[0],"
         pcmd=pcmd[:-1]
-      elif(pblock):
-        pcmd=xpr(cmd,pblock,vargs)
+      #elif(pblock):
+        #pcmd=xpr(cmd,pblock,vargs)
+      elif("<--" in line):
+        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+      elif("ΜΕΤΑΒΛΗΤΕΣ" in line):
+        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+      elif("ΑΡΧΗ" in line):
+        pcmd=xpr(cmd,pblock,vargs)#(cmd)
+      elif("_" in line[:1]):
+        pcmd=xpr(cmd,pblock,vargs)#(cmd)
       else:
-        if("<--" not in line and "ΜΕΤΑΒΛΗΤΕΣ" not in line and "ΑΡΧΗ" not in line and "\n" not in line and line[0]!="_"):
-          raise Exception
-        pcmd=xpr(cmd)
+        errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
+        raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
         fout.write(nsp*" "+pcmd+comment+"\n")
@@ -539,7 +589,7 @@ def _init(A,B):
     fout.close()
     #print(">")
   except:
-    print("exit with error...\n> "+str(nl+1)+". "+line)
+    print("[error] "+errmsg+"\n> "+str(nl+1)+". "+line)
     return
   import source
   importlib.reload(source)
