@@ -350,16 +350,16 @@ def _init(A,B):
         block=True
         pcmd="if("
         if(cmd[-4:]!=list("ΤΟΤΕ")):
-          print(nl,":  λείπει η λέξη ΤΟΤΕ\n")
-          cmd.append(" ΤΟΤΕ")
+          #print(nl+1,":  λείπει η λέξη ΤΟΤΕ\n")
+          raise Exception #cmd.append(" ΤΟΤΕ")
         pcmd+=xpr(cmd[3:-5])+"):"
       elif(cmd[:9]==list("ΑΛΛΙΩΣ_ΑΝ")):           #ELIF
         block=True
         nsp-=2
         pcmd="elif("
         if(cmd[-4:]!=list("ΤΟΤΕ")):
-          print(nl,":  λείπει η λέξη ΤΟΤΕ\n")
-          cmd.append(" ΤΟΤΕ")
+          #print(nl+1,":  λείπει η λέξη ΤΟΤΕ\n")
+          raise Exception #cmd.append(" ΤΟΤΕ")
         pcmd+=xpr(cmd[10:-5])+"):"
       elif(cmd[:6]==list("ΑΛΛΙΩΣ")):           #ELSE
         block=True
@@ -371,10 +371,12 @@ def _init(A,B):
         block=True
         pcmd="while("
         if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
-          print(nl,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
-          cmd.append(" ΤΟΤΕ")
+          #print(nl+1,":  λείπει η λέξη ΕΠΑΝΑΛΑΒΕ\n")
+          raise Exception #cmd.append(" ΕΠΑΝΑΛΑΒΕ")
         pcmd+=xpr(cmd[4:-10])+"):"
       elif(cmd[:3]==list("ΓΙΑ")):           # FOR #
+        if("ΑΠΟ" not in line or "ΜΕΧΡΙ" not in line):
+          raise Exception
         block=True
         pos1=4
         while(pos1<len(cmd)):
@@ -392,21 +394,18 @@ def _init(A,B):
             break
           pos3+=1
         pos4=pos3+8
-
-        flag=xpr(cmd[pos2+6:pos3])
-        if(flag[-1]==' '):
-           flag=flag[:-1]
-        flag+="<"+xpr(cmd[pos1+4:pos2])
-        if(flag[-1]==' '):
-          flag=flag[:-1]
-        pcmd="correction=1-2*("+flag+")\n"+" "*nsp
+        
+        if("ΜΕ_ΒΗΜΑ" in line):
+          pcmd="correction=1-2*("+xpr(cmd[pos4:])+"<0)\n"+" "*nsp
+        else:
+          pcmd="correction=1\n"+" "*nsp
         pcmd+="for "
         pcmd+=xpr(cmd[4:pos1])+" in range("
         pcmd+=xpr(cmd[pos1+4:pos2])+","
         if("ΜΕ_ΒΗΜΑ" in line):
           pcmd+=xpr(cmd[pos2+6:pos3])+"+correction,"+xpr(cmd[pos4:])+"):"
         else:
-          pcmd+=xpr(cmd[pos2+6:])+"+1):"
+          pcmd+=xpr(cmd[pos2+6:])+" +1):"
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
         deblock=True
       elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):    #DO
@@ -421,8 +420,6 @@ def _init(A,B):
         exe=True
         pcmd="def main():\n  try:"
       elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
-        #deblock=True
-        #mdeblock=True
         nsp=0
         pcmd="  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))"
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
@@ -481,7 +478,6 @@ def _init(A,B):
         pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
       elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
         pblock=True
-        #fblock=True
         block=True
         pcmd="def "
         cmd=cmd[11:]
@@ -498,7 +494,6 @@ def _init(A,B):
       elif(cmd[:17]==list("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
         pblock=False
         deblock=True
-        #fblock=False
         fname=""
         pcmd="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
       elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
@@ -524,6 +519,8 @@ def _init(A,B):
       elif(pblock):
         pcmd=xpr(cmd,pblock,vargs)
       else:
+        if("<--" not in line and "ΜΕΤΑΒΛΗΤΕΣ" not in line and "ΑΡΧΗ" not in line and "\n" not in line and line[0]!="_"):
+          raise Exception
         pcmd=xpr(cmd)
 
       if(pcmd not in ["","\n"]):              # save line
@@ -537,14 +534,12 @@ def _init(A,B):
       if(mblock):
         nsp+=2
         mblock=False
-      if(demblock):
-        #nsp-=2
-        demblock=False
+
     fin.close()
     fout.close()
-    print("...")
+    #print(">")
   except:
-    print("exit with error...\n"+line)
+    print("exit with error...\n> "+str(nl+1)+". "+line)
     return
   import source
   importlib.reload(source)
