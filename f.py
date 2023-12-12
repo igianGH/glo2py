@@ -2,6 +2,23 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
+def evaluate():
+  interpret(segment=True)
+
+def compare(fn1="source1",fn2="source2"):
+  interpret(fname=fn1,cmp=True,aa=1)
+  interpret(fname=fn2,cmp=True,aa=2)
+  f1,f2=open("log1",'r'),open("log2",'r')
+  l1,l2=(line for line in f1),(line for line in f2)
+  try:
+    while(True):
+      line1,line2 = next(l1),next(l2)
+      if(line1!=line2):
+        print(line1[:-1]+" | "+line2)
+  except StopIteration:
+    f1.close()
+    f2.close()
+
 iset,fset,cset,bset={},{},{},{}
 def ΤΥΠΟΣ(v):
   global iset,fset,cset,bset
@@ -173,11 +190,10 @@ def xpr(s,pblock=False,v=[]):
         pcmd+=s.pop(0)
   return(pcmd)
 
-def interpret(randIN=True,cmp=False,aa=1):
-  fname="source"
+def interpret(fname="source",randIN=True,cmp=False,aa=1,segment=False):
   import importlib
   fin=open(fname,'r')
-  fout=open(fname+".py",'w')
+  fout=open("source"+".py",'w') #import conflict
   nsp=0
   nl=0
   ifN=whN=dwhN=0
@@ -196,6 +212,10 @@ def _init(A,B):
   else:
     A[1:]=X
 \n''')
+  if(segment):
+    nsp=4
+    exe=True
+    fout.write("def main():\n  try:\n")
   try:
     for line in fin:
       pcmd=""
@@ -410,7 +430,7 @@ def _init(A,B):
             break
           pos3+=1
         pos4=pos3+8
-        
+
         if("ΜΕ_ΒΗΜΑ" in line):
           pcmd="correction=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
         else:
@@ -424,7 +444,7 @@ def _init(A,B):
           pcmd+=xpr(cmd[pos2+6:],pblock,vargs)+" +1):"
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
         whN-=1
-        if(whN<0):          
+        if(whN<0):
           errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         deblock=True
@@ -434,7 +454,7 @@ def _init(A,B):
         pcmd="while(True):"
       elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ")):  #_WHILE
         dwhN-=1
-        if(dwhN<0):          
+        if(dwhN<0):
           errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         deblock=True
@@ -595,6 +615,10 @@ def _init(A,B):
         nsp+=2
         mblock=False
 
+    if(segment):
+      nsp=0
+      tryblock=0
+      fout.write("  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))")
     if(fblock+pblock+tryblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
       errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
       raise Exception
