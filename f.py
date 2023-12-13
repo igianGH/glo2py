@@ -181,7 +181,7 @@ def xpr(s,pblock=False,v=[]):
             pcmd+=i+"[0]"
             s=s[len(i):]
             break
-          elif len(s)>len(i) and list(i)==s[:len(i)] and s[len(i)] in " +-*/^()=<>[":
+          elif len(s)>len(i) and list(i)==s[:len(i)] and s[len(i)] in " +-*/^()=<>[\n":
             iINs=True
             pcmd+=i+"[0]"
             s=s[len(i):]
