@@ -1,13 +1,27 @@
+import traceback
+import sys
 import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
 def evaluate():
-  interpret(segment=True)
+  interpretM(segment=True)
+
+def interpret():
+  try:
+    interpretM()
+  except:
+    print("ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ")
+    errmsg=str(sys.exc_info()[1])
+    iline=errmsg.find("line")
+    nline=int(errmsg[iline+5:-1])
+    trb=str(traceback.format_exc())
+    ierr=trb.find("line "+str(nline))
+    print(">"+trb[ierr+9:])
 
 def compare(fn1="source1",fn2="source2"):
-  interpret(fname=fn1,cmp=True,aa=1)
-  interpret(fname=fn2,cmp=True,aa=2)
+  interpretM(fname=fn1,cmp=True,aa=1)
+  interpretM(fname=fn2,cmp=True,aa=2)
   f1,f2=open("log1",'r'),open("log2",'r')
   l1,l2=(line for line in f1),(line for line in f2)
   try:
@@ -190,15 +204,16 @@ def xpr(s,pblock=False,v=[]):
         pcmd+=s.pop(0)
   return(pcmd)
 
-def interpret(fname="source",randIN=True,cmp=False,aa=1,segment=False):
+def interpretM(fname="source",randIN=True,cmp=False,aa=1,segment=False):
   import importlib
   fin=open(fname,'r')
   fout=open("source"+".py",'w') #import conflict
   nsp=0
   nl=0
+  pline=""
   ifN=whN=dwhN=0
   exe=tryblock=mblock=block=deblock=fblock=pblock=False
-  errmsg=""
+  errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
   vargs=[]
   fout.write('''import random as r\nimport math as m\nimport numpy as np\nimport f as f\n
 def _init(A,B):
@@ -220,6 +235,9 @@ def _init(A,B):
     for line in fin:
       pcmd=""
       comment=""
+      if(pline!=""):
+        line=pline+line
+        pline=""
       for cmpos in range(len(line)):    #COMMENTS
         if(line[cmpos]=="!"):
           comment="   #"+line[cmpos+1:]
@@ -230,6 +248,41 @@ def _init(A,B):
           line=line[:i+1]
           break
       nl+=1
+      if(line!="" and line[-1]=='&'):
+        pline=line[:-1]
+        continue
+      while(True):
+        if("  " not in line):
+          break
+        dsp=line.find("  ")
+        line=line[:dsp]+line[dsp+1:]
+      if(",," in line or ".." in line or ", ," in line):
+        raise Exception
+      if(line.count('\"')%2==1 or line.count('\'')%2==1):
+        raise Exception
+      lpar=rpar=lc=rc=0
+      for i in line:
+        match i:
+          case '(':
+            lpar+=1
+          case ')':
+            rpar+=1
+          case '[':
+            lc+=1
+          case ']':
+            rc+=1
+        if(lpar<rpar):
+          errmsg="ΠΛΕΟΝΑΖΟΥΣΑ ΔΕΞΙΑ ΠΑΡΕΝΘΕΣΗ"
+          raise Exception
+        elif(lc<rc):
+          errmsg="ΠΛΕΟΝΑΖΟΥΣΑ ΔΕΞΙΑ ΑΓΚΥΛΗ"
+          raise Exception
+      if(lpar>rpar):
+        errmsg="ΑΝΟΙΧΤΟ ΜΠΛΟΚ ΠΑΡΕΝΘΕΣΕΩΝ"
+        raise Exception
+      if(lc>rc):
+        errmsg="ΑΝΟΙΧΤΟ ΜΠΛΟΚ ΑΓΚΥΛΩΝ"
+        raise Exception
       line=[w for w in line.split(" ") if w!=""]
       line=" ".join(line)
       cmd=[c for c in line]
@@ -624,7 +677,9 @@ def _init(A,B):
       raise Exception
     fin.close()
     fout.close()
-  except:
+  except Exception as e:
+    if(errmsg==""):
+      errmsg=getattr(e, 'message', repr(e))
     print("[error] "+errmsg+"\n> "+str(nl+1)+". "+line)
     return
   import source
