@@ -6,11 +6,11 @@ import importlib  #reload module
 from contextlib import redirect_stdout
 
 def evaluate():
-  interpretM(segment=True)
+  interpret(segment=True)
 
-def interpret(ftrb=False,dline=False):
+def interpret(ftrb=False,dline=False,segment=False):
   try:
-    interpretM()
+    interpretM(segment=segment)
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
