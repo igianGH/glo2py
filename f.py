@@ -8,20 +8,16 @@ from contextlib import redirect_stdout
 def evaluate():
   interpretM(segment=True)
 
-def interpret():
+def interpret(ftrb=False,dline=False):
   try:
     interpretM()
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
     trb=str(traceback.format_exc())
-    #print(">",trb)
     sb=trb[0:]
-    #while('%' in trb):
-      #print("% in trb\n")
-      #imod=trb.find('%')
-      #trb2=trb[:imod]+"MOD"+trb[imod+1:]
-      #print(trb2)
+    if(ftrb):
+      print("\n"+trb)
     ierr=trb.find("Error:")
     trb=trb[ierr:]
     if('%' in trb):
@@ -41,18 +37,32 @@ def interpret():
     print(errmsg2)
     #print(">",trb[ierr:])
     msnl=snl=0
-    with open("source.py",'r') as fin:
-      msize=0
-      for line in fin:
-        if("#//" in line):
-          snl=int(line[line.find("#//")+3:])
-        ics=dfl.SequenceMatcher(None,line,sb).find_longest_match()
-        if(msize<ics.size):
-          msize=ics.size
-          cssq=line
-          msnl=snl
-    if(msize>0):
-      with open("source",'r') as fin:
+    msnl=sb[:]
+    foundline=False
+    while("#//" in msnl):
+      foundline=True
+      msnl=msnl[msnl.find("#//")+3:]
+    if(foundline):
+      for i in range(len(msnl)):
+        if(msnl[i] not in "0123456789"):
+          msnl=msnl[:i]
+          break
+      msnl=int(msnl)
+      print("found line",msnl)
+    else:
+      with open("source.py",'r') as fin:
+        msize=0
+        for line in fin:
+          if("#//" in line):
+            snl=int(line[line.find("#//")+3:])
+          ics=dfl.SequenceMatcher(None,line,sb).find_longest_match()
+          if(msize<ics.size):
+            msize=ics.size
+            cssq=line
+            msnl=snl
+            #print("line",msnl)
+    if(foundline or msize>0):
+      safe='''with open("source",'r') as fin:
         snl=0+linecorr
         for line in fin:
           snl+=1
@@ -60,7 +70,27 @@ def interpret():
             while(line[0]==' '):
               line=line[1:]
             print(str(snl+1-linecorr)+". ",line)
+            break'''
+      fin=open("source",'r')
+      snl=linecorr
+      lines=(line for line in fin)
+      try:
+        while(True):
+          line=next(lines)
+          snl+=1
+          if(snl==msnl):
+            while(line[0]==' '):
+              line=line[1:]
+            print(str(snl+1-linecorr)+". ",line,end=' ')
+            line=next(lines)
+            snl+=1
+            while(line[0]==' '):
+              line=line[1:]
+            if(dline):
+              print(str(snl+1-linecorr)+". ",line)
             break
+      except StopIteration:
+        safe=""
 
 def compare(fn1="source1",fn2="source2"):
   interpretM(fname=fn1,cmp=True,aa=1)
@@ -252,7 +282,7 @@ def interpretM(fname="source",randIN=True,cmp=False,aa=1,segment=False):
   fin=open(fname,'r')
   fout=open("source"+".py",'w') #import conflict
   nsp=0
-  nl=0
+  nl=1#0
   pline=""
   ifN=whN=dwhN=0
   exe=tryblock=mblock=block=deblock=fblock=pblock=False
@@ -277,9 +307,9 @@ def _init(A,B):
     A[1:]=X
 \n''')
   if(segment):
-    nsp=2#4
+    nsp=2
     exe=True
-    fout.write("def main():\n")#  try:\n")
+    fout.write("def main():\n")
   try:
     for line in fin:
       pcmd=""
@@ -650,7 +680,7 @@ def _init(A,B):
         if(fblock or pblock or tryblock):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
           raise Exception
-        pblock=True
+        #pblock=True
         block=True
         pcmd="def "
         cmd=cmd[11:]
@@ -673,8 +703,12 @@ def _init(A,B):
           raise Exception
         pblock=False
         deblock=True
+        pcmd="return "                                      #procedure by return
+        for a in vargs:
+          pcmd+=a+','
+        pcmd=pcmd[:-1]
         fname=""
-        pcmd="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
+        pcmd+="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
       elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
         for i in range(len(cmd)):
           if cmd[i]=="(":
@@ -685,16 +719,17 @@ def _init(A,B):
         for v in pV:
           pcmd+=v+","
         pcmd=pcmd[:-1]+"="
-        for v in pV:
-          pcmd+="["+v+"],"
-        pcmd=pcmd[:-1]+"\n"                               #load
-        pcmd+=" "*(nsp)+"".join(cmd[7:])+"\n"+" "*(nsp)   #call
-        for v in pV:                                      #unload
-          pcmd+=v+","
-        pcmd=pcmd[:-1]+"="
-        for v in pV:
-          pcmd+=v+"[0],"
-        pcmd=pcmd[:-1]
+        #for v in pV:
+          #pcmd+="["+v+"],"
+        #pcmd=pcmd[:-1]+"\n"                               #load
+        pcmd+="".join(cmd[7:])
+        #pcmd+=" "*(nsp)+"".join(cmd[7:])+"\n"+" "*(nsp)   #call
+        #for v in pV:                                      #unload
+          #pcmd+=v+","
+        #pcmd=pcmd[:-1]+"="
+        #for v in pV:
+          #pcmd+=v+"[0],"
+        #pcmd=pcmd[:-1]
       elif("<--" in line):
         pcmd=xpr(cmd,pblock,vargs)
       elif("ΜΕΤΑΒΛΗΤΕΣ" in line):
