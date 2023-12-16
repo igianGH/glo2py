@@ -1,3 +1,4 @@
+import difflib as dfl
 import traceback
 import sys
 import random as r
@@ -11,13 +12,55 @@ def interpret():
   try:
     interpretM()
   except:
-    print("ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ")
+    errmsg2=""
     errmsg=str(sys.exc_info()[1])
-    iline=errmsg.find("line")
-    nline=int(errmsg[iline+5:-1])
     trb=str(traceback.format_exc())
-    ierr=trb.find("line "+str(nline))
-    print(">"+trb[ierr+9:])
+    #print(">",trb)
+    sb=trb[0:]
+    #while('%' in trb):
+      #print("% in trb\n")
+      #imod=trb.find('%')
+      #trb2=trb[:imod]+"MOD"+trb[imod+1:]
+      #print(trb2)
+    ierr=trb.find("Error:")
+    trb=trb[ierr:]
+    if('%' in trb):
+      imod=trb.find('%')
+      trb=trb[:imod]+"MOD"+trb[imod+1:]
+    if("yntax" in trb):
+      errmsg2+="> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ\n"
+      linecorr=0
+      if("comma" in trb):
+        errmsg2+="> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΚΟΜΜΑ?"
+      else:
+        errmsg2+="\n> "+trb
+    else:
+      linecorr=1
+      errmsg2+="> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ\n"
+      errmsg2+="> "+trb
+    print(errmsg2)
+    #print(">",trb[ierr:])
+    msnl=snl=0
+    with open("source.py",'r') as fin:
+      msize=0
+      for line in fin:
+        if("#//" in line):
+          snl=int(line[line.find("#//")+3:])
+        ics=dfl.SequenceMatcher(None,line,sb).find_longest_match()
+        if(msize<ics.size):
+          msize=ics.size
+          cssq=line
+          msnl=snl
+    if(msize>0):
+      with open("source",'r') as fin:
+        snl=0+linecorr
+        for line in fin:
+          snl+=1
+          if(snl>msnl):
+            while(line[0]==' '):
+              line=line[1:]
+            print(str(snl+1-linecorr)+". ",line)
+            break
 
 def compare(fn1="source1",fn2="source2"):
   interpretM(fname=fn1,cmp=True,aa=1)
@@ -215,7 +258,13 @@ def interpretM(fname="source",randIN=True,cmp=False,aa=1,segment=False):
   exe=tryblock=mblock=block=deblock=fblock=pblock=False
   errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
   vargs=[]
-  fout.write('''import random as r\nimport math as m\nimport numpy as np\nimport f as f\n
+  fout.write('''import random as r
+import math as m
+import numpy as np
+import f as f
+import sys
+import traceback
+
 def _init(A,B):
   X=B.split(',')
   if(A[0]==int):
@@ -228,9 +277,9 @@ def _init(A,B):
     A[1:]=X
 \n''')
   if(segment):
-    nsp=4
+    nsp=2#4
     exe=True
-    fout.write("def main():\n  try:\n")
+    fout.write("def main():\n")#  try:\n")
   try:
     for line in fin:
       pcmd=""
@@ -518,10 +567,10 @@ def _init(A,B):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
           raise Exception
         block=True
-        mblock=True
+        #mblock=True
         tryblock=True
         exe=True
-        pcmd="def main():\n  try:"
+        pcmd="def main():\n"#  try:"
       elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
         tryblock=False
         if(ifN!=0):
@@ -531,7 +580,9 @@ def _init(A,B):
           errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ")
           raise Exception
         nsp=0
-        pcmd="  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))"
+        #pcmd='''  except Exception as e:
+    #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
+    #print(getattr(e, 'message', repr(e)))'''
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
       elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
         if(fblock or pblock or tryblock):
@@ -657,7 +708,7 @@ def _init(A,B):
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
-        fout.write(nsp*" "+pcmd+comment+"\n")
+        fout.write(nsp*" "+pcmd+comment+"#//"+str(nl)+"\n")
       if(block):
         nsp+=2
         block=False
@@ -671,7 +722,9 @@ def _init(A,B):
     if(segment):
       nsp=0
       tryblock=0
-      fout.write("  except Exception as e:\n    print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")\n    print(getattr(e, 'message', repr(e)))")
+      #fout.write('''  except Exception as e:
+    #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
+    #print(getattr(e, 'message', repr(e)))''')
     if(fblock+pblock+tryblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
       errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
       raise Exception
