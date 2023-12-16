@@ -23,19 +23,18 @@ def interpret(ftrb=False,dline=False):
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("yntax" in trb):
-      errmsg2+="> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ\n"
-      linecorr=0
-      if("comma" in trb):
+    if("yntax" in sb or "TypeError" in sb or"efined" in sb):
+      errmsg2+="> .\n> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ"
+      linecorr=1#0
+      if("comma" in sb):
         errmsg2+="> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΚΟΜΜΑ?"
       else:
         errmsg2+="\n> "+trb
     else:
       linecorr=1
-      errmsg2+="> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ\n"
+      errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ"
       errmsg2+="> "+trb
     print(errmsg2)
-    #print(">",trb[ierr:])
     msnl=snl=0
     msnl=sb[:]
     foundline=False
@@ -48,7 +47,6 @@ def interpret(ftrb=False,dline=False):
           msnl=msnl[:i]
           break
       msnl=int(msnl)
-      print("found line",msnl)
     else:
       with open("source.py",'r') as fin:
         msize=0
@@ -62,15 +60,6 @@ def interpret(ftrb=False,dline=False):
             msnl=snl
             #print("line",msnl)
     if(foundline or msize>0):
-      safe='''with open("source",'r') as fin:
-        snl=0+linecorr
-        for line in fin:
-          snl+=1
-          if(snl>msnl):
-            while(line[0]==' '):
-              line=line[1:]
-            print(str(snl+1-linecorr)+". ",line)
-            break'''
       fin=open("source",'r')
       snl=linecorr
       lines=(line for line in fin)
@@ -81,16 +70,14 @@ def interpret(ftrb=False,dline=False):
           if(snl==msnl):
             while(line[0]==' '):
               line=line[1:]
-            print(str(snl+1-linecorr)+". ",line,end=' ')
-            line=next(lines)
-            snl+=1
-            while(line[0]==' '):
-              line=line[1:]
+            print(str(snl+1-linecorr)+". ",line,"\n")
             if(dline):
+              line=next(lines)
+              snl+=1
               print(str(snl+1-linecorr)+". ",line)
             break
       except StopIteration:
-        safe=""
+        print("reached EOF")
 
 def compare(fn1="source1",fn2="source2"):
   interpretM(fname=fn1,cmp=True,aa=1)
@@ -719,17 +706,7 @@ def _init(A,B):
         for v in pV:
           pcmd+=v+","
         pcmd=pcmd[:-1]+"="
-        #for v in pV:
-          #pcmd+="["+v+"],"
-        #pcmd=pcmd[:-1]+"\n"                               #load
         pcmd+="".join(cmd[7:])
-        #pcmd+=" "*(nsp)+"".join(cmd[7:])+"\n"+" "*(nsp)   #call
-        #for v in pV:                                      #unload
-          #pcmd+=v+","
-        #pcmd=pcmd[:-1]+"="
-        #for v in pV:
-          #pcmd+=v+"[0],"
-        #pcmd=pcmd[:-1]
       elif("<--" in line):
         pcmd=xpr(cmd,pblock,vargs)
       elif("ΜΕΤΑΒΛΗΤΕΣ" in line):
