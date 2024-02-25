@@ -538,13 +538,14 @@ import traceback
       elif(cmd[:3]==list("ΟΣΟ")):           #WHILE
         whN+=1
         block=True
-        pcmd="while("
+        whv.append("dummy")
+        whstep.append("0")
+        pcmd=whv[-1]+"=0\n"+nsp*' ' # for +
+        pcmd+="while("
         if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΕΠΑΝΑΛΑΒΕ"
           raise Exception
-        pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):\n"+nsp*' ' # for +
-        whv.append("dummy")
-        whstep.append("0")
+        pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):"
       elif(cmd[:3]==list("ΓΙΑ")):           # FOR ΜΕΣΩ WHILE
         whN+=1
         if("ΑΠΟ" not in line or "ΜΕΧΡΙ" not in line):
