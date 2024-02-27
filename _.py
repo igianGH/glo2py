@@ -10,7 +10,7 @@ def evaluate():
 
 def interpret(ftrb=False,dline=False,segment=False,report=False,randIN=True):
   try:
-    interpretM(segment=segment,report=str(report))
+    interpretM(segment=segment,report=str(report),randIN=randIN)
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
@@ -520,7 +520,7 @@ import traceback
           pcmd+=" in ("+xpr(cmd[10:],pblock,vargs)+",)):"
         elif(",..," in line):
           swRa=xpr(cmd[10:line.find(",..,")],pblock,vargs)
-          swRb=xpr(cmd[line.find(",..,")+4:],pblock,vargs)          
+          swRb=xpr(cmd[line.find(",..,")+4:],pblock,vargs)
           pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))):"
         else:
           pcmd+=xpr(cmd[10:],pblock,vargs)+"):"
@@ -583,7 +583,7 @@ import traceback
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction):"
         else:
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+"):\n"+" "*nsp
-      elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE          
+      elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ")):    #ENDFOR/WHILE
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         whN-=1
         if(whN<0):
