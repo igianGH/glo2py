@@ -352,11 +352,10 @@ import traceback
         pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
 
       elif(cmd[:9]==list("ΑΚΕΡΑΙΕΣ:")):   #TYPES INT
-        if(cmd[9]==' '):
-          fvarpos=10
-        else:
-          fvarpos=9
-        vars=line[fvarpos:].split(",")
+        fvarpos=9
+        while(cmd[fvarpos]==' '):
+          fvarpos+=1
+        vars=(line[fvarpos:].replace(' ','')).split(",")
         pcmd=""
         arr=False
         for v in vars:
@@ -380,11 +379,10 @@ import traceback
           else:
             pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=int\n"+" "*(nsp)
       elif(cmd[:12]==list("ΠΡΑΓΜΑΤΙΚΕΣ:")):   #TYPES FLOAT
-        if(cmd[12]==' '):
-          fvarpos=13
-        else:
-          fvarpos=12
-        vars=line[fvarpos:].split(",")
+        fvarpos=12
+        while(cmd[fvarpos]==' '):
+          fvarpos+=1
+        vars=(line[fvarpos:].replace(' ','')).split(",")
         pcmd=""
         arr=False
         for v in vars:
@@ -408,11 +406,10 @@ import traceback
           else:
             pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=float\n"+" "*(nsp)
       elif(cmd[:11]==list("ΧΑΡΑΚΤΗΡΕΣ:")):   #TYPES STR
-        if(cmd[11]==' '):
-          fvarpos=12
-        else:
-          fvarpos=11
-        vars=line[fvarpos:].split(",")
+        fvarpos=11
+        while(cmd[fvarpos]==' '):
+          fvarpos+=1
+        vars=(line[fvarpos:].replace(' ','')).split(",")
         pcmd=""
         arr=False
         for v in vars:
@@ -436,11 +433,10 @@ import traceback
           else:
             pcmd+="try:\n"+" "*(nsp+2)+v+"=="+v+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)+v+"=str\n"+" "*(nsp)
       elif(cmd[:8]==list("ΛΟΓΙΚΕΣ:")):   #TYPES BOOL
-        if(cmd[8]==' '):
-          fvarpos=9
-        else:
-          fvarpos=8
-        vars=line[fvarpos:].split(",")
+        fvarpos=8
+        while(cmd[fvarpos]==' '):
+          fvarpos+=1
+        vars=(line[fvarpos:].replace(' ','')).split(",")
         pcmd=""
         arr=False
         for v in vars:
