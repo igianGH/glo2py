@@ -365,14 +365,14 @@ import traceback
             pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
             arr=True
             dim=1
-            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            pcmd+=vname+"=np.array((1+"+xpr(list(vdim1))+")*["
             if("]" in v):
               arr=False
               pcmd+="int"+("]")+")\n"+" "*(nsp)
           elif("]" in v):
             dim+=1
             arr=False
-            pcmd+="(1+"+v[:-1]+")*[int"+("]")*dim+")\n"+" "*(nsp)
+            pcmd+="(1+"+v[:-1]+")*[int"+("]")*xpr(list(dim))+")\n"+" "*(nsp)
           elif(arr):
             dim+=1
             pcmd+="(1+"+v+")*["
@@ -392,14 +392,14 @@ import traceback
             pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
             arr=True
             dim=1
-            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            pcmd+=vname+"=np.array((1+"+xpr(list(vdim1))+")*["
             if("]" in v):
               arr=False
               pcmd+="float"+("]")+")\n"+" "*(nsp)
           elif("]" in v):
             dim+=1
             arr=False
-            pcmd+="(1+"+v[:-1]+")*[float"+("]")*dim+")\n"+" "*(nsp)
+            pcmd+="(1+"+v[:-1]+")*[float"+("]")*xpr(list(dim))+")\n"+" "*(nsp)
           elif(arr):
             dim+=1
             pcmd+="(1+"+v+")*["
@@ -419,14 +419,14 @@ import traceback
             pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
             arr=True
             dim=1
-            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            pcmd+=vname+"=np.array((1+"+xpr(list(vdim1))+")*["
             if("]" in v):
               arr=False
               pcmd+="str"+("]")+")\n"+" "*(nsp)
           elif("]" in v):
             dim+=1
             arr=False
-            pcmd+="(1+"+v[:-1]+")*[str"+("]")*dim+")\n"+" "*(nsp)
+            pcmd+="(1+"+v[:-1]+")*[str"+("]")*xpr(list(dim))+")\n"+" "*(nsp)
           elif(arr):
             dim+=1
             pcmd+="(1+"+v+")*["
@@ -446,14 +446,14 @@ import traceback
             pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)+"except:\n"+" "*(nsp+2)
             arr=True
             dim=1
-            pcmd+=vname+"=np.array((1+"+vdim1+")*["
+            pcmd+=vname+"=np.array((1+"+xpr(list(vdim1))+")*["
             if("]" in v):
               arr=False
               pcmd+="bool"+("]")+")\n"+" "*(nsp)
           elif("]" in v):
             dim+=1
             arr=False
-            pcmd+="(1+"+v[:-1]+")*[bool"+("]")*dim+")\n"+" "*(nsp)
+            pcmd+="(1+"+v[:-1]+")*[bool"+("]")*xpr(list(dim))+")\n"+" "*(nsp)
           elif(arr):
             dim+=1
             pcmd+="(1+"+v+")*["
