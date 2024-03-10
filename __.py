@@ -820,7 +820,7 @@ import traceback
       elif("_" in line[:1] and False):          #DEPRECATED
         pcmd=xpr(cmd,pblock,vargs)
       else:
-        errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: Τ800"
+        errmsg=""#"ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: Τ800"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
