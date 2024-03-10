@@ -279,19 +279,20 @@ def isname(s):
       return False
   return True
 
-def interpretM(fname="source",randIN=True,cmp=False,aa=1,segment=False,report="False"):
+def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="False"):
   import importlib
   global letters,Reserved
-  fin=open(fname,'r')
+  fin=open(file,'r')
   fout=open("source"+".py",'w') #import conflict
   nsp=0
   nl=1
-  pline=""
+  fname=pline=""
   swN=ifN=whN=dwhN=0
   whv,whstep=[],[]
   cdict,vdict={},{}
   intl=floatl=strl=booll=False
-  aflag=vblock=cblock=ablock=exe=tryblock=mblock=block=deblock=fblock=pblock=False
+  acounter=0
+  vblock=cblock=ablock=exe=tryblock=mblock=block=deblock=fblock=pblock=False
   errmsg=""#"ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: L289"
   vargs=[]
   fout.write('''import random as r
@@ -330,7 +331,7 @@ import traceback
           break
         dsp=line.find("  ")
         line=line[:dsp]+line[dsp+1:]
-      if(",," in line or ", ," in line or (".." in line and "ΠΕΡΙΠΤΩΣΗ" not in line)):
+      if("[]" in line or "[ ]" in line or ",," in line or ", ," in line or (".." in line and "ΠΕΡΙΠΤΩΣΗ" not in line)):
         errmsg="ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
         raise Exception
       if(line.count('\"')%2==1 or line.count('\'')%2==1):
@@ -378,6 +379,7 @@ import traceback
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΣΤΑΘΕΡΩΝ"
           raise Exception
         cblock=True
+        #cdict[fname]=dict()
         pcmd="#"+line
       elif(line[:10]=="ΜΕΤΑΒΛΗΤΕΣ"):            #VARIABLES
         if(vblock+ablock):
@@ -385,10 +387,12 @@ import traceback
           raise Exception
         cblock=False
         vblock=True
+        #vdict[fname]=dict()
         pcmd="#"+line
       elif(line[:4]=="ΑΡΧΗ"):                     #ΑΡΧΗ
         cblock=vblock=False
-        aflag=ablock=True
+        acounter+=1
+        ablock=True
         intl=floatl=strl=booll=False
         pcmd="#"+line
       elif(cblock):                               #CBLOCK
@@ -403,14 +407,14 @@ import traceback
           cvalue=line[eqpos+1:]
           if(cvalue[-1]==" "):
             cvalue=cvalue[:-1]
-          if(cname in cdict.keys()):
+          if(cname in cdict[fname].keys()):
             errmsg="Η ΣΤΑΘΕΡΑ "+cname+" ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
             raise Exception
           elif(cname in Reserved):
             errmsg="ΤΟ "+cname+" ΕΙΝΑΙ ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           else:
-            cdict[cname]=cvalue
+            cdict[fname][cname]=cvalue
           pcmd=cname+"="+cvalue
         else:
           errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΤΑΘΕΡΑΣ / <cname> = <cvalue>"
@@ -478,19 +482,19 @@ import traceback
             vname=v#.replace(" ","")
             if(vname[-1]==" "):
               vname=vname[:-1]
-          if(vname in vdict.keys() or vname in cdict.keys()):
+          if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
             errmsg="Η ΜΕΤΑΒΛΗΤΗ "+vname+" ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
             raise Exception
           elif(vname in Reserved):
             errmsg="ΤΟ "+vname+" ΕΙΝΑΙ ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           else:
-            vdict[vname]=vtype
+            vdict[fname][vname]=vtype
           pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)
           pcmd+="except:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
 
-      elif(line.count("<--")==1 and ablock):            #ASSIGNMENT
+      elif(line.count("<--")==1 and ablock and not (fname in line and line[len(fname)] not in letters+list("0123456789_"))):            #ASSIGNMENT
         aspos=line.find("<--")
         vname=line[:aspos]#.replace(" ","")
         if(vname[-1]==" "):
@@ -498,10 +502,10 @@ import traceback
         if("[" in vname):
           lbrpos=vname.find("[")
           vname=vname[:lbrpos]
-        if(vname not in vdict.keys()):
+        if(vname not in vdict[fname].keys() and vname!=fname):
           errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
           raise Exception
-        if(vname in cdict.keys()):
+        if(vname in cdict[fname].keys()):
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
         pcmd=xpr(cmd,pblock,vargs)
@@ -649,6 +653,8 @@ import traceback
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
       elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):                     # MAIN
+        fname="_main_"        
+        cdict[fname],vdict[fname]=dict(),dict()
         if(fblock or pblock or tryblock):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
           raise Exception
@@ -669,6 +675,7 @@ import traceback
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
+        acounter-=1
         nsp=0
         #pcmd='''  except Exception as e:
     #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
@@ -691,6 +698,7 @@ import traceback
           if(i=="("):
             break
           fname+=i
+        cdict[fname],vdict[fname]=dict(),dict()
         ftypos="".join(cmd[tpos+1:])
         if ftypos[0]==" ":
           ftypos=ftypos[1:]
@@ -718,7 +726,7 @@ import traceback
         for a in vargs:
           pcmd+=a+","
         pcmd=pcmd[:-1]
-      elif(fblock and fname==line[:lfn] and ("<--"==line[lfn:lfn+3] or " <--"==line[lfn:lfn+4])):                   #RETURN
+      elif(fblock and fname==line[:lfn] and ("<--"==line[lfn:lfn+3] or " <--"==line[lfn:lfn+4])): #RETURN
         pcmd="_"+fname+xpr(cmd[len(fname):])#[2:]
         nfvalue=False
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
@@ -738,6 +746,7 @@ import traceback
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
+        acounter-=1
         for a in vargs:
           pcmd+=a+","
         pcmd=pcmd[:-1]+" = "  #restore values
@@ -762,6 +771,7 @@ import traceback
           if(i=="("):
             break
           fname+=i
+        cdict[fname],vdict[fname]=dict(),dict()
         pcmd+=fname+"("
         vargs="".join(cmd[len(fname)+1:-1]).split(",")
         for a in vargs:
@@ -781,9 +791,10 @@ import traceback
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
+        acounter-=1
         pblock=False
         deblock=True
-        pcmd="return "                                      #procedure by return
+        pcmd="return "                             #procedure by return
         for a in vargs:
           pcmd+=a+','
         pcmd=pcmd[:-1]
@@ -836,7 +847,7 @@ import traceback
     fin.close()
     fout.close()
   except Exception as e:
-    if(not aflag and errmsg==""):
+    if(acounter!=0 and errmsg==""):
       errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
