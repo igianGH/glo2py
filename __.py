@@ -476,7 +476,7 @@ import traceback
               vname=vname[:-1]
             vdim=(v[lbrpos+1:rbrpos].replace(" ","")).split(",")
             for i in range(len(vdim)-1,-1,-1):
-              vval="("+vdim[i]+"+1)*["+vval+"]"
+              vval="("+xpr(list(vdim[i]))+"+1)*["+vval+"]"              #expression in Shape
             vval="np.array("+vval+")"
           else:
             vname=v#.replace(" ","")
