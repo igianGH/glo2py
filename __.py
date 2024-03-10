@@ -391,7 +391,7 @@ import traceback
         pcmd="#"+line
       elif(line[:4]=="ΑΡΧΗ"):                     #ΑΡΧΗ
         cblock=vblock=False
-        acounter+=1
+        acounter-=1
         ablock=True
         intl=floatl=strl=booll=False
         pcmd="#"+line
@@ -659,6 +659,7 @@ import traceback
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
           raise Exception
         block=True
+        acounter+=1
         #mblock=True
         tryblock=True
         exe=True
@@ -675,7 +676,6 @@ import traceback
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
-        acounter-=1
         nsp=0
         #pcmd='''  except Exception as e:
     #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
@@ -687,6 +687,7 @@ import traceback
           raise Exception
         fblock=True
         block=True
+        acounter+=1
         nfvalue=True
         pcmd="def "
         cmd=cmd[10:]
@@ -746,7 +747,6 @@ import traceback
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
-        acounter-=1
         for a in vargs:
           pcmd+=a+","
         pcmd=pcmd[:-1]+" = "  #restore values
@@ -764,6 +764,7 @@ import traceback
           raise Exception
         #pblock=True
         block=True
+        acounter+=1
         pcmd="def "
         cmd=cmd[11:]
         fname=""
@@ -791,7 +792,6 @@ import traceback
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
-        acounter-=1
         pblock=False
         deblock=True
         pcmd="return "                             #procedure by return
