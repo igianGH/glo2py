@@ -493,7 +493,7 @@ import traceback
       elif(line.count("<--")==1 and ablock):            #ASSIGNMENT
         aspos=line.find("<--")
         vname=line[:aspos]#.replace(" ","")
-        if(vname[-1]):
+        if(vname[-1]==" "):
           vname=vname[:-1]
         if("[" in vname):
           lbrpos=vname.find("[")
