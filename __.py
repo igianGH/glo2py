@@ -821,6 +821,8 @@ import traceback
         pcmd=xpr(cmd,pblock,vargs)
       else:
         errmsg=""#"ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: Τ800"
+        if(acounter!=0):
+          errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
