@@ -186,15 +186,15 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=="," and sarr):
       pcmd+="]["
       s.pop(0)
-    elif(s[:4]==list(" ΟΧΙ")):
-      pcmd+=" not"
-      s=s[4:]
-    elif(s[:4]==list(" ΚΑΙ")):
-      pcmd+=" and"
-      s=s[4:]
-    elif(s[:2]==list(" Ή")):
-      pcmd+=" or"
-      s=s[2:]
+    elif(s[:4]==list("ΟΧΙ ") or s[:4]==list("ΟΧΙ(")):
+      pcmd+="not"
+      s=s[3:]
+    elif(s[:4]==list("ΚΑΙ ") or s[:4]==list("ΚΑΙ(")):
+      pcmd+="and"
+      s=s[3:]
+    elif(s[:2]==list("Ή ") or s[:2]==list("Ή(")):
+      pcmd+="or"
+      s=s[1:]
     elif(s[:2]==list("<>")):
       pcmd+="!="
       s=s[2:]
@@ -249,9 +249,6 @@ def xpr(s,pblock=False,v=[]):
     elif(s[:2]==list("Ε(")):
       pcmd+="m.exp("
       s=s[2:]
-    #elif(s[:4]==list("ΑΡΧΗ") or s[:8]==list("ΣΤΑΘΕΡΕΣ") or s[:10]==list("ΜΕΤΑΒΛΗΤΕΣ")):
-      #pcmd+="#"+"".join(s)
-      #s=[]
     else:
       if(pblock):
         iINs=False
@@ -331,9 +328,13 @@ import traceback
           break
         dsp=line.find("  ")
         line=line[:dsp]+line[dsp+1:]
-      if("[]" in line or "[ ]" in line or ",," in line or ", ," in line or (".." in line and "ΠΕΡΙΠΤΩΣΗ" not in line)):
-        errmsg="ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
-        raise Exception
+      lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. .,".split(" ")
+      if("ΠΕΡΙΠΤΩΣΗ" in lineNS and ",..," in lineNS):
+        lineNS=lineNS[:lineNS.find(",..,")]+lineNS[lineNS.find(",..,")+4:]
+      for i in cflags:
+        if(i in lineNS):
+          errmsg="ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
+          raise Exception
       if(line.count('\"')%2==1 or line.count('\'')%2==1):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
         raise Exception
@@ -374,7 +375,7 @@ import traceback
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ ΓΡΑΜΜΗΣ"
         raise Exception
 
-      elif(line[:8]=="ΣΤΑΘΕΡΕΣ"):               #CONSTANTS    ##.replace(" ","")
+      elif(line[:8]=="ΣΤΑΘΕΡΕΣ"):               #CONSTANTS
         if(cblock+vblock+ablock):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΣΤΑΘΕΡΩΝ"
           raise Exception
@@ -389,7 +390,7 @@ import traceback
         vblock=True
         #vdict[fname]=dict()
         pcmd="#"+line
-      elif(line[:4]=="ΑΡΧΗ"):                     #ΑΡΧΗ
+      elif(line[:4]=="ΑΡΧΗ" and line[4]!='_'):                     #ΑΡΧΗ
         cblock=vblock=False
         acounter-=1
         ablock=True
@@ -494,7 +495,7 @@ import traceback
           pcmd+="except:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
 
-      elif(line.count("<--")==1 and ablock and not (fname in line and line[len(fname)] not in letters+list("0123456789_"))):            #ASSIGNMENT
+      elif(line.count("<--")==1 and ablock and not (fname in line and line[len(fname)] not in letters+list("0123456789_"))): #ASSIGNMENT
         aspos=line.find("<--")
         vname=line[:aspos]#.replace(" ","")
         if(vname[-1]==" "):
@@ -640,7 +641,7 @@ import traceback
           errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         deblock=True
-      elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #DO
+      elif("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line):#cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #DO
         dwhN+=1
         block=True
         pcmd="while(True):"
