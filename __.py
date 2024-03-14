@@ -295,7 +295,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   fout.write('''import random as r
 import math as m
 import numpy as np
-import _ as _
+import __ as _
 import sys
 import traceback
 \n''')
@@ -654,7 +654,7 @@ import traceback
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
       elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):                     # MAIN
-        fname="_main_"        
+        fname="_main_"
         cdict[fname],vdict[fname]=dict(),dict()
         if(fblock or pblock or tryblock):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
