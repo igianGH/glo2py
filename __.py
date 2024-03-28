@@ -8,9 +8,9 @@ from contextlib import redirect_stdout
 def evaluate():
   interpret(segment=True)
 
-def interpret(ftrb=False,dline=False,segment=False,report=False,randIN=True):
+def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,randIN=True):
   try:
-    interpretM(segment=segment,report=str(report),randIN=randIN)
+    interpretM(file,segment=segment,report=str(report),randIN=randIN)
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
@@ -48,7 +48,7 @@ def interpret(ftrb=False,dline=False,segment=False,report=False,randIN=True):
           break
       msnl=int(msnl)
     else:
-      with open("source.py",'r') as fin:
+      with open(file+".py",'r') as fin:
         msize=0
         for line in fin:
           if("#//" in line):
@@ -59,7 +59,7 @@ def interpret(ftrb=False,dline=False,segment=False,report=False,randIN=True):
             cssq=line
             msnl=snl
     if(foundline or msize>0):
-      fin=open("source",'r')
+      fin=open(file,'r')
       snl=linecorr
       lines=(line for line in fin)
       try:
@@ -280,7 +280,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   import importlib
   global letters,Reserved
   fin=open(file,'r')
-  fout=open("source"+".py",'w') #import conflict
+  fout=open(file+".py",'w') #import conflict
   nsp=0
   nl=1
   fname=pline=""
@@ -480,7 +480,7 @@ import traceback
               vval="("+xpr(list(vdim[i]))+"+1)*["+vval+"]"              #expression in Shape
             vval="np.array("+vval+")"
           else:
-            vname=v#.replace(" ","")
+            vname=v
             if(vname[-1]==" "):
               vname=vname[:-1]
           if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
@@ -497,7 +497,7 @@ import traceback
 
       elif(line.count("<--")==1 and ablock and not (fname in line and line[len(fname)] not in letters+list("0123456789_"))): #ASSIGNMENT
         aspos=line.find("<--")
-        vname=line[:aspos]#.replace(" ","")
+        vname=line[:aspos]
         if(vname[-1]==" "):
           vname=vname[:-1]
         if("[" in vname):
@@ -621,17 +621,17 @@ import traceback
         pos4=pos3+8
 
         if("ΜΕ_ΒΗΜΑ" in line):
-          pcmd="correction=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
+          pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
           step=xpr(cmd[pos4:],pblock,vargs)
         else:
-          pcmd="correction=1\n"+" "*nsp
+          pcmd="correction"+str(whN)+"=1\n"+" "*nsp
           step="1"
         whv.append(xpr(cmd[4:pos1-1],pblock,vargs))
         whstep.append(step)
         pcmd+=whv[-1]+"="+xpr(cmd[pos1+4:pos2],pblock,vargs)+"\n"+" "*nsp
         pcmd+="while("  #for "
         if("ΜΕ_ΒΗΜΑ" in line):
-          pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction):"
+          pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction"+str(whN)+" <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction"+str(whN)+"):"
         else:
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+"):\n"+" "*nsp
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #ENDFOR/WHILE
@@ -857,7 +857,8 @@ import traceback
     print("[error] "+errmsg+"\n> "+str(nl)+". "+line)   #str(nl+1)
     return
 
-  import source                 #EXECUTION
+  #import source                 #EXECUTION
+  source=__import__(file)
   importlib.reload(source)
   if(exe):
     if(cmp):
@@ -865,4 +866,7 @@ import traceback
         with redirect_stdout(lfile):
           source.main()
     else:
-      source.main()
+      try:
+        source.main()
+      except:
+        print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))
