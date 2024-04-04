@@ -8,9 +8,9 @@ from contextlib import redirect_stdout
 def evaluate():
   interpret(segment=True)
 
-def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,randIN=True):
+def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,randIN=True,test=False):
   try:
-    interpretM(file,segment=segment,report=str(report),randIN=randIN)
+    interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
@@ -276,7 +276,7 @@ def isname(s):
       return False
   return True
 
-def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="False"):
+def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="False",test=False):
   import importlib
   global letters,Reserved
   fin=open(file,'r')
@@ -396,6 +396,10 @@ import traceback
         ablock=True
         intl=floatl=strl=booll=False
         pcmd="#"+line
+        if(test):
+          print("ΥΠΟΠΡΟΓΡΑΜΜΑ:",fname,
+                "ΣΤΑΘΕΡΕΣ:",list(cdict[fname].keys()),
+                "ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))       # ERRORCHECK
       elif(cblock):                               #CBLOCK
         if(line.count('=')==1):
           eqpos=line.find('=')
@@ -495,7 +499,8 @@ import traceback
           pcmd+="except:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
 
-      elif(line.count("<--")==1 and ablock and not (fname in line and line[len(fname)] not in letters+list("0123456789_"))): #ASSIGNMENT
+      elif(line.count("<--")==1 and ablock and                                   #ASSIGNMENT
+           not (fname in line and line[len(fname)] not in letters+list("0123456789_"))):  # return handled elsewhere
         aspos=line.find("<--")
         vname=line[:aspos]
         if(vname[-1]==" "):
@@ -505,6 +510,7 @@ import traceback
           vname=vname[:lbrpos]
         if(vname not in vdict[fname].keys() and vname!=fname):
           errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
+          print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
           raise Exception
         if(vname in cdict[fname].keys()):
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
@@ -805,7 +811,6 @@ import traceback
         for i in range(len(cmd)):
           if cmd[i]=="(":
             break
-        fname="".join(cmd[7:i])
         pV=[v for v in "".join(cmd[i+1:-1]).split(",")]
         pcmd=""
         for v in pV:
