@@ -23,7 +23,7 @@ def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,ra
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("yntax" in sb or "TypeError" in sb or"efined" in sb):
+    if("yntax" in sb in sb or"efined" in sb): # or "TypeError"
       errmsg2+="> .\n> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ"
       linecorr=1
       if("comma" in sb):
@@ -33,7 +33,7 @@ def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,ra
     else:
       linecorr=1
       errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ"
-      errmsg2+="> "+trb
+      errmsg2+="> "+trb.split('\n')[0]
     print(errmsg2)
     msnl=snl=0
     msnl=sb[:]
