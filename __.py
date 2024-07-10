@@ -29,7 +29,7 @@ def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,ra
       if("comma" in sb):
         errmsg2+="> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΚΟΜΜΑ?"
       else:
-        errmsg2+="\n> "+trb
+        errmsg2+="\n> "+trb.split('\n')[0]
     else:
       linecorr=1
       errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ"
@@ -51,7 +51,7 @@ def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,ra
       with open(file+".py",'r') as fin:
         msize=0
         for line in fin:
-          if("#//" in line):
+          if("#//" in line):            # εύρεση γραμμής όπου απέτυχε η μετάφραση/εκτέλεση
             snl=int(line[line.find("#//")+3:])
           ics=dfl.SequenceMatcher(None,line,sb).find_longest_match()
           if(msize<ics.size):
@@ -279,7 +279,27 @@ def isname(s):
 def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="False",test=False):
   import importlib
   global letters,Reserved
-  fin=open(file,'r')
+  fin=open(file+"_",'w')
+  with open(file) as fraw:      #'&' στην αρχή πρότασης
+    lineG=(line for line in fraw)
+    line1=next(lineG)[:-1]
+    while(True):
+      try:
+        line2=next(lineG)[:-1]
+        while(len(line2)>0 and line2[0]==' '):    #remove wspace from start
+          line2=line2[1:]
+        if(len(line2)<1 or line2[0]=='&'):
+          line1+=' '+line2[1:]
+        elif(line1!=""):
+          fin.write(line1+"\n")
+          line1=line2[:]
+        else:
+          line1=line2[:]
+      except:
+        fin.write(line1+"\n")
+        break
+  fin.close()
+  fin=open(file+"_",'r')
   fout=open(file+".py",'w') #import conflict
   nsp=0
   nl=1
@@ -329,15 +349,26 @@ import traceback
         dsp=line.find("  ")
         line=line[:dsp]+line[dsp+1:]
       lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. .,".split(" ")
+      if(line.count('\"')%2==1 or line.count('\'')%2==1):
+        errmsg="ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
+        raise Exception
+      while("\"" in lineNS):      # ignore "strings"
+        pos1=lineNS.find("\"")
+        pos2=lineNS[pos1+1:].find("\"")+pos1+1
+        if("\'" in lineNS[pos1:pos2]):
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
+          raise Exception
+        lineNS=lineNS[:pos1]+lineNS[pos2+1:]
+      while("\'" in lineNS):      # ignore 'strings'
+        pos1=lineNS.find("\'")
+        pos2=lineNS[pos1+1:].find("\'")+pos1+1
+        lineNS=lineNS[:pos1]+lineNS[pos2+1:]
       if("ΠΕΡΙΠΤΩΣΗ" in lineNS and ",..," in lineNS):
         lineNS=lineNS[:lineNS.find(",..,")]+lineNS[lineNS.find(",..,")+4:]
       for i in cflags:
         if(i in lineNS):
           errmsg="ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
           raise Exception
-      if(line.count('\"')%2==1 or line.count('\'')%2==1):
-        errmsg="ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
-        raise Exception
       lpar=rpar=lc=rc=0
       for i in line:
         match i:
@@ -426,7 +457,7 @@ import traceback
           raise Exception
       elif(vblock):                                               #VBLOCK
         if(line.count(":")!=1):
-          errgmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΗΣ"
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΗΣ"
           raise Exception
         clpos=line.find(":")
         vtype=line[:clpos]
@@ -464,6 +495,9 @@ import traceback
         while(cmd[fvarpos]==' '):
           fvarpos+=1
         line=line[fvarpos:]
+        if(line in " "):
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΩΝ"
+          raise Exception
         tvars=(line.replace(' ','')).split(",")
         vars=[tvars.pop(0)]
         for v in tvars:
