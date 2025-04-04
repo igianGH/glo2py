@@ -5,8 +5,9 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
-def evaluate():
-  interpret(segment=True)
+def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
+  interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
+  
 
 def source(code,fname="source"):
   with open(fname,'w') as f:
