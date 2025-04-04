@@ -8,6 +8,10 @@ from contextlib import redirect_stdout
 def evaluate():
   interpret(segment=True)
 
+def source(code,fname="source"):
+  with open(fname,'w') as f:
+    f.write(code)
+
 def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,randIN=True,test=False):
   try:
     interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
