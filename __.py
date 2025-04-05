@@ -12,7 +12,7 @@ def evaluate(fname="source"):
   fOUT=open(fname+".py",'w')
   with open(fname,'r') as fIN:
     fOUT.write("def main():\n")
-    fOUT.write("  print("+_.xpr([c for c in fIN.read()])+')\n')
+    fOUT.write("  print("+xpr([c for c in fIN.read()])+')\n')
   fOUT.close()
   ##EXECUTION
   source=__import__(fname)
