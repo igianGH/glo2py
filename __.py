@@ -11,8 +11,9 @@ from contextlib import redirect_stdout
 def evaluate(fname="source"):
   fOUT=open(fname+".py",'w')
   with open(fname,'r') as fIN:
+    X=xpr([c for c in fIN.read()])
     fOUT.write("def main():\n")
-    fOUT.write("  print("+xpr([c for c in fIN.read()])+')\n')
+    fOUT.write("  print("+X+')\n')
   fOUT.close()
   ##EXECUTION
   source=__import__(fname)
@@ -20,7 +21,7 @@ def evaluate(fname="source"):
   try:
     source.main()
   except:
-    print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))
+    print(">> ",X)
   
 
 def source(code,fname="source"):
