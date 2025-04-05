@@ -10,6 +10,13 @@ from contextlib import redirect_stdout
 
 def evaluate(fname="source"):
   fOUT=open(fname+".py",'w')
+  fOUT.write('''import random as r
+import math as m
+import numpy as np
+import __ as _
+import sys
+import traceback
+\n''')  
   with open(fname,'r') as fIN:
     X=xpr([c for c in fIN.read()])
     fOUT.write("def main():\n")
@@ -22,7 +29,7 @@ def evaluate(fname="source"):
     source.main()
   except Exception as e:
     errmsg=getattr(e, 'message', repr(e))
-    print("[error] "+errmsg+"\n> "+line)
+    print("[error] "+errmsg+"\n> "+X)
   
 
 def source(code,fname="source"):
