@@ -5,8 +5,22 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
-def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
-  interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
+#def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
+  #interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
+
+def evaluate(fname="source"):
+  fOUT=open(fname+".py",'w')
+  with open(fname,'r') as fIN:
+    fOUT.write("def main():\n")
+    fOUT.write("  print("+_.xpr([c for c in fIN.read()])+')\n')
+  fOUT.close()
+  ##EXECUTION
+  source=__import__(fname)
+  importlib.reload(source)
+  try:
+    source.main()
+  except:
+    print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))
   
 
 def source(code,fname="source"):
