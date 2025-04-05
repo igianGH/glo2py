@@ -20,8 +20,9 @@ def evaluate(fname="source"):
   importlib.reload(source)
   try:
     source.main()
-  except:
-    print(">> ",X)
+  except Exception as e:
+    errmsg=getattr(e, 'message', repr(e))
+    print("[error] "+errmsg+"\n> "+line)
   
 
 def source(code,fname="source"):
