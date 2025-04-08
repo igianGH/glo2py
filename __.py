@@ -599,6 +599,9 @@ import traceback
         pcmd=",".join(vars)+"="
         for v in vars:
           vname = str(v)                              #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
+          if("[" in vname):
+            lbrpos=vname.find("[")
+            vname=vname[:lbrpos]
           if(vname not in vdict[fname].keys() and vname!=fname):
             errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
             print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
