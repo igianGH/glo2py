@@ -100,7 +100,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
           if(snl==msnl):
             while(line[0]==' '):
               line=line[1:]
-            print(str(snl+1-linecorr)+". ",line,"")
+            print(str(snl+1-linecorr)+". ",line[:-1])
             if(dline):
               line=next(lines)
               snl+=1
