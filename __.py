@@ -36,7 +36,7 @@ def source(code,fname="source"):
   with open(fname,'w') as f:
     f.write(code)
 
-def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,randIN=True,test=False):
+def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,randIN=True,test=False):
   try:
     interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
   except:
@@ -61,7 +61,10 @@ def interpret(file="source",ftrb=False,dline=False,segment=False,report=False,ra
     else:
       linecorr=1
       errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ"
-      errmsg2+="> "+trb.split('\n')[0]
+      if("'type'" in sb):
+        errmsg2+=":\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή."
+      else:
+        errmsg2+="> "+trb.split('\n')[0]
     print(errmsg2)
     msnl=snl=0
     msnl=sb[:]
@@ -163,7 +166,7 @@ def Rinput(v,report=False):
     print(">διαβάστηκε το",v)
   return v
 
-def TCinput(prompt=">"):
+def TCinput(prompt="> "):
   temp=input(prompt)
   tfl=True
   for c in temp:
@@ -595,6 +598,11 @@ import traceback
         vars=temp.split(",")
         pcmd=",".join(vars)+"="
         for v in vars:
+          vname = str(v)                              #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
+          if(vname not in vdict[fname].keys() and vname!=fname):
+            errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
+            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
+            raise Exception
           pcmd+=("_.Rinput("+str(v)+","+report+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
       elif(cmd[:2]==list("ΑΝ") and ablock):           #IF
