@@ -56,6 +56,8 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       linecorr=1
       if("comma" in sb):
         errmsg2+="> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΚΟΜΜΑ?"
+      elif("name" in sb and "not defined" in sb):
+        errmsg2+="> Η ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
