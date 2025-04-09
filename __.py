@@ -52,7 +52,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
     if("yntax" in sb in sb or"efined" in sb): # or "TypeError"
-      errmsg2+="\nΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
         errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
@@ -104,11 +104,11 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
           if(snl==msnl):
             while(line[0]==' '):
               line=line[1:]
-            print("----> "+str(snl+1-linecorr)+". ",line[:-1])
+            print(" "*6+str(snl+0-linecorr)+". ",line[:-1])
             if(dline):
               line=next(lines)
               snl+=1
-              print(str(snl+1-linecorr)+". ",line[2:])
+              print("----> "+str(snl+0-linecorr)+". ",line[2:])
             break
       except StopIteration:
         print("reached EOF")
