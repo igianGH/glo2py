@@ -475,16 +475,16 @@ import traceback
           if(cname[-1]==" "):
             cname=cname[:-1]
           if(not isname(cname)):
-            errmsg=cname+" ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΣΤΑΘΕΡΑΣ"
+            errmsg=cname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΣΤΑΘΕΡΑΣ"
             raise Exception
           cvalue=line[eqpos+1:]
           if(cvalue[-1]==" "):
             cvalue=cvalue[:-1]
           if(cname in cdict[fname].keys()):
-            errmsg="Η ΣΤΑΘΕΡΑ "+cname+" ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
+            errmsg=cname+" ----> ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
             raise Exception
           elif(cname in Reserved):
-            errmsg="ΤΟ "+cname+" ΕΙΝΑΙ ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg=cname+" ----> ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           else:
             cdict[fname][cname]=cvalue
@@ -559,13 +559,13 @@ import traceback
             if(vname[-1]==" "):
               vname=vname[:-1]
           if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
-            errmsg="Η ΜΕΤΑΒΛΗΤΗ "+vname+" ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
+            errmsg=vname+" ----> ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
             raise Exception
           elif(vname in Reserved):
-            errmsg="ΤΟ "+vname+" ΕΙΝΑΙ ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg=vname+" ----> ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           elif(not isname(vname)):
-            errmsg=vname+" ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΜΕΤΑΒΛΗΤΗΣ"
+            errmsg=vname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΜΕΤΑΒΛΗΤΗΣ"
             raise Exception
           else:
             vdict[fname][vname]=vtype
@@ -788,6 +788,9 @@ import traceback
           if(i=="("):
             break
           fname+=i
+        if(not isname(fname)):
+          errmsg=fname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+          raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         ftypos="".join(cmd[tpos+1:])
         if ftypos[0]==" ":
@@ -861,6 +864,9 @@ import traceback
           if(i=="("):
             break
           fname+=i
+        if(not isname(fname)):
+          errmsg=fname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+          raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         pcmd+=fname+"("
         vargs="".join(cmd[len(fname)+1:-1]).split(",")
@@ -941,7 +947,7 @@ import traceback
       #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:\n"+errmsg+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
