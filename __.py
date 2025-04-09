@@ -62,7 +62,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
       linecorr=1
-      errmsg2+="\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("'type'" in sb):
         errmsg2+="\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή"
       elif("invalid literal" in sb):
@@ -490,11 +490,11 @@ import traceback
             cdict[fname][cname]=cvalue
           pcmd=cname+"="+cvalue
         else:
-          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΤΑΘΕΡΑΣ / <cname> = <cvalue>"
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΤΑΘΕΡΑΣ"# / <cname> = <cvalue>"
           raise Exception
       elif(vblock):                                               #VBLOCK
         if(line.count(":")!=1):
-          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΗΣ"
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΩΝ"
           raise Exception
         clpos=line.find(":")
         vtype=line[:clpos]
@@ -526,7 +526,7 @@ import traceback
               raise Exception
             booll=True
           case default:
-            errmsg="ΜΗ ΕΓΚΥΡΟΣ ΤΥΠΟΣ ΜΕΤΑΒΛΗΤΗΣ"
+            errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΩΝ"
             raise Exception
         fvarpos=clpos+1
         while(cmd[fvarpos]==' '):
@@ -906,8 +906,8 @@ import traceback
         pcmd=xpr(cmd,pblock,vargs)
       else:
         errmsg=""#"ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: Τ800"
-        if(acounter!=0):
-          errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
+        #if(acounter!=0):
+          #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
@@ -934,8 +934,8 @@ import traceback
     fin.close()
     fout.close()
   except Exception as e:
-    if(acounter!=0 and errmsg==""):
-      errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
+    #if(acounter!=0 and errmsg==""):
+      #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
     print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg+"\n----> "+str(nl)+". "+line)   #str(nl+1)
