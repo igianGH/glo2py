@@ -69,7 +69,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
         errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ."
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
-    print(errmsg2)
+    print("-"*75+'\n'+errmsg2)
     msnl=snl=0
     msnl=sb[:]
     foundline=False
@@ -936,7 +936,7 @@ import traceback
       errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
-    print("[error] "+errmsg+"\n> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg+"\n> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
