@@ -29,7 +29,7 @@ import traceback
     source.main()
   except Exception as e:
     errmsg=getattr(e, 'message', repr(e))
-    print("[error] "+errmsg+"\n> "+X)
+    print("[error] "+errmsg+"\n--> "+X)
   
 
 def source(code,fname="source"):
@@ -52,7 +52,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
     if("yntax" in sb in sb or"efined" in sb): # or "TypeError"
-      errmsg2+="> .\n> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\nΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
         errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
@@ -62,7 +62,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
       linecorr=1
-      errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="> ..\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("'type'" in sb):
         errmsg2+="\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή."
       elif("invalid literal" in sb):
@@ -104,11 +104,11 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
           if(snl==msnl):
             while(line[0]==' '):
               line=line[1:]
-            print(str(snl+1-linecorr)+". ",line[:-1])
+            print("----> "+str(snl+1-linecorr)+". ",line[:-1])
             if(dline):
               line=next(lines)
               snl+=1
-              print(str(snl+1-linecorr)+". ",line)
+              print(str(snl+1-linecorr)+". ",line[2:])
             break
       except StopIteration:
         print("reached EOF")
@@ -936,7 +936,7 @@ import traceback
       errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg+"\n> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
