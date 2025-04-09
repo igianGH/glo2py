@@ -475,16 +475,16 @@ import traceback
           if(cname[-1]==" "):
             cname=cname[:-1]
           if(not isname(cname)):
-            errmsg=cname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΣΤΑΘΕΡΑΣ"
+            errmsg=cname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΣΤΑΘΕΡΑΣ"
             raise Exception
           cvalue=line[eqpos+1:]
           if(cvalue[-1]==" "):
             cvalue=cvalue[:-1]
           if(cname in cdict[fname].keys()):
-            errmsg=cname+" ----> ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
+            errmsg=cname+" : ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
             raise Exception
           elif(cname in Reserved):
-            errmsg=cname+" ----> ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg=cname+" : ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           else:
             cdict[fname][cname]=cvalue
@@ -559,13 +559,13 @@ import traceback
             if(vname[-1]==" "):
               vname=vname[:-1]
           if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
-            errmsg=vname+" ----> ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
+            errmsg=vname+" : ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
             raise Exception
           elif(vname in Reserved):
-            errmsg=vname+" ----> ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg=vname+" : ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           elif(not isname(vname)):
-            errmsg=vname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΜΕΤΑΒΛΗΤΗΣ"
+            errmsg=vname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΜΕΤΑΒΛΗΤΗΣ"
             raise Exception
           else:
             vdict[fname][vname]=vtype
@@ -789,7 +789,7 @@ import traceback
             break
           fname+=i
         if(not isname(fname)):
-          errmsg=fname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+          errmsg=fname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
           raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         ftypos="".join(cmd[tpos+1:])
@@ -865,7 +865,7 @@ import traceback
             break
           fname+=i
         if(not isname(fname)):
-          errmsg=fname+" ----> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+          errmsg=fname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
           raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         pcmd+=fname+"("
