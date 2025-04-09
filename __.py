@@ -62,11 +62,13 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
       linecorr=1
-      errmsg2+="> ..\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("'type'" in sb):
-        errmsg2+="\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή."
+        errmsg2+="\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή"
       elif("invalid literal" in sb):
-        errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ."
+        errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
+      elif("index" in sb and "out of bounds" in sb):
+        errmsg2+="\nΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     print("-"*75+'\n'+errmsg2)
