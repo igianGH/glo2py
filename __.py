@@ -106,11 +106,11 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
           if(snl==msnl):
             while(line[0]==' '):
               line=line[1:]
-            print(" "*6+str(snl+0-linecorr)+". ",line[:-1])
+            #print(" "*6+str(snl+0-linecorr)+". ",line[:-1])
             if(dline):
               line=next(lines)
               snl+=1
-              print("----> "+str(snl+0-linecorr)+". ",line[2:])
+              print("----> "+str(snl+0-linecorr)+". ",line[:])
             break
       except StopIteration:
         print("reached EOF")
@@ -474,7 +474,7 @@ import traceback
           cname=line[:eqpos]
           if(cname[-1]==" "):
             cname=cname[:-1]
-          if not isname(cname):
+          if(not isname(cname)):
             errmsg=cname+" ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΣΤΑΘΕΡΑΣ"
             raise Exception
           cvalue=line[eqpos+1:]
@@ -563,6 +563,9 @@ import traceback
             raise Exception
           elif(vname in Reserved):
             errmsg="ΤΟ "+vname+" ΕΙΝΑΙ ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            raise Exception
+          elif(not isname(vname)):
+            errmsg=vname+" ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΜΕΤΑΒΛΗΤΗΣ"
             raise Exception
           else:
             vdict[fname][vname]=vtype
