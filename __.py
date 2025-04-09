@@ -52,21 +52,21 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
     if("yntax" in sb in sb or"efined" in sb): # or "TypeError"
-      errmsg2+="> .\n> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ"
+      errmsg2+="> .\n> ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
-        errmsg2+="> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΚΟΜΜΑ?"
+        errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
       elif("name" in sb and "not defined" in sb):
-        errmsg2+="> Η ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
+        errmsg2+="\nΗ ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
       linecorr=1
-      errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ"
+      errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("'type'" in sb):
-        errmsg2+=":\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή."
+        errmsg2+="\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή."
       elif("invalid literal" in sb):
-        errmsg2+=": ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ."
+        errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ."
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     print(errmsg2)
