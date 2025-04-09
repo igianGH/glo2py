@@ -63,8 +63,10 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       errmsg2+="> ..\n> ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ"
       if("'type'" in sb):
         errmsg2+=":\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή."
+      elif("invalid literal" in sb):
+        errmsg2+=": ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ."
       else:
-        errmsg2+="> "+trb.split('\n')[0]
+        errmsg2+="\n> "+trb.split('\n')[0]
     print(errmsg2)
     msnl=snl=0
     msnl=sb[:]
