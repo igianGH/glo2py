@@ -908,7 +908,10 @@ import traceback
         pV=[v for v in "".join(cmd[i+1:-1]).split(",")]
         pcmd=""
         for v in pV:
-          pcmd+=v+","
+          if(v in vdict[fname]):
+            pcmd+=v+","
+          else:
+            pcmd+="_,"
         pcmd=pcmd[:-1]+"="
         pcmd+="".join(cmd[7:])
       elif("<--" in line and False):          #DEPRECATED
