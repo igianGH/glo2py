@@ -272,13 +272,13 @@ def xpr(s,pblock=False,v=[]):
       pcmd+="int("
       s=s[4:]
     elif(s[:3]==list("ΗΜ(")):
-      pcmd+="m.sin("
+      pcmd+="m.sin(m.pi/180*"
       s=s[3:]
     elif(s[:4]==list("ΣΥΝ(")):
-      pcmd+="m.cos("
+      pcmd+="m.cos(m.pi/180*"
       s=s[4:]
     elif(s[:3]==list("ΕΦ(")):
-      pcmd+="m.tan("
+      pcmd+="m.tan(m.pi/180*"
       s=s[3:]
     elif(s[:4]==list("ΛΟΓ(")):
       pcmd+="m.log("
