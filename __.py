@@ -780,6 +780,9 @@ import traceback
         nfvalue=True
         pcmd="def "
         cmd=cmd[10:]
+        if(":" not in cmd):
+          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΥΝΑΡΤΗΣΗΣ"
+          raise Exception
         for tpos in range(len(cmd)):
           if(cmd[tpos]==":"):
             break
@@ -801,8 +804,11 @@ import traceback
           ftypos=float
         elif ftypos=="ΧΑΡΑΚΤΗΡΑΣ":
           ftypos=str
-        else:         #ΛΟΓΙΚΗ
+        elif ftypos=="ΛΟΓΙΚΗ":         #ΛΟΓΙΚΗ
           ftypos=bool
+        else:
+          errmsg="ΜΗ ΕΓΚΥΡΟΣ ΤΥΠΟΣ ΣΥΝΑΡΤΗΣΗΣ"
+          raise Exception
 
         pcmd+=fname+"("
         lfn=len(fname)
