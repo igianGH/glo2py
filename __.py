@@ -905,17 +905,18 @@ import traceback
         for i in range(len(cmd)):
           if cmd[i]=="(":
             break
-        #foundP,foundB=True,False
-        #for i in range(len(cmd)):
-          #if(cmd[i]=='('):
-            #foundP=True
-          #elif(cmd[i]==')'):
-            #foundP=False
-          #elif(cmd[i]=='['):
-            #foundB=True
-          #elif(cmd[i]==']'):
-            #foundB=False
-        pV=[v for v in "".join(xpr(cmd[i+1:-1])).split(",")]
+        Xcmd=xpr(cmd)
+        nP=1  #number of open left(
+        for i in range(len(Xcmd)):
+          if(Xcmd[i]=='('):
+            nP+=1
+          elif(Xcmd[i]==')'):
+            nP-=1
+          elif(Xcmd[i]==',' and nP>1):
+            Xcmd=Xcmd[:i]+['$']+Xcmd[i+1:]
+        pV=[v for v in "".join(Xcmd[i+1:-1]).split(",")]  #split at the correct commas
+        pV=[v.replace('$',',') for v in pV]
+        Xcmd=[v.replace('$',',') for v in Xcmd]
         pcmd=""
         for v in pV:
           if(v in vdict[fname]):
@@ -923,7 +924,7 @@ import traceback
           else:
             pcmd+="_dummy,"
         pcmd=pcmd[:-1]+"="
-        pcmd+="".join(xpr(cmd[7:]))
+        pcmd+="".join(Xcmd[7:])
       elif("<--" in line and False):          #DEPRECATED
         pcmd=xpr(cmd,pblock,vargs)
       elif("ΜΕΤΑΒΛΗΤΕΣ" in line and False):          #DEPRECATED
