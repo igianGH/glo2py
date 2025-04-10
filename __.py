@@ -911,7 +911,7 @@ import traceback
           if(v in vdict[fname]):
             pcmd+=v+","
           else:
-            pcmd+="_,"
+            pcmd+="_dummy,"
         pcmd=pcmd[:-1]+"="
         pcmd+="".join(cmd[7:])
       elif("<--" in line and False):          #DEPRECATED
