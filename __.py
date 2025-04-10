@@ -905,7 +905,17 @@ import traceback
         for i in range(len(cmd)):
           if cmd[i]=="(":
             break
-        pV=[v for v in "".join(cmd[i+1:-1]).split(",")]
+        #foundP,foundB=True,False
+        #for i in range(len(cmd)):
+          #if(cmd[i]=='('):
+            #foundP=True
+          #elif(cmd[i]==')'):
+            #foundP=False
+          #elif(cmd[i]=='['):
+            #foundB=True
+          #elif(cmd[i]==']'):
+            #foundB=False
+        pV=[v for v in "".join(xpr(cmd[i+1:-1])).split(",")]
         pcmd=""
         for v in pV:
           if(v in vdict[fname]):
@@ -913,7 +923,7 @@ import traceback
           else:
             pcmd+="_dummy,"
         pcmd=pcmd[:-1]+"="
-        pcmd+="".join(cmd[7:])
+        pcmd+="".join(xpr(cmd[7:]))
       elif("<--" in line and False):          #DEPRECATED
         pcmd=xpr(cmd,pblock,vargs)
       elif("ΜΕΤΑΒΛΗΤΕΣ" in line and False):          #DEPRECATED
