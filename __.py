@@ -614,11 +614,11 @@ import traceback
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
         pcmd=xpr(cmd,pblock,vargs)
-        pcmd+="\n"+" "*(nsp)                                                      #TYPE CHECK
-        pcmd+="if(type("+vname+")!="+vdict[fname][vname]+"):\n"
-        pcmd+=" "*(nsp+2)+"print(\"ΕΚΧΩΡΗΣΗ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ\")\n"
-        pcmd+=" "*(nsp+2)+"print(----> "+line+")\n"
-        pcmd+=" "*(nsp+2)+"raise Exception\n"+" "*(nsp)
+        #pcmd+="\n"+" "*(nsp)                                                      #TYPE CHECK
+        #pcmd+="if(type("+vname+")!="+vdict[fname][vname]+"):\n"
+        #pcmd+=" "*(nsp+2)+"print(\"-\"*75+\"\\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\\nΕΚΧΩΡΗΣΗ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ\\n\")\n"
+        #pcmd+=" "*(nsp+2)+"print(\"----> "+str(nl)+". "+line.replace("\n","")+"\\n\")\n"
+        #pcmd+=" "*(nsp+2)+"raise Exception\n"+" "*(nsp)
 
       elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
         pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
@@ -1033,4 +1033,4 @@ import traceback
       try:
         source.main()
       except:
-        print("ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ")#"το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))
+        print("\n<ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ>")#"το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))
