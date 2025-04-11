@@ -592,7 +592,10 @@ import traceback
           vname=vname[:lbrpos]
         if(vname not in vdict[fname].keys() and vname!=fname):
           errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
-          print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
+          if(fname=="_main_"):
+            print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+          else:
+            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
           raise Exception
         if(vname in cdict[fname].keys()):
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
