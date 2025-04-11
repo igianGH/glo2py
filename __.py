@@ -729,11 +729,11 @@ import traceback
         else:
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+"):\n"+" "*nsp
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #ENDFOR/WHILE
-        pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         whN-=1
         if(whN<0):
           errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
+        pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
       elif("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line):#cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #DO
         dwhN+=1
