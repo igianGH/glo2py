@@ -6,7 +6,7 @@ import importlib  #reload module
 from contextlib import redirect_stdout
 
 def testversion():
-  print("1415")
+  print("2135")
 def rword(w):
   return [w,w+' ',w+'\n']
 
@@ -53,7 +53,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("yntax" in sb in sb or"efined" in sb): # or "TypeError"
+    if("yntax" in sb or "efined" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
@@ -348,7 +348,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   fout=open(file+".py",'w') #import conflict
   nsp=0
   nl=1
-  fname=pline=""
+  PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
   whv,whstep=[],[]
   cdict,vdict={},{}
@@ -625,9 +625,9 @@ import traceback
           if(vname not in vdict[fname].keys() and vname!=fname):
             errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
             if(fname=="_main_"):
-              print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+              print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
             else:
-              print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+              print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
             raise Exception
           pcmd+=("_.Rinput("+str(v)+","+report+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
@@ -769,6 +769,9 @@ import traceback
         pcmd+="):\n"+" "*(nsp+2)+"break"
       elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN
         fname="_main_"
+        PROname=line[11:]
+        if(PROname[-1] in "\n "):
+          PROname=PROname[:-1]
         cdict[fname],vdict[fname]=dict(),dict()
         if(fblock or pblock or tryblock):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
@@ -779,7 +782,7 @@ import traceback
         tryblock=True
         exe=True
         pcmd="def main():\n"#  try:"
-      elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
+      elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):    #END MAIN
         tryblock=False
         if(ifN!=0):
           errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ"
@@ -995,6 +998,8 @@ import traceback
       #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
+      if("invalid syntax" in errmsg):
+        errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
     print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:\n"+errmsg.replace("Exception()","")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
