@@ -53,24 +53,31 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("yntax" in sb or "efined" in sb): # or "TypeError"
+    if("\'type\' and \'type\'" in sb and "unsupported operand" in sb):
+      linecorr=1
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
+    elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
         errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
       elif("name" in sb and "not defined" in sb):
         errmsg2+="\nΗ ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
+      elif("unsupported operand" in sb):
+        errmsg2+="\nΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
-      if("'type'" in sb):
-        errmsg2+="\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή"
-      elif("invalid literal" in sb):
+      if("invalid literal" in sb):
         errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
       elif("index" in sb and "out of bounds" in sb):
         errmsg2+="\nΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
+      elif("division by zero" in sb):
+        errmsg2+="\nΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
+      elif("math domain error" in sb):
+        errmsg2+="\nΔΕΝ ΟΡΙΖΕΤΑΙ Η ΜΑΘΗΜΑΤΙΚΗ ΠΡΑΞΗ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     print("-"*75+'\n'+errmsg2)
