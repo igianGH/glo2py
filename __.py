@@ -619,7 +619,10 @@ import traceback
             vname=vname[:lbrpos]
           if(vname not in vdict[fname].keys() and vname!=fname):
             errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
-            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
+            if(fname=="_main_"):
+              print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+            else:
+              print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
             raise Exception
           pcmd+=("_.Rinput("+str(v)+","+report+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
@@ -646,7 +649,7 @@ import traceback
       elif(cmd[:8]==list("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
         ifN-=1
         if(ifN<0):
-          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
+          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
         deblock=True
       elif(cmd[:7]==list("ΕΠΙΛΕΞΕ") and ablock):           #SWITCH
@@ -677,7 +680,7 @@ import traceback
         ifN-=1
         swN-=1
         if(swN<0):
-          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
+          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
         deblock=True
       elif(cmd[:3]==list("ΟΣΟ") and ablock):           #WHILE
@@ -731,7 +734,7 @@ import traceback
       elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #ENDFOR/WHILE
         whN-=1
         if(whN<0):
-          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
@@ -742,7 +745,7 @@ import traceback
       elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ") and ablock):  #_WHILE
         dwhN-=1
         if(dwhN<0):
-          errmsg=(str(nl+1)+": ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
@@ -798,7 +801,7 @@ import traceback
             break
           fname+=i
         if(not isname(fname)):
-          errmsg=fname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+          errmsg="ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ: "+fname
           raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         ftypos="".join(cmd[tpos+1:])
@@ -877,7 +880,7 @@ import traceback
             break
           fname+=i
         if(not isname(fname)):
-          errmsg=fname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+          errmsg="ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ: "+fname
           raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         pcmd+=fname+"("
