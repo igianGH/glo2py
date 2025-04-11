@@ -947,6 +947,8 @@ import traceback
 
       if(pcmd not in ["","\n"]):              # save line
         fout.write(nsp*" "+pcmd+comment+"#//"+str(nl)+"\n")
+      else:
+        nl+=1
       if(block):
         nsp+=2
         block=False
@@ -973,7 +975,7 @@ import traceback
       #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:\n"+errmsg+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:\n"+errmsg.replace("Exception()","")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
