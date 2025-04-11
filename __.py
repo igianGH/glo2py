@@ -6,7 +6,7 @@ import importlib  #reload module
 from contextlib import redirect_stdout
 
 def testversion():
-  print("2135")
+  print("2145")
 def rword(w):
   return [w,w+' ',w+'\n']
 
@@ -593,9 +593,9 @@ import traceback
         if(vname not in vdict[fname].keys() and vname!=fname):
           errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
           if(fname=="_main_"):
-            print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+            print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
           else:
-            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+            print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
           raise Exception
         if(vname in cdict[fname].keys()):                                      #obsolete
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
@@ -769,7 +769,7 @@ import traceback
         pcmd+="):\n"+" "*(nsp+2)+"break"
       elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN
         fname="_main_"
-        PROname=line[11:]
+        PROname=line[10:]
         if(PROname[-1] in "\n "):
           PROname=PROname[:-1]
         cdict[fname],vdict[fname]=dict(),dict()
