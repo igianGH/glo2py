@@ -220,7 +220,7 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=='(' and sarr):
       sfunc=True
       pcmd+=s.pop(0)
-    elif(s[0]==')' and sfunc and sarr):
+    elif(s[0]==')' and sfunc and sarr): #array and function
       sfunc=False
       pcmd+=s.pop(0)
     elif(s[0]=="]"):
