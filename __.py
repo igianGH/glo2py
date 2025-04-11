@@ -651,20 +651,20 @@ import traceback
         block=True
         nsp-=2
         pcmd="else:"
-      elif(cmd[:8]==list("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
+      elif(line[:8] in rword("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
         ifN-=1
         if(ifN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
         deblock=True
-      elif(cmd[:7]==list("ΕΠΙΛΕΞΕ") and ablock):           #SWITCH
+      elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):           #SWITCH
         ifN+=1
         swN+=1
         block=True
         pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"\n"+nsp*" "
         pcmd+="if(False):\n"+nsp*" "
         pcmd+="  0"
-      elif(cmd[:9]==list("ΠΕΡΙΠΤΩΣΗ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
+      elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
         block=True
         nsp-=2
         pcmd="elif(sw"+str(swN)
@@ -677,18 +677,18 @@ import traceback
           pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))):"
         else:
           pcmd+=xpr(cmd[10:],pblock,vargs)+"):"
-      elif(cmd[:16]==list("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
+      elif(line[:16] in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
         block=True
         nsp-=2
         pcmd="else:"
-      elif(cmd[:14]==list("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):    #ENDSWITCH
+      elif(line[:14] in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):    #ENDSWITCH
         ifN-=1
         swN-=1
         if(swN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
         deblock=True
-      elif(cmd[:3]==list("ΟΣΟ") and ablock):           #WHILE
+      elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
         whN+=1
         block=True
         whv.append("dummy")
@@ -699,9 +699,10 @@ import traceback
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΕΠΑΝΑΛΑΒΕ"
           raise Exception
         pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):"
-      elif(cmd[:3]==list("ΓΙΑ") and ablock):           # FOR ΜΕΣΩ WHILE
+      elif(cmd[:4]==list("ΓΙΑ ") and ablock):           # FOR ΜΕΣΩ WHILE
         whN+=1
-        if("ΑΠΟ" not in line or "ΜΕΧΡΙ" not in line):
+        if("ΑΠΟ " not in line or "ΜΕΧΡΙ " not in line 
+           or line.count("ΓΙΑ")>1 or line.count("ΑΠΟ")>1 or line.count("ΜΕΧΡΙ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
           raise Exception
         block=True
@@ -723,6 +724,9 @@ import traceback
         pos4=pos3+8
 
         if("ΜΕ_ΒΗΜΑ" in line):
+          if("ΜΕ_ΒΗΜΑ " not in line):
+            errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
+            raise Exception
           pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
           step=xpr(cmd[pos4:],pblock,vargs)
         else:
@@ -744,18 +748,18 @@ import traceback
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction"+str(whN)+" <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction"+str(whN)+"):"
         else:
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+"):\n"+" "*nsp
-      elif(cmd[:16]==list("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #ENDFOR/WHILE
+      elif(line[:16] in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #ENDFOR/WHILE
         whN-=1
         if(whN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
-      elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
+      elif(line[:15] in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
         dwhN+=1
         block=True
         pcmd="while(True):"
-      elif(cmd[:11]==list("ΜΕΧΡΙΣ_ΟΤΟΥ") and ablock):  #_WHILE
+      elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
         dwhN-=1
         if(dwhN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
@@ -763,7 +767,7 @@ import traceback
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
-      elif(cmd[:9]==list("ΠΡΟΓΡΑΜΜΑ")):                     # MAIN
+      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN
         fname="_main_"
         cdict[fname],vdict[fname]=dict(),dict()
         if(fblock or pblock or tryblock):
@@ -775,7 +779,7 @@ import traceback
         tryblock=True
         exe=True
         pcmd="def main():\n"#  try:"
-      elif(cmd[:18]==list("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
+      elif(line[:18] in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")):    #END MAIN
         tryblock=False
         if(ifN!=0):
           errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ"
@@ -792,7 +796,7 @@ import traceback
     #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
     #print(getattr(e, 'message', repr(e)))'''
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
-      elif(cmd[:9]==list("ΣΥΝΑΡΤΗΣΗ")):           #FUNCTION
+      elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):           #FUNCTION
         if(fblock or pblock or tryblock):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
           raise Exception
@@ -850,7 +854,7 @@ import traceback
       elif(fblock and fname==line[:lfn] and ("<--"==line[lfn:lfn+3] or " <--"==line[lfn:lfn+4])): #RETURN
         pcmd="_"+fname+xpr(cmd[len(fname):])#[2:]
         nfvalue=False
-      elif(cmd[:16]==list("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
+      elif(line[:16] in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
@@ -878,7 +882,7 @@ import traceback
         fblock=False
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
-      elif(cmd[:10]==list("ΔΙΑΔΙΚΑΣΙΑ")):           #PROCEDURE
+      elif(cmd[:11]==list("ΔΙΑΔΙΚΑΣΙΑ ")):           #PROCEDURE
         if(fblock or pblock or tryblock):
           errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
           raise Exception
@@ -901,7 +905,7 @@ import traceback
         for a in vargs:
           pcmd+=a+","
         pcmd=pcmd[:-1]+"):"
-      elif(cmd[:17]==list("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
+      elif(line[:17] in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
