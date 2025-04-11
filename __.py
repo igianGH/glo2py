@@ -259,6 +259,12 @@ def xpr(s,pblock=False,v=[]):
     elif(s[:3]==list("<--")):
       pcmd+="="
       s=s[3:]
+    elif(s[0]=="+"):
+      pcmd+="+0+"
+      s.pop(0)
+    elif(s[0]=="*"):
+      pcmd+="*1.*"
+      s.pop(0)
     elif(s[0]=="="):
       pcmd+="=="
       s.pop(0)
