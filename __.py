@@ -475,8 +475,8 @@ import traceback
         if(test):
           print("ΥΠΟΠΡΟΓΡΑΜΜΑ:",fname,
                 "ΣΤΑΘΕΡΕΣ:",list(cdict[fname].keys()),
-                "ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))       # ERRORCHECK
-      elif(cblock):                               #CBLOCK
+                "ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))       #full variable report
+      elif(cblock):                                            #CBLOCK
         if(line.count('=')==1):
           eqpos=line.find('=')
           cname=line[:eqpos]
@@ -581,8 +581,8 @@ import traceback
           pcmd+="except:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
 
-      elif(line.count("<--")==1 and ablock and                                   #ASSIGNMENT
-           not (fname in line and line[len(fname)] not in letters+list("0123456789_"))):  # return handled elsewhere
+      elif(line.count("<--")==1 and ablock and                                             #ASSIGNMENT
+           not( fname in line and line[len(fname)] not in letters+list("0123456789_") )):   #return handled elsewhere
         aspos=line.find("<--")
         vname=line[:aspos]
         if(vname[-1]==" "):
@@ -597,7 +597,7 @@ import traceback
           else:
             print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
           raise Exception
-        if(vname in cdict[fname].keys()):
+        if(vname in cdict[fname].keys()):                                      #obsolete
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
         pcmd=xpr(cmd,pblock,vargs)
@@ -730,6 +730,14 @@ import traceback
           step="1"
         whv.append(xpr(cmd[4:pos1-1],pblock,vargs))
         whstep.append(step)
+        vname=whv[-1]
+        if(vname not in vdict[fname].keys() and vname!=fname):
+          errmsg="ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
+          if(fname=="_main_"):
+            print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+          else:
+            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))
+          raise Exception
         pcmd+=whv[-1]+"="+xpr(cmd[pos1+4:pos2],pblock,vargs)+"\n"+" "*nsp
         pcmd+="while("  #for "
         if("ΜΕ_ΒΗΜΑ" in line):
@@ -743,7 +751,7 @@ import traceback
           raise Exception
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
-      elif("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line):#cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #DO
+      elif(cmd[:15]==list("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
         dwhN+=1
         block=True
         pcmd="while(True):"
