@@ -5,9 +5,8 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
-#def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
-  #interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
-
+def testversion():
+  print("1415")
 #def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
   #interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
 
