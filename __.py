@@ -217,10 +217,16 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=="["):
       sarr=True
       pcmd+=s.pop(0)
+    elif(s[0]=='(' and sarr):
+      sfunc=True
+      pcmd+=s.pop(0)
+    elif(s[0]==')' and sfunc and sarr):
+      sfunc=False
+      pcmd+=s.pop(0)
     elif(s[0]=="]"):
       sarr=False
       pcmd+=s.pop(0)
-    elif(s[0]=="," and sarr):
+    elif(s[0]=="," and sarr and not sfunc):
       pcmd+="]["
       s.pop(0)
     elif(s[:4]==list("ΟΧΙ ") or s[:4]==list("ΟΧΙ(")):
@@ -902,19 +908,19 @@ import traceback
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
       elif(cmd[:6]==list("ΚΑΛΕΣΕ")):          #ΚΑΛΕΣΕ
-        for i in range(len(cmd)):
-          if cmd[i]=="(":
+        for posP in range(len(cmd)):
+          if cmd[posP]=="(":
             break
         Xcmd=xpr(cmd)
-        nP=1  #number of open left(
+        nP=0  #number of open left(
         for i in range(len(Xcmd)):
           if(Xcmd[i]=='('):
             nP+=1
           elif(Xcmd[i]==')'):
             nP-=1
-          elif(Xcmd[i]==',' and nP>1):
-            Xcmd=Xcmd[:i]+['$']+Xcmd[i+1:]
-        pV=[v for v in "".join(Xcmd[i+1:-1]).split(",")]  #split at the correct commas
+          elif(Xcmd[i]==',' and nP==1):
+            Xcmd=Xcmd[:i]+'$'+Xcmd[i+1:]
+        pV=[v for v in Xcmd[posP+1:-1].split("$")]  #split at the correct commas
         pV=[v.replace('$',',') for v in pV]
         Xcmd=[v.replace('$',',') for v in Xcmd]
         pcmd=""
