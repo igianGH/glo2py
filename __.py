@@ -200,7 +200,7 @@ def print2D(A):
 def xpr(s,pblock=False,v=[]):
   # s list of characters
   pcmd=""
-  sarr=False
+  sarr=sfunc=False
   while(s!=[]):
     if(s[0] in "\"\'"):
       pcmd+="\""
