@@ -7,8 +7,8 @@ from contextlib import redirect_stdout
 
 def testversion():
   print("1415")
-#def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
-  #interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
+def rword(w):
+  return [w,w+' ',w+'\n']
 
 def evaluate(fname="source"):
   fOUT=open(fname+".py",'w')
@@ -451,14 +451,14 @@ import traceback
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ ΓΡΑΜΜΗΣ"
         raise Exception
 
-      elif(line[:8]=="ΣΤΑΘΕΡΕΣ"):               #CONSTANTS
+      elif(line in rword("ΣΤΑΘΕΡΕΣ")):               #CONSTANTS
         if(cblock+vblock+ablock):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΣΤΑΘΕΡΩΝ"
           raise Exception
         cblock=True
         #cdict[fname]=dict()
         pcmd="#"+line
-      elif(line[:10]=="ΜΕΤΑΒΛΗΤΕΣ"):            #VARIABLES
+      elif(line in rword("ΜΕΤΑΒΛΗΤΕΣ")):            #VARIABLES
         if(vblock+ablock):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΜΕΤΑΒΛΗΤΩΝ"
           raise Exception
@@ -466,7 +466,7 @@ import traceback
         vblock=True
         #vdict[fname]=dict()
         pcmd="#"+line
-      elif(line[:4]=="ΑΡΧΗ" and line[4]!='_'):                     #ΑΡΧΗ
+      elif(line in rword("ΑΡΧΗ")):                     #ΑΡΧΗ
         cblock=vblock=False
         acounter-=1
         ablock=True
@@ -602,9 +602,9 @@ import traceback
           raise Exception
         pcmd=xpr(cmd,pblock,vargs)
 
-      elif(cmd[:5]==list("ΓΡΑΨΕ") and ablock):                                  #PRINT
+      elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
         pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
-      elif(cmd[:7]==list("ΔΙΑΒΑΣΕ") and ablock):                                #INPUT
+      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
         temp=list(line[8:])
         parr=False
         for i in range(len(temp)):
@@ -631,7 +631,7 @@ import traceback
             raise Exception
           pcmd+=("_.Rinput("+str(v)+","+report+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
-      elif(cmd[:2]==list("ΑΝ") and ablock):           #IF
+      elif(cmd[:3]==list("ΑΝ ") and ablock):           #IF
         ifN+=1
         block=True
         pcmd="if("
@@ -639,7 +639,7 @@ import traceback
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
         pcmd+=xpr(cmd[3:-5],pblock,vargs)+"):"
-      elif(cmd[:9]==list("ΑΛΛΙΩΣ_ΑΝ") and ablock):           #ELIF
+      elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):           #ELIF
         block=True
         nsp-=2
         pcmd="elif("
@@ -647,7 +647,7 @@ import traceback
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
         pcmd+=xpr(cmd[10:-5],pblock,vargs)+"):"
-      elif(cmd[:6]==list("ΑΛΛΙΩΣ") and ablock):           #ELSE
+      elif(line[:6] in rword("ΑΛΛΙΩΣ") and ablock):           #ELSE  ##cmd[:6]==list("ΑΛΛΙΩΣ")
         block=True
         nsp-=2
         pcmd="else:"
