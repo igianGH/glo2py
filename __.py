@@ -8,6 +8,9 @@ from contextlib import redirect_stdout
 #def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
   #interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
 
+#def evaluate(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False):
+  #interpret(file="source",ftrb=False,dline=False,segment=True,report=False,randIN=True,test=False)
+
 def evaluate(fname="source"):
   fOUT=open(fname+".py",'w')
   fOUT.write('''import random as r
