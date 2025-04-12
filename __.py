@@ -263,7 +263,7 @@ def xpr(s,pblock=False,v=[]):
       pcmd+="+0+"
       s.pop(0)
     elif(s[0]=="*"):
-      pcmd+="*1.*"
+      pcmd+="**1*"
       s.pop(0)
     elif(s[0]=="="):
       pcmd+="=="
