@@ -225,7 +225,7 @@ def xpr(s,pblock=False,v=[]):
         break
     elif(s[0]=="["):
       sarr=True
-      pcmd+=s.pop(0)
+      pcmd+=s.pop(0)+"-1+"
     elif(s[0]=='(' and sarr):
       sfunc=True
       pcmd+=s.pop(0)
@@ -236,7 +236,7 @@ def xpr(s,pblock=False,v=[]):
       sarr=False
       pcmd+=s.pop(0)
     elif(s[0]=="," and sarr and not sfunc):
-      pcmd+="]["
+      pcmd+="][-1+"
       s.pop(0)
     elif(s[:4]==list("ΟΧΙ ") or s[:4]==list("ΟΧΙ(")):
       pcmd+="not"
@@ -573,7 +573,7 @@ import traceback
               vname=vname[:-1]
             vdim=(v[lbrpos+1:rbrpos].replace(" ","")).split(",")
             for i in range(len(vdim)-1,-1,-1):
-              vval="("+xpr(list(vdim[i]))+"+1)*["+vval+"]"              #expression in Shape
+              vval="("+xpr(list(vdim[i]))+")*["+vval+"]"              #expression in Shape
             vval="np.array("+vval+")"
           else:
             vname=v
@@ -627,9 +627,10 @@ import traceback
         parr=False
         for i in range(len(temp)):
           if(temp[i]=='['):
+            temp[i]='[-1+'
             parr=True
           elif(parr and temp[i]==','):
-            temp[i]=']['
+            temp[i]='][-1+'
           elif(temp[i]==']'):
             parr=False
         temp="".join(temp)
@@ -1030,7 +1031,8 @@ import traceback
         with redirect_stdout(lfile):
           source.main()
     else:
+      source.main()
       try:
-        source.main()
+        0==0#source.main()
       except:
-        print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))#"\n<ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ>")#
+        0==0#print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))#"\n<ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ>")#
