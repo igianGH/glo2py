@@ -56,14 +56,14 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     if("\'type\' and \'type\'" in sb and "unsupported operand" in sb):
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
-    elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb): # or "TypeError"
+    elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb or "only concatenate" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
         errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
       elif("name" in sb and "not defined" in sb):
         errmsg2+="\nΗ ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
-      elif("unsupported operand" in sb):
+      elif("unsupported operand" in sb or "only concatenate" in sb):
         errmsg2+="\nΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
