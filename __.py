@@ -238,7 +238,7 @@ def xpr(s,pblock=False,v=[]):
         break
     elif(s[0]=="["):
       sarr=True
-      pcmd+=s.pop(0)+"-1+"
+      pcmd+=s.pop(0)+"isindex("
     elif(s[0]=='(' and sarr):
       sfunc=True
       pcmd+=s.pop(0)
@@ -247,9 +247,9 @@ def xpr(s,pblock=False,v=[]):
       pcmd+=s.pop(0)
     elif(s[0]=="]"):
       sarr=False
-      pcmd+=s.pop(0)
+      pcmd+=")"+s.pop(0)
     elif(s[0]=="," and sarr and not sfunc):
-      pcmd+="][-1+"
+      pcmd+=")][isindex("
       s.pop(0)
     elif(s[:4]==list("ΟΧΙ ") or s[:4]==list("ΟΧΙ(")):
       pcmd+="not"
@@ -389,6 +389,14 @@ import numpy as np
 import __ as _
 import sys
 import traceback
+
+class NUM:
+  def __init__(self,value=1):
+    self.value=value
+  def __mul__(self,x):
+    return self.value*x**1
+  def __rmul__(self,x):
+    return NUM(x)
 \n''')
   if(segment):
     nsp=2
@@ -813,7 +821,7 @@ import traceback
         #mblock=True
         tryblock=True
         exe=True
-        pcmd="def main():\n"#  try:"
+        pcmd="def main():\n  N1=NUM()\n"
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):    #END MAIN
         tryblock=False
         if(ifN!=0):
