@@ -33,7 +33,7 @@ class NUM:
 \n''')  
   with open(fname,'r') as fIN:
     X=xpr([c for c in fIN.read()])
-    fOUT.write("def main():\n")
+    fOUT.write("def main():\n  N1=NUM()\n")
     fOUT.write("  print("+X+')\n')
   fOUT.close()
   ##EXECUTION
