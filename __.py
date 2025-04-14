@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1404252145")
+  print("1504250023")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -30,7 +30,7 @@ class NUM:
   def __mul__(self,x):
     return self.value*x**1
   def __rmul__(self,x):
-    return NUM(x)
+    return NUM(x**1)
 \n''')  
   with open(fname,'r') as fIN:
     X=xpr([c for c in fIN.read()])
@@ -396,7 +396,7 @@ class NUM:
   def __mul__(self,x):
     return self.value*x**1
   def __rmul__(self,x):
-    return NUM(x)
+    return NUM(x**1)
 \n''')
   if(segment):
     nsp=2
@@ -807,7 +807,7 @@ class NUM:
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
-      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN
+      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ___________________________
         fname="_main_"
         PROname=line[10:]
         if(PROname[-1] in "\n "):
