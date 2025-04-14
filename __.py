@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1404252140")
+  print("1404252145")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -85,7 +85,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("invalid literal" in sb):
         errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
-      elif("index" in sb and "out of bounds" in sb):
+      elif("index" in sb and "out of bounds" in sb or "valid indices" in sb):
         errmsg2+="\nΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
       elif("division by zero" in sb):
         errmsg2+="\nΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
