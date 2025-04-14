@@ -9,6 +9,10 @@ def testversion():
   print("2145")
 def rword(w):
   return [w,w+' ',w+'\n']
+def isindex(i):
+  if(i>0):
+    return i-1
+  return 1.
 
 def evaluate(fname="source"):
   fOUT=open(fname+".py",'w')
@@ -18,10 +22,7 @@ import numpy as np
 import __ as _
 import sys
 import traceback
-\n''')  
-  with open(fname,'r') as fIN:
-    X=xpr([c for c in fIN.read()])
-    fOUT.write('''
+
 class NUM:
   def __init__(self,value=1):
     self.value=value
@@ -29,7 +30,9 @@ class NUM:
     return self.value*x**1
   def __rmul__(self,x):
     return NUM(x)
-''')
+\n''')  
+  with open(fname,'r') as fIN:
+    X=xpr([c for c in fIN.read()])
     fOUT.write("def main():\n")
     fOUT.write("  print("+X+')\n')
   fOUT.close()
