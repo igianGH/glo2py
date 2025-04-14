@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1404251518")
+  print("1404252140")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -238,7 +238,7 @@ def xpr(s,pblock=False,v=[]):
         break
     elif(s[0]=="["):
       sarr=True
-      pcmd+=s.pop(0)+"isindex("
+      pcmd+=s.pop(0)+"_.isindex("
     elif(s[0]=='(' and sarr):
       sfunc=True
       pcmd+=s.pop(0)
@@ -249,7 +249,7 @@ def xpr(s,pblock=False,v=[]):
       sarr=False
       pcmd+=")"+s.pop(0)
     elif(s[0]=="," and sarr and not sfunc):
-      pcmd+=")][isindex("
+      pcmd+=")][_.isindex("
       s.pop(0)
     elif(s[:4]==list("ΟΧΙ ") or s[:4]==list("ΟΧΙ(")):
       pcmd+="not"
