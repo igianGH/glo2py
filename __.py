@@ -6,7 +6,8 @@ import importlib  #reload module
 from contextlib import redirect_stdout
 
 def testversion():
-  print("2145")
+  print(">",end="")
+  print("1404251518")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
