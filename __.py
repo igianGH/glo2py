@@ -21,6 +21,15 @@ import traceback
 \n''')  
   with open(fname,'r') as fIN:
     X=xpr([c for c in fIN.read()])
+    fOUT.write('''
+class NUM:
+  def __init__(self,value=1):
+    self.value=value
+  def __mul__(self,x):
+    return self.value*x**1
+  def __rmul__(self,x):
+    return NUM(x)
+''')
     fOUT.write("def main():\n")
     fOUT.write("  print("+X+')\n')
   fOUT.close()
@@ -263,7 +272,7 @@ def xpr(s,pblock=False,v=[]):
       pcmd+="+0+"
       s.pop(0)
     elif(s[0]=="*"):
-      pcmd+="**1*"
+      pcmd+="*N1*"
       s.pop(0)
     elif(s[0]=="="):
       pcmd+="=="
