@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1504250309")
+  print("1504250343")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -373,7 +373,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   fin=open(file+"_",'r')
   fout=open(file+".py",'w') #import conflict
   nsp=0
-  nl=1
+  nl=0
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
   whv,whstep=[],[]
@@ -404,6 +404,7 @@ class NUM:
     fout.write("def main():\n")
   try:
     for line in fin:
+      nl+=1
       pcmd=""
       comment=""
       if(pline!=""):
@@ -418,7 +419,6 @@ class NUM:
         if(line[i] not in " \n"):
           line=line[:i+1]
           break
-      nl+=1
       if(line!="" and line[-1]=='&'):
         pline=line[:-1]
         continue
@@ -1009,9 +1009,11 @@ class NUM:
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
+        if(pcmd[-1]=="\n"):
+          pcmd=pcmd[:-1]
         fout.write(nsp*" "+pcmd+comment+"#//"+str(nl)+"\n")
       else:
-        nl+=1
+        nl+=0
       if(block):
         nsp+=2
         block=False
