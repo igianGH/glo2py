@@ -417,7 +417,7 @@ class myA:
     if(self.dimension==1 and len(self.value)<21):
       return self.value+\"\\n\"+\"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
     n=0
-    for l in self.values:
+    for l in self.value:
       n+=1
       print(n,l)
     return \"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
