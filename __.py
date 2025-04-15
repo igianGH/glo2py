@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1504250343")
+  print("1504250514")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -69,7 +69,8 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     if("\'type\' and \'type\'" in sb and "unsupported operand" in sb):
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
-    elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb or "only concatenate" in sb): # or "TypeError"
+    elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
+    or "only concatenate" in sb or "no attribute \'value\'" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
@@ -78,6 +79,8 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
         errmsg2+="\nΗ ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
       elif("unsupported operand" in sb or "only concatenate" in sb):
         errmsg2+="\nΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
+      elif("no attribute \'value\'" in sb):
+        errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι πίνακας"
       else:
         errmsg2+="\n> "+trb.split('\n')[0]
     else:
@@ -238,7 +241,7 @@ def xpr(s,pblock=False,v=[]):
         break
     elif(s[0]=="["):
       sarr=True
-      pcmd+=s.pop(0)+"_.isindex("
+      pcmd+=".value"+s.pop(0)+"_.isindex("
     elif(s[0]=='(' and sarr):
       sfunc=True
       pcmd+=s.pop(0)
@@ -397,6 +400,13 @@ class NUM:
     return self.value*x**1
   def __rmul__(self,x):
     return NUM(x**1)
+class myA:
+  def __init__(self,shape,typos):
+    A=[typos for i in range(shape.pop(-1))]
+    while(shape!=[]):
+      A=[A[:] for i in range(shape.pop(-1))]
+    self.value=A
+    self.typos=typos
 \n''')
   if(segment):
     nsp=2
@@ -589,13 +599,13 @@ class NUM:
           vval=vtype
           if("[" in v):
             lbrpos,rbrpos=v.find("["),v.find("]")
-            vname=v[:lbrpos]
+            vname=v[:lbrpos]#+".value"
             if(vname[-1]==" "):
               vname=vname[:-1]
-            vdim=(v[lbrpos+1:rbrpos].replace(" ","")).split(",")
+            vdim=(v[lbrpos+1:rbrpos].replace(" ",""))#.split(",")
             for i in range(len(vdim)-1,-1,-1):
               vval="("+xpr(list(vdim[i]))+")*["+vval+"]"              #expression in Shape
-            vval="np.array("+vval+")"
+            vval="myA(["+vdim+"],"+vtype+")"#"np.array("+vval+")"
           else:
             vname=v
             if(vname[-1]==" "):
@@ -611,6 +621,7 @@ class NUM:
             raise Exception
           else:
             vdict[fname][vname]=vtype
+            vdict[fname][vname+".value"]=vtype
           pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)
           pcmd+="except:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
@@ -648,7 +659,7 @@ class NUM:
         parr=False
         for i in range(len(temp)):
           if(temp[i]=='['):
-            temp[i]='[-1+'
+            temp[i]='.value[-1+'
             parr=True
           elif(parr and temp[i]==','):
             temp[i]='][-1+'
@@ -1042,7 +1053,7 @@ class NUM:
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:\n"+errmsg.replace("Exception()","")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:\n"+errmsg.replace("Exception()","> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
