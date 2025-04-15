@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1504250023")
+  print("1504250309")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -357,15 +357,15 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
     while(True):
       try:
         line2=next(lineG)[:-1]
-        while(len(line2)>0 and line2[0]==' '):    #remove wspace from start
+        while(len(line2)>0 and line2[0]==' '):    # remove wspace from start
           line2=line2[1:]
-        if(len(line2)<1 or line2[0]=='&'):
+        if(len(line2)<1 or line2[0]=='&'):  # merge 2+ lines
           line1+=' '+line2[1:]
-        elif(line1!=""):
+        else:#elif(line1!=""):
           fin.write(line1+"\n")
           line1=line2[:]
-        else:
-          line1=line2[:]
+        #else:
+          #line1=line2[:]
       except:
         fin.write(line1+"\n")
         break
@@ -411,7 +411,7 @@ class NUM:
         pline=""
       for cmpos in range(len(line)):    #COMMENTS
         if(line[cmpos]=="!"):
-          comment="   #"+line[cmpos+1:]
+          comment=("   #"+line[cmpos+1:]).replace("\n","")
           line=line[:cmpos]
           break
       for i in range(cmpos-1,5,-1):     # SPACES tail
