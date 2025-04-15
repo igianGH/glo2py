@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1604250100")
+  print("1604250144")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -415,7 +415,8 @@ class myA:
     print(\"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\")
   def ΤΙΜΕΣ(self):
     if(self.dimension==1 and len(self.value)<21):
-      return self.value+\"\\n\"+\"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
+      print(self.value)
+      return \"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
     n=0
     for l in self.value:
       n+=1
