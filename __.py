@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1504250514")
+  print("1604250100")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -407,6 +407,15 @@ class myA:
       A=[A[:] for i in range(shape.pop(-1))]
     self.value=A
     self.typos=typos
+  def COPY(self,other):
+    self.value=other
+    print(\"_\"*75+\"ΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\")
+  def ΤΙΜΕΣ(self):
+    n=0
+    for l in self.values:
+      n+=1
+      print(n,l)
+    return \"_\"*75+\"ΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
 \n''')
   if(segment):
     nsp=2
