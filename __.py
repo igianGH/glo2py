@@ -403,19 +403,24 @@ class NUM:
 class myA:
   def __init__(self,shape,typos):
     A=[typos for i in range(shape.pop(-1))]
+    d=1
     while(shape!=[]):
+      d+=1
       A=[A[:] for i in range(shape.pop(-1))]
     self.value=A
     self.typos=typos
+    self.dimension=d
   def COPY(self,other):
     self.value=other
-    print(\"_\"*75+\"ΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\")
+    print(\"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\")
   def ΤΙΜΕΣ(self):
+    if(self.dimension==1 and len(self.value)<21):
+      return self.value+\"\\n\"+\"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
     n=0
     for l in self.values:
       n+=1
       print(n,l)
-    return \"_\"*75+\"ΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
+    return \"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
 \n''')
   if(segment):
     nsp=2
