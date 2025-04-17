@@ -66,7 +66,8 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("\'type\' and \'type\'" in sb and "unsupported operand" in sb):
+    if("\'type\' and \'type\'" in sb and "unsupported operand" in sb 
+       or "not supported between instances" in sb and "\'type\'" in sb):
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
     elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
