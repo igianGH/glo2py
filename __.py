@@ -89,7 +89,8 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("invalid literal" in sb):
         errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
-      elif("index" in sb and "out of bounds" in sb or "valid indices" in sb):
+      elif("index" in sb and "out of bounds" in sb or "valid indices" in sb
+          or "indices must be integers" in sb):
         errmsg2+="\nΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
       elif("division by zero" in sb):
         errmsg2+="\nΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
