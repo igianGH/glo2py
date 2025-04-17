@@ -362,6 +362,10 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
     while(True):
       try:
         line2=next(lineG)[:-1]
+        if(line1 in " \n"):
+          fin.write(line1+"\n\n")
+          line1=line2
+          continue
         while(len(line2)>0 and line2[0]==' '):    # remove wspace from start
           line2=line2[1:]
         if(len(line2)<1 or line2[0]=='&'):  # merge 2+ lines
