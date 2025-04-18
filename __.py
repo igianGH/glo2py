@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1604250144")
+  print("1904250016")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -62,7 +62,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     if(ftrb):
       print("\n"+trb)
     ierr=trb.find("Error:")
-    trb=trb[ierr:]
+    trb=trb[ierr+7:]
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
@@ -83,7 +83,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       elif("no attribute \'value\'" in sb):
         errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι πίνακας"
       else:
-        errmsg2+="\n> "+trb.split('\n')[0]
+        errmsg2+="\n"+trb.split('\n')[0]
     else:
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
@@ -97,7 +97,7 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
       elif("math domain error" in sb):
         errmsg2+="\nΔΕΝ ΟΡΙΖΕΤΑΙ Η ΜΑΘΗΜΑΤΙΚΗ ΠΡΑΞΗ"
       else:
-        errmsg2+="\n> "+trb.split('\n')[0]
+        errmsg2+="\n"+trb.split('\n')[0]
     print("-"*75+'\n'+errmsg2)
     msnl=snl=0
     msnl=sb[:]
@@ -382,7 +382,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   fin=open(file+"_",'r')
   fout=open(file+".py",'w') #import conflict
   nsp=0
-  nl=0
+  nl=-1
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
   whv,whstep=[],[]
@@ -429,12 +429,13 @@ class _myA:
 def _assign(y,x):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ"}
   if(type(y)==_myA):
-    raise Exception("Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
+    raise RuntimeError("Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
+  y=_.Rinput(y,False)
   if(type(x) in [y,type(y)]):
     return x
   elif(type(y)==float and type(x)==int):
     return x
-  raise Exception("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tGL[type(x)]+" σε μεταβλητή τύπου "+tGL[type(y)])
+  raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tGL[type(x)]+" σε μεταβλητή τύπου "+tGL[type(y)])
 \n''')
   if(segment):
     nsp=2
@@ -674,7 +675,11 @@ def _assign(y,x):
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
         #pcmd=xpr(cmd,pblock,vargs)
-        pcmd=xpr(list(line[:aspos]+"<--_assign("+line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")"
+        pcmd="try:\n"+" "*(nsp+2)
+        pcmd+=xpr(list(line[:aspos]+"<--_assign("+line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
+        pcmd+="except Exception as e:\n"+" "*(nsp+2)
+        pcmd+="raise RuntimeError(e) from e"
+        #pcmd=xpr(list(line[:aspos]+"<--_assign("+line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")"
         #pcmd+="\n"+" "*(nsp)                                                      #TYPE CHECK
         #pcmd+="if(type("+vname+")!="+vdict[fname][vname]+"):\n"
         #pcmd+=" "*(nsp+2)+"print(\"-\"*75+\"\\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\\nΕΚΧΩΡΗΣΗ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ\\n\")\n"
