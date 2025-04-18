@@ -362,19 +362,17 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
     while(True):
       try:
         line2=next(lineG)[:-1]
-        if(line1 in " \n"):
-          fin.write(line1+"\n\n")
+        if(line1.replace(" ","").replace("\n","")==""):
+          fin.write(line1+"\n")
           line1=line2
           continue
         while(len(line2)>0 and line2[0]==' '):    # remove wspace from start
           line2=line2[1:]
-        if(len(line2)<1 or line2[0]=='&'):  # merge 2+ lines
+        if(len(line2)>0 and line2[0]=='&'):  # merge 2+ lines
           line1+=' '+line2[1:]
-        else:#elif(line1!=""):
+        else:
           fin.write(line1+"\n")
           line1=line2[:]
-        #else:
-          #line1=line2[:]
       except:
         fin.write(line1+"\n")
         break
@@ -454,10 +452,12 @@ def _assign(y,x):
           comment=("   #"+line[cmpos+1:]).replace("\n","")
           line=line[:cmpos]
           break
-      for i in range(cmpos-1,5,-1):     # SPACES tail
+      for i in range(cmpos-1,-1,-1):     # SPACES tail #range(cmpos-1,5,-1):
         if(line[i] not in " \n"):
           line=line[:i+1]
           break
+        else:
+          line=""
       if(line!="" and line[-1]=='&'):
         pline=line[:-1]
         continue
