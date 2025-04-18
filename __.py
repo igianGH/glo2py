@@ -34,7 +34,7 @@ class NUM:
 \n''')  
   with open(fname,'r') as fIN:
     X=xpr([c for c in fIN.read()])
-    fOUT.write("def main():\n  N1=NUM()\n")
+    fOUT.write("def main():\n  N1=_NUM()\n")
     fOUT.write("  print("+X+')\n')
   fOUT.close()
   ##EXECUTION
@@ -399,14 +399,14 @@ import __ as _
 import sys
 import traceback
 
-class NUM:
+class _NUM:
   def __init__(self,value=1):
     self.value=value
   def __mul__(self,x):
     return self.value*x**1
   def __rmul__(self,x):
-    return NUM(x**1)
-class myA:
+    return _NUM(x**1)
+class _myA:
   def __init__(self,shape,typos):
     A=[typos for i in range(shape.pop(-1))]
     d=1
@@ -416,9 +416,6 @@ class myA:
     self.value=A
     self.typos=typos
     self.dimension=d
-  def COPY(self,other):
-    self.value=other
-    print(\"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\")
   def ΤΙΜΕΣ(self):
     if(self.dimension==1 and len(self.value)<21):
       print(self.value)
@@ -428,6 +425,16 @@ class myA:
       n+=1
       print(n,l)
     return \"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
+
+def _assign(y,x):
+  tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ"}
+  if(type(y)==_myA):
+    raise Exception("Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
+  if(type(x) in [y,type(y)]):
+    return x
+  elif(type(y)==float and type(x)==int):
+    return x
+  raise Exception("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tGL[type(x)]+" σε μεταβλητή τύπου "+tGL[type(y)])
 \n''')
   if(segment):
     nsp=2
@@ -626,7 +633,7 @@ class myA:
             vdim=(v[lbrpos+1:rbrpos].replace(" ",""))#.split(",")
             for i in range(len(vdim)-1,-1,-1):
               vval="("+xpr(list(vdim[i]))+")*["+vval+"]"              #expression in Shape
-            vval="myA(["+vdim+"],"+vtype+")"#"np.array("+vval+")"
+            vval="_myA(["+vdim+"],"+vtype+")"#"np.array("+vval+")"
           else:
             vname=v
             if(vname[-1]==" "):
@@ -666,7 +673,8 @@ class myA:
         if(vname in cdict[fname].keys()):                                      #obsolete
           errmsg="ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
-        pcmd=xpr(cmd,pblock,vargs)
+        #pcmd=xpr(cmd,pblock,vargs)
+        pcmd=xpr(list(line[:aspos]+"<--_assign("+line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")"
         #pcmd+="\n"+" "*(nsp)                                                      #TYPE CHECK
         #pcmd+="if(type("+vname+")!="+vdict[fname][vname]+"):\n"
         #pcmd+=" "*(nsp+2)+"print(\"-\"*75+\"\\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\\nΕΚΧΩΡΗΣΗ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ\\n\")\n"
@@ -853,7 +861,7 @@ class myA:
         #mblock=True
         tryblock=True
         exe=True
-        pcmd="def main():\n  N1=NUM()\n"
+        pcmd="def main():\n  N1=_NUM()\n"
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):    #END MAIN
         tryblock=False
         if(ifN!=0):
@@ -927,7 +935,8 @@ class myA:
           pcmd+=a+","
         pcmd=pcmd[:-1]
       elif(fblock and fname==line[:lfn] and ("<--"==line[lfn:lfn+3] or " <--"==line[lfn:lfn+4])): #RETURN
-        pcmd="_"+fname+xpr(cmd[len(fname):])#[2:]
+        #pcmd="_"+fname+xpr(cmd[len(fname):])#[2:]
+        pcmd="_"+fname+xpr(list("<--_assign("+"_"+fname+",")+cmd[len(fname):])
         nfvalue=False
       elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
         if(not ablock):
