@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1904250543")
+  print("1904251443")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -133,7 +133,6 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
           if(snl==msnl):
             while(line[0]==' '):
               line=line[1:]
-            #print(" "*6+str(snl+0-linecorr)+". ",line[:-1])
             if(dline):
               line=next(lines)
               snl+=1
@@ -637,7 +636,7 @@ def _assign(y,x):
             vname,vsub=v[:lbrpos],".typos"
             if(vname[-1]==" "):
               vname=vname[:-1]
-            vdim=(v[lbrpos+1:rbrpos].replace(" ",""))#.split(",")
+            vdim=(v[lbrpos+1:rbrpos].replace(" ",""))
             for i in range(len(vdim)-1,-1,-1):
               vval="("+xpr(list(vdim[i]))+")*["+vval+"]"              #expression in Shape
             vval="_myA(["+vdim+"],"+vtype+")"#"np.array("+vval+")"
@@ -690,10 +689,6 @@ def _assign(y,x):
         pcmd+="raise RuntimeError(e) from e"
         #pcmd=xpr(list(line[:aspos]+"<--_assign("+line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")"
         #pcmd+="\n"+" "*(nsp)                                                      #TYPE CHECK
-        #pcmd+="if(type("+vname+")!="+vdict[fname][vname]+"):\n"
-        #pcmd+=" "*(nsp+2)+"print(\"-\"*75+\"\\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\\nΕΚΧΩΡΗΣΗ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ\\n\")\n"
-        #pcmd+=" "*(nsp+2)+"print(\"----> "+str(nl)+". "+line.replace("\n","")+"\\n\")\n"
-        #pcmd+=" "*(nsp+2)+"raise Exception\n"+" "*(nsp)
 
       elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
         pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
@@ -889,9 +884,6 @@ def _assign(y,x):
           raise Exception
         ablock=False
         nsp=0
-        #pcmd='''  except Exception as e:
-    #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
-    #print(getattr(e, 'message', repr(e)))'''
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):           #FUNCTION
         if(fblock or pblock or tryblock):
