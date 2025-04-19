@@ -234,7 +234,7 @@ def xpr(s,pblock=False,v=[]):
       while(True):
         s.pop(0)
         if(s[0] in "\"\'" or s==[]):
-          pcmd+="\""
+          pcmd+="\'"
           s.pop(0)
           break
         else:
@@ -473,7 +473,7 @@ def _assign(y,x):
         dsp=line.find("  ")
         line=line[:dsp]+line[dsp+1:]
       lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. .,".split(" ")
-      if(line.count('\"')%2==1 or line.count('\'')%2==1):
+      if(line.count('\"')>0 or line.count('\'')%2==1):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
         raise Exception
       while("\"" in lineNS):      # ignore "strings"
@@ -482,11 +482,11 @@ def _assign(y,x):
         if("\'" in lineNS[pos1:pos2]):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
           raise Exception
-        lineNS=lineNS[:pos1]+lineNS[pos2+1:]
+        lineNS=lineNS[:pos1]+"_"+lineNS[pos2+1:]
       while("\'" in lineNS):      # ignore 'strings'
         pos1=lineNS.find("\'")
         pos2=lineNS[pos1+1:].find("\'")+pos1+1
-        lineNS=lineNS[:pos1]+lineNS[pos2+1:]
+        lineNS=lineNS[:pos1]+"_"+lineNS[pos2+1:]
       if("ΠΕΡΙΠΤΩΣΗ" in lineNS and ",..," in lineNS):
         lineNS=lineNS[:lineNS.find(",..,")]+lineNS[lineNS.find(",..,")+4:]
       for i in cflags:
