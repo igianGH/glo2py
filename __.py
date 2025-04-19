@@ -492,6 +492,11 @@ def _assign(y,x):
         if(i in lineNS):
           errmsg="ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
           raise Exception
+      for i in range(len(lineNS)):
+        if(lineNS[i]=='.' and (lineNS[i-1] not in "0987654321"
+          or lineNS[i+1] not in "0987654321")):
+          errmsg = "μη έγκυρη χρήση υποδιαστολής"
+          raise Exception 
       lpar=rpar=lc=rc=0
       for i in line:
         match i:
