@@ -24,13 +24,13 @@ import __ as _
 import sys
 import traceback
 
-class NUM:
+class _NUM:
   def __init__(self,value=1):
     self.value=value
   def __mul__(self,x):
     return self.value*x**1
   def __rmul__(self,x):
-    return NUM(x**1)
+    return _NUM(x**1)
 \n''')  
   with open(fname,'r') as fIN:
     X=xpr([c for c in fIN.read()])
@@ -44,7 +44,7 @@ class NUM:
     source.main()
   except Exception as e:
     errmsg=getattr(e, 'message', repr(e))
-    print("[error] "+errmsg+"\n--> "+X)
+    print("Σφάλμα: "+errmsg+"\n--> "+X)
   
 
 def source(code,fname="source"):
