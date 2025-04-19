@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1904250016")
+  print("1904250543")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
