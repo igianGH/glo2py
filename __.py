@@ -660,8 +660,8 @@ def _assign(y,x):
           #pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)
           pcmd+="try:\n"+" "*(nsp+2)
           pcmd+=vname+"=="+vname+"\n"+" "*(nsp+2)
-          pcmd+="_assign("+vname+vsub+","+vtype+")\n"+" "*(nsp)
-          pcmd+="except:\n"+" "*(nsp+2)
+          pcmd+="_assign("+vtype+","+vname+vsub+")\n"+" "*(nsp)
+          pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
 
       elif(line.count("<--")==1 and ablock and                                             #ASSIGNMENT
@@ -922,13 +922,13 @@ def _assign(y,x):
         if ftypos[0]==" ":
           ftypos=ftypos[1:]
         if ftypos=="ΑΚΕΡΑΙΑ":
-          ftypos=int
+          ftypos="int"
         elif ftypos=="ΠΡΑΓΜΑΤΙΚΗ":
-          ftypos=float
+          ftypos="float"
         elif ftypos=="ΧΑΡΑΚΤΗΡΑΣ":
-          ftypos=str
+          ftypos="str"
         elif ftypos=="ΛΟΓΙΚΗ":         #ΛΟΓΙΚΗ
-          ftypos=bool
+          ftypos="bool"
         else:
           errmsg="ΜΗ ΕΓΚΥΡΟΣ ΤΥΠΟΣ ΣΥΝΑΡΤΗΣΗΣ"
           raise Exception
@@ -938,19 +938,19 @@ def _assign(y,x):
         vargs="".join(cmd[len(fname)+1:tpos-1]).split(",")
         for a in vargs:
           pcmd+=a+","
-        pcmd=pcmd[:-1]+"):\n  " #function parameter list
-
-        pcmd+="#"+str(ftypos)+"\n  "
+        pcmd=pcmd[:-1]+"): " #function parameter list
+        pcmd+="#"+(ftypos)+"\n  "
 
         for a in vargs:
           pcmd+="_"+a+","
         pcmd=pcmd[:-1]+"="  #backup values for mutable
         for a in vargs:
           pcmd+=a+","
-        pcmd=pcmd[:-1]
+        pcmd=pcmd[:-1]+"\n"
+        pcmd+=" "*(nsp+2)+"N1=_NUM()\n"
       elif(fblock and fname==line[:lfn] and ("<--"==line[lfn:lfn+3] or " <--"==line[lfn:lfn+4])): #RETURN
         #pcmd="_"+fname+xpr(cmd[len(fname):])#[2:]
-        pcmd="_"+fname+xpr(list("<--_assign("+"_"+fname+",")+cmd[len(fname):])
+        pcmd+="_"+fname+xpr(list("<--_assign("+ftypos+",")+cmd[len(fname)+3:])+")"
         nfvalue=False
       elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
         if(not ablock):
@@ -1002,7 +1002,8 @@ def _assign(y,x):
         vargs="".join(cmd[len(fname)+1:-1]).split(",")
         for a in vargs:
           pcmd+=a+","
-        pcmd=pcmd[:-1]+"):"
+        pcmd=pcmd[:-1]+"):"+"\n"
+        pcmd+=" "*(nsp+2)+"N1=_NUM()\n"
       elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
