@@ -380,7 +380,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   fin=open(file+"_",'r')
   fout=open(file+".py",'w') #import conflict
   nsp=0
-  nl=-1
+  nl=0
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
   whv,whstep=[],[]
@@ -425,15 +425,21 @@ class _myA:
     return \"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
 
 def _assign(y,x):
-  tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ"}
-  if(type(y)==_myA):
+  tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",_myA:"ΠΙΝΑΚΑΣ"}
+  tt,j={},1
+  for i in [y,x]:
+    if(i not in tGL.keys()):
+      tt[j]=tGL[type(i)]
+    else:
+      tt[j]=tGL[i]
+    j+=1
+  if(tt[1]=="ΠΙΝΑΚΑΣ"):
     raise RuntimeError("Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
-  y=_.Rinput(y,False)
-  if(type(x) in [y,type(y)]):
+  if(tt[2]==tt[1]):
     return x
-  elif(type(y)==float and type(x)==int):
+  elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
-  raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tGL[type(x)]+" σε μεταβλητή τύπου "+tGL[type(y)])
+  raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
 \n''')
   if(segment):
     nsp=2
@@ -625,10 +631,10 @@ def _assign(y,x):
             vars[-1]+=(','+v)
         pcmd=""
         for v in vars:
-          vval=vtype
+          vval,vsub=vtype,""
           if("[" in v):
             lbrpos,rbrpos=v.find("["),v.find("]")
-            vname=v[:lbrpos]#+".value"
+            vname,vsub=v[:lbrpos],".typos"
             if(vname[-1]==" "):
               vname=vname[:-1]
             vdim=(v[lbrpos+1:rbrpos].replace(" ",""))#.split(",")
@@ -651,7 +657,10 @@ def _assign(y,x):
           else:
             vdict[fname][vname]=vtype
             vdict[fname][vname+".value"]=vtype
-          pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)
+          #pcmd+="try:\n"+" "*(nsp+2)+vname+"=="+vname+"\n"+" "*(nsp)
+          pcmd+="try:\n"+" "*(nsp+2)
+          pcmd+=vname+"=="+vname+"\n"+" "*(nsp+2)
+          pcmd+="_assign("+vname+vsub+","+vtype+")\n"+" "*(nsp)
           pcmd+="except:\n"+" "*(nsp+2)
           pcmd+=vname+"="+vval+"\n"+" "*(nsp)
 
