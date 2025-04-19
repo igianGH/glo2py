@@ -230,7 +230,7 @@ def xpr(s,pblock=False,v=[]):
   sarr=sfunc=False
   while(s!=[]):
     if(s[0] in "\"\'"):
-      pcmd+="\""
+      pcmd+="\'"
       while(True):
         s.pop(0)
         if(s[0] in "\"\'" or s==[]):
