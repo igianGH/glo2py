@@ -94,8 +94,8 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
         errmsg2+="\nΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
       elif("division by zero" in sb):
         errmsg2+="\nΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
-      elif("math domain error" in sb):
-        errmsg2+="\nΔΕΝ ΟΡΙΖΕΤΑΙ Η ΜΑΘΗΜΑΤΙΚΗ ΠΡΑΞΗ"
+      elif("math domain error" in sb or "class \'complex\'" in sb):
+        errmsg2+="\nΔΕΝ ΟΡΙΖΕΤΑΙ Η ΑΡΙΘΜΗΤΙΚΗ ΠΡΑΞΗ"
       else:
         errmsg2+="\n"+trb.split('\n')[0]
     print("-"*75+'\n'+errmsg2)
@@ -413,7 +413,7 @@ class _myA:
     self.value=A
     self.typos=typos
     self.dimension=d
-  def ΤΙΜΕΣ(self):
+  def __invert__(self):
     if(self.dimension==1 and len(self.value)<21):
       print(self.value)
       return \"_\"*75+\"\\nΠΡΟΣΟΧΗ: δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
