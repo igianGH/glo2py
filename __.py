@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 
 def testversion():
   print(">",end="")
-  print("1904251443")
+  print("2004252330")
 def rword(w):
   return [w,w+' ',w+'\n']
 def isindex(i):
@@ -461,8 +461,6 @@ def _assign(y,x):
         if(line[i] not in " \n"):
           line=line[:i+1]
           break
-        else:
-          line=""
       if(line!="" and line[-1]=='&'):
         pline=line[:-1]
         continue
