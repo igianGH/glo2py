@@ -267,9 +267,9 @@ def xpr(s,pblock=False,v=[]):
   s
     list of str με μήκος 1
   pblock
-    αν είναι True τότε καλείται μέσα από ΔΙΑΔΙΚΑΣΙΑ, default False
+    αν είναι True τότε καλείται μέσα από ΔΙΑΔΙΚΑΣΙΑ, default False. DEPRECATED
   v
-    λίστα με τις μεταβλητές της ΔΙΑΔΙΚΑΣΙΑΣ
+    λίστα με τις μεταβλητές της ΔΙΑΔΙΚΑΣΙΑΣ. DEPRECATED
   '''
   # s list of characters
   pcmd=""
@@ -372,24 +372,15 @@ def xpr(s,pblock=False,v=[]):
       pcmd+="m.exp("
       s=s[2:]
     else:
-      if(pblock):
-        iINs=False
-        for i in v:
-          if list(i)==s:
-            iINs=True
-            pcmd+=i+"[0]"
-            s=s[len(i):]
-            break
-          elif len(s)>len(i) and list(i)==s[:len(i)] and s[len(i)] in " +-*/^()=<>[\n":
-            iINs=True
-            pcmd+=i+"[0]"
-            s=s[len(i):]
-            break
-      if(not pblock or not iINs):
-        pcmd+=s.pop(0)
+      pcmd+=s.pop(0)
   return(pcmd)
 
 def isname(s):
+  '''
+  Επιστρέφει True αν το s είναι έγκυρο όνομα μεταβλητής
+  s
+    str, το όνομα που εξετάζεται αν είναι έγκυρο
+  '''
   global letters
   if s[0] not in letters:
     return False
@@ -690,7 +681,7 @@ def _assign(y,x):
             vdim=(v[lbrpos+1:rbrpos].replace(" ",""))
             for i in range(len(vdim)-1,-1,-1):
               vval="("+xpr(list(vdim[i]))+")*["+vval+"]"              #expression in Shape
-            vval="_myA(["+vdim+"],"+vtype+")"#"np.array("+vval+")"
+            vval="_myA(["+vdim+"],"+vtype+")"
           else:
             vname=v
             if(vname[-1]==" "):
@@ -917,8 +908,14 @@ def _assign(y,x):
         if(PROname[-1] in "\n "):
           PROname=PROname[:-1]
         cdict[fname],vdict[fname]=dict(),dict()
-        if(fblock or pblock or tryblock):
-          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+        if(fblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
+          raise Exception
+        if(pblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"
+          raise Exception
+        if(tryblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
           raise Exception
         block=True
         acounter+=1
@@ -941,8 +938,14 @@ def _assign(y,x):
         nsp=0
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):           #FUNCTION
-        if(fblock or pblock or tryblock):
-          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+        if(fblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
+          raise Exception
+        if(pblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"
+          raise Exception
+        if(tryblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
           raise Exception
         fblock=True
         block=True
@@ -1028,10 +1031,16 @@ def _assign(y,x):
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
       elif(cmd[:11]==list("ΔΙΑΔΙΚΑΣΙΑ ")):           #PROCEDURE
-        if(fblock or pblock or tryblock):
-          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+        if(fblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
           raise Exception
-        #pblock=True
+        if(pblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"
+          raise Exception
+        if(tryblock):
+          errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
+          raise Exception
+        pblock=True
         block=True
         acounter+=1
         pcmd="def "
