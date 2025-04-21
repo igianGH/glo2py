@@ -200,30 +200,25 @@ def compare(fn1="source1",fn2="source2",randIN=True):
     f1.close()
     f2.close()
 
-def typos(x):
-  x0=x
-  try:
-    for i in range(len(x.shape)):
-      x0=x0[0]
-  except:
-    x0=x
-  if(x0 in {int,float,str,bool}):
-    return x0
-  else:
-    return type(x0)
-
 l=[chr(ord("a")+i) for i in range(26)]
 l+=[chr(ord("A")+i) for i in range(26)]
 l+=[chr(ord("α")+i) for i in range(25)]
 l+=[chr(ord("Α")+i) for i in range(25) if i!=17]
 letters=l
-Reserved="ΠΡΟΓΡΑΜΜΑ,ΣΥΝΑΡΤΗΣΗ,ΔΙΑΔΙΚΑΣΙΑ,ΜΕΤΑΒΛΗΤΕΣ,ΣΤΑΘΕΡΕΣ,ΑΚΕΡΑΙΕΣ,ΠΡΑΓΜΑΤΙΚΕΣ,ΧΑΡΑΚΤΗΡΕΣ,ΑΛΗΘΗΣ,"
-Reserved+="ΑΡΧΗ,ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ,ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ,ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ,ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ,ΤΕΛΟΣ_ΑΝ,"
-Reserved+="ΑΝ,ΤΟΤΕ,ΑΛΛΙΩΣ_ΑΝ,ΑΛΛΙΩΣ,ΕΠΙΛΕΞΕ,ΠΕΡΙΠΤΩΣΗ,ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ,ΟΣΟ,ΕΠΑΝΑΛΑΒΕ,ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ,"
-Reserved+="ΜΕΧΡΙΣ_ΟΤΟΥ,ΓΙΑ,ΑΠΟ,ΜΕΧΡΙ,ΜΕ_ΒΗΜΑ,ΗΜ,ΣΥΝ,ΕΦ,ΛΟΓ,Ε,Α_Τ,Α_Μ,Τ_Ρ,MOD,DIV,ΟΧΙ,ΚΑΙ,Ή,ΨΕΥΔΗΣ"
-Reserved=Reserved.split(",")
+Reserved='''ΠΡΟΓΡΑΜΜΑ,ΣΥΝΑΡΤΗΣΗ,ΔΙΑΔΙΚΑΣΙΑ,ΜΕΤΑΒΛΗΤΕΣ,ΣΤΑΘΕΡΕΣ,ΑΚΕΡΑΙΕΣ,ΠΡΑΓΜΑΤΙΚΕΣ,ΧΑΡΑΚΤΗΡΕΣ,
+ΑΛΗΘΗΣ,ΨΕΥΔΗΣ,ΑΡΧΗ,ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ,ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ,ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ,ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ,
+ΑΝ,ΤΟΤΕ,ΑΛΛΙΩΣ_ΑΝ,ΑΛΛΙΩΣ,ΤΕΛΟΣ_ΑΝ,ΕΠΙΛΕΞΕ,ΠΕΡΙΠΤΩΣΗ,ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ,ΟΣΟ,ΕΠΑΝΑΛΑΒΕ,ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ,
+ΜΕΧΡΙΣ_ΟΤΟΥ,ΓΙΑ,ΑΠΟ,ΜΕΧΡΙ,ΜΕ_ΒΗΜΑ,ΗΜ,ΣΥΝ,ΕΦ,ΛΟΓ,Ε,Α_Τ,Α_Μ,Τ_Ρ,MOD,DIV,ΟΧΙ,ΚΑΙ,Ή
+'''.replace("\n","").split(",")
 
 def Rinput(v,report=False):
+  '''
+  Επιστρέφει τυχαία τιμή με τύπο τον τύπο της v
+  v
+    μεταβλητή που θα λάβει τυχαία τιμή
+  report
+    αν είναι True τότε εμφανίζεται ποια τυχαία τιμή αποδόθηκε στη v, default False
+  '''
   #v variable
   global letters
   ndigits=r.randrange(1,9)
@@ -244,6 +239,11 @@ def Rinput(v,report=False):
   return v
 
 def TCinput(prompt="> "):
+  '''
+  Λαμβάνει μία τιμή από την είσοδο και τη μετατρέπει από str στον κατάλληλο τύπο
+  prompt
+    εμφανίζεται για να δηλώσει ότι θα διαβαστεί τιμή από την είσοδο
+  '''
   temp=input(prompt)
   tfl=True
   for c in temp:
@@ -261,14 +261,16 @@ def TCinput(prompt="> "):
       return float(temp)
   return temp
 
-def print2D(A):
-  for r in range(1,A.shape[0]):
-    row=""
-    for c in range(1,A.shape[1]):
-      row+=str(A[r][c])+" "
-    print(row)
-
 def xpr(s,pblock=False,v=[]):
+  '''
+  Μετατρέπει λίστα χαρακτήρων σε έγκυρη έκφραση της ΓΛΩΣΣΑΣ
+  s
+    list of str με μήκος 1
+  pblock
+    αν είναι True τότε καλείται μέσα από ΔΙΑΔΙΚΑΣΙΑ, default False
+  v
+    λίστα με τις μεταβλητές της ΔΙΑΔΙΚΑΣΙΑΣ
+  '''
   # s list of characters
   pcmd=""
   sarr=sfunc=False
