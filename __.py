@@ -6,18 +6,39 @@ import importlib  #reload module
 from contextlib import redirect_stdout
 
 def testversion():
+  '''
+  Prints GHlib version
+  '''
   print(">",end="")
-  print("2004252330")
-def rword(w):
+  print("2104252330")
+
+def rword(w:str):
+  '''
+  Returns list of str. This is used for reserved word identification.
+  '''
   return [w,w+' ',w+'\n']
+
 def isindex(i):
-  if(i>0):
-    return i-1
-  return 1.
+  '''
+  Returns valid index for positive integers
+  '''
+  try:
+    if(i>0):
+      return i-1
+    else:
+      return 1.
+  except:
+    raise RuntimeError("Μη έγκυρος δείκτης πίνακα")
 
 def evaluate(fname="source"):
+  '''
+  Αποτιμά μεμονωμένη γραμμή κώδικα σε ΓΛΩΣΣΑ χωρίς μεταβλητές.
+  fname
+    όνομα αρχείου με κώδικα σε ΓΛΩΣΣΑ, default "source".
+  '''
   fOUT=open(fname+".py",'w')
-  fOUT.write('''import random as r
+  fOUT.write('''
+import random as r
 import math as m
 import numpy as np
 import __ as _
@@ -48,10 +69,34 @@ class _NUM:
   
 
 def source(code,fname="source"):
+  '''
+  Αποθηκεύει στο δίσκο str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ.
+  code
+    str με τον κώδικα του προγράμματος
+  fname
+    όνομα αρχείου, default "source"
+  '''
   with open(fname,'w') as f:
     f.write(code)
 
-def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,randIN=True,test=False):
+def interpret(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False):
+  '''
+  Μεταγλωττίζει και επιχειρεί να εκτελέσει κάθε γραμμή προγράμματος σε ΓΛΩΣΣΑ με μέθοδο transpiler.
+  file
+    όνομα πηγαίου αρχείου, default str
+  developer
+    αν έχει τιμή True τότε σε περίπτωση σφάλματος θα εμφανίσει το πλήρες μήνυμα, default False
+  dline
+    αν έχει τιμή True τότε εμφανίζει την εκτιμώμενη γραμμή στην οποία εμφανίστηκε το σφάλμα, default True
+  segment
+    αν έχει τιμή False τότε το πηγαίο πρέπει να είναι πλήρες ΠΡΟΓΡΑΜΜΑ, default False
+  report
+    αν έχει τιμή True τότε όταν παράγεται μία τυχαία τιμή αντί εισόδου, αυτή εμφανίζεται. Default False
+  randIN
+    αν έχει τιμή True τότε αντί εισόδου παράγεται μία τυχαία τιμή με τον αντίστοιχο τύπο, default True
+  test
+    αν έχει τιμή True τότε στη μεταγλώττιση εμφανίζονται οι δηλωμένες μεταβλητές του προγράμματος, default False
+  '''
   try:
     interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
   except:
@@ -59,9 +104,9 @@ def interpret(file="source",ftrb=False,dline=True,segment=False,report=False,ran
     errmsg=str(sys.exc_info()[1])
     trb=str(traceback.format_exc())
     sb=trb[0:]
-    if(ftrb):
+    if(developer):
       print("\n"+trb)
-    ierr=trb.find("Error:")
+    ierr=trb.rfind("Error:")
     trb=trb[ierr+7:]
     if('%' in trb):
       imod=trb.find('%')
@@ -701,11 +746,15 @@ def _assign(y,x):
         parr=False
         for i in range(len(temp)):
           if(temp[i]=='['):
-            temp[i]='.value[-1+'
+            temp[i]='.value[_.isindex('
+            #temp[i]='.value[-1+'
             parr=True
           elif(parr and temp[i]==','):
-            temp[i]='][-1+'
+            temp[i]=')][_.isindex('
+            #temp[i]='][-1+'
           elif(temp[i]==']'):
+            temp[i]=')]'
+            #temp[i]=']'
             parr=False
         temp="".join(temp)
         vars=temp.split(",")
