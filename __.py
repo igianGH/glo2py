@@ -135,7 +135,7 @@ def interpret(file="source",developer=False,dline=True,segment=False,report=Fals
       if("invalid literal" in sb):
         errmsg2+="\nΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
       elif("index" in sb and "out of bounds" in sb or "valid indices" in sb
-          or "indices must be integers" in sb):
+          or "indices must be integers" in sb or "index out of range" in sb):
         errmsg2+="\nΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
       elif("division by zero" in sb):
         errmsg2+="\nΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
