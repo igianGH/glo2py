@@ -421,6 +421,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
   whv,whstep,whline,dwhline,ifline,swline,ALLblock=[],[],[],[],[],[],[]
+  blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
   cdict,vdict={},{}
   intl=floatl=strl=booll=False
   acounter=0
@@ -793,9 +794,10 @@ def _assign(y,x):
         if(ifN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
-        if(ALLblock.pop(-1)!="if"):
-          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+        if(ALLblock.[-1]!="if"):
+          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
+        ALLblock.pop(-1)
         ifline.pop(-1)
         deblock=True
       elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):           #SWITCH
@@ -830,9 +832,10 @@ def _assign(y,x):
         if(swN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
-        if(ALLblock.pop(-1)!="sw"):
-          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+        if(ALLblock.[-1]!="sw"):
+          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
+        ALLblock.pop(-1)
         swline.pop(-1)
         deblock=True
       elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
@@ -899,14 +902,15 @@ def _assign(y,x):
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction"+str(whN)+" <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction"+str(whN)+"):"
         else:
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+"):\n"+" "*nsp
-      elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #ENDFOR/WHILE
+      elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                                        #ENDFOR/WHILE
         whN-=1
         if(whN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
-        if(ALLblock.pop(-1)!="wh"):
-          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+        if(ALLblock.[-1]!="wh"):
+          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
+        ALLblock.pop(-1)
         whline.pop(-1)
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
@@ -921,9 +925,10 @@ def _assign(y,x):
         if(dwhN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
-        if(ALLblock.pop(-1)!="dwh"):
-          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+        if(ALLblock.[-1]!="dwh"):
+          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
+        ALLblock.pop(-1)
         dwhline.pop(-1)
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
