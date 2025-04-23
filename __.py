@@ -778,6 +778,9 @@ def _assign(y,x):
           raise Exception
         pcmd+=xpr(cmd[3:-5],pblock,vargs)+"):"
       elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):           #ELIF
+        if(ifN<0):
+          errmsg=("> unexpected \'ΑΛΛΙΩΣ_ΑΝ\'")
+          raise Exception
         block=True
         nsp-=2
         pcmd="elif("
@@ -792,7 +795,7 @@ def _assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
         ifN-=1
         if(ifN<0):
-          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
+          errmsg=("> unexpected \'ΤΕΛΟΣ_ΑΝ\'")
           raise Exception
         if(ALLblock[-1]!="if"):
           errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
@@ -805,11 +808,15 @@ def _assign(y,x):
         swN+=1
         swline.append(str(nl))
         ALLblock.append("sw")
+        #swblock=True
         block=True
         pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"\n"+nsp*" "
         pcmd+="if(False):\n"+nsp*" "
         pcmd+="  0"
       elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
+        if(swN<0):
+          errmsg="> unexpected \'ΠΕΡΙΠΤΩΣΗ\'"
+          raise Exception
         block=True
         nsp-=2
         pcmd="elif(sw"+str(swN)
@@ -823,6 +830,9 @@ def _assign(y,x):
         else:
           pcmd+=xpr(cmd[10:],pblock,vargs)+"):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
+        if(swN<0):
+          errmsg="> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\'"
+          raise Exception
         block=True
         nsp-=2
         pcmd="else:"
@@ -830,13 +840,14 @@ def _assign(y,x):
         #ifN-=1
         swN-=1
         if(swN<0):
-          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
+          errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
           raise Exception
         if(ALLblock[-1]!="sw"):
           errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         swline.pop(-1)
+        #swblock=False
         deblock=True
       elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
         whN+=1
@@ -905,7 +916,7 @@ def _assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                                        #ENDFOR/WHILE
         whN-=1
         if(whN<0):
-          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\'")
           raise Exception
         if(ALLblock[-1]!="wh"):
           errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
@@ -923,7 +934,7 @@ def _assign(y,x):
       elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
         dwhN-=1
         if(dwhN<0):
-          errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          errmsg=("> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\'")
           raise Exception
         if(ALLblock[-1]!="dwh"):
           errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
@@ -1161,9 +1172,9 @@ def _assign(y,x):
       elif("_" in line[:1] and False):          #DEPRECATED
         pcmd=xpr(cmd,pblock,vargs)
       else:
-        errmsg=""#"ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: Τ800"
-        #if(acounter!=0):
-          #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
+        errmsg=""
+        if(not(tryblock or fblock or pblock)):
+          errmsg="ΛΕΙΠΕΙ Η ΔΗΛΩΣΗ ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
