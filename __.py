@@ -935,16 +935,16 @@ def _assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname] and tryblock and not fblock and not pblock):    #END MAIN
         tryblock=False
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+ifline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+ifline.pop(-1))
           raise Exception
         if(swN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+swline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+swline.pop(-1))
           raise Exception
         if(whN!=0):
           errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
           raise Exception
         if(dwhN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: "+dwhline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+dwhline.pop(-1))
           raise Exception
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
@@ -1022,16 +1022,16 @@ def _assign(y,x):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+ifline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+ifline.pop(-1))
           raise Exception
         if(swN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+swline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+swline.pop(-1))
           raise Exception
         if(whN!=0):
           errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
           raise Exception
         if(dwhN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: "+dwhline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+dwhline.pop(-1))
           raise Exception
         if(nfvalue):
           errmsg=("ΔΕΝ ΕΧΕΙ ΥΠΟΛΟΓΙΣΤΕΙ Η ΤΙΜΗ ΤΗΣ ΣΥΝΑΡΤΗΣΗΣ")
@@ -1083,16 +1083,16 @@ def _assign(y,x):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+ifline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+ifline.pop(-1))
           raise Exception
         if(swN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+swline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+swline.pop(-1))
           raise Exception
         if(whN!=0):
           errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
           raise Exception
         if(dwhN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: "+dwhline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+dwhline.pop(-1))
           raise Exception
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
@@ -1166,8 +1166,14 @@ def _assign(y,x):
       #fout.write('''  except Exception as e:
     #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
     #print(getattr(e, 'message', repr(e)))''')
-    if(fblock+pblock+tryblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
-      errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_<ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ>"
+    if(tryblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
+      errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
+      raise Exception
+    if(fblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
+      errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
+      raise Exception
+    if(pblock!=0):              #ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
+      errmsg="ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"
       raise Exception
     fin.close()
     fout.close()
