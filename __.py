@@ -794,7 +794,7 @@ def _assign(y,x):
         if(ifN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
-        if(ALLblock.[-1]!="if"):
+        if(ALLblock[-1]!="if"):
           errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
         ALLblock.pop(-1)
@@ -832,7 +832,7 @@ def _assign(y,x):
         if(swN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
-        if(ALLblock.[-1]!="sw"):
+        if(ALLblock[-1]!="sw"):
           errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
         ALLblock.pop(-1)
@@ -907,7 +907,7 @@ def _assign(y,x):
         if(whN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
-        if(ALLblock.[-1]!="wh"):
+        if(ALLblock[-1]!="wh"):
           errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
         ALLblock.pop(-1)
@@ -925,7 +925,7 @@ def _assign(y,x):
         if(dwhN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
-        if(ALLblock.[-1]!="dwh"):
+        if(ALLblock[-1]!="dwh"):
           errmsg=("expected "+blockdict[ALLblock.pop(-1)])
           raise Exception
         ALLblock.pop(-1)
