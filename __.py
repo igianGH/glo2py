@@ -795,7 +795,7 @@ def _assign(y,x):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
         if(ALLblock[-1]!="if"):
-          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
+          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         ifline.pop(-1)
@@ -833,7 +833,7 @@ def _assign(y,x):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
         if(ALLblock[-1]!="sw"):
-          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
+          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         swline.pop(-1)
@@ -908,7 +908,7 @@ def _assign(y,x):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         if(ALLblock[-1]!="wh"):
-          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
+          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         whline.pop(-1)
@@ -926,14 +926,14 @@ def _assign(y,x):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
         if(ALLblock[-1]!="dwh"):
-          errmsg=("expected "+blockdict[ALLblock.pop(-1)])
+          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         dwhline.pop(-1)
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
-      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ___________________________
+      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ---------------------------------------------------------------
         fname="_main_"
         PROname=line[10:]
         if(PROname[-1] in "\n "):
