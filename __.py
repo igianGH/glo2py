@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("2104252330")
+  print("2404250124")
 
 def rword(w:str):
   '''
