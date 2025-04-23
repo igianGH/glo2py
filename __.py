@@ -420,7 +420,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   nl=0
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
-  whv,whstep,whline,dwhline,ifline,swline=[],[],[],[],[],[]
+  whv,whstep,whline,dwhline,ifline,swline,ALLblock=[],[],[],[],[],[],[]
   cdict,vdict={},{}
   intl=floatl=strl=booll=False
   acounter=0
@@ -769,6 +769,7 @@ def _assign(y,x):
       elif(cmd[:3]==list("ΑΝ ") and ablock):           #IF
         ifN+=1
         ifline.append(str(nl))
+        ALLblock.append("if")
         block=True
         pcmd="if("
         if(cmd[-4:]!=list("ΤΟΤΕ")):
@@ -792,12 +793,16 @@ def _assign(y,x):
         if(ifN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
+        if(ALLblock.pop(-1)!="if"):
+          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+          raise Exception
         ifline.pop(-1)
         deblock=True
       elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):           #SWITCH
         #ifN+=1
         swN+=1
         swline.append(str(nl))
+        ALLblock.append("sw")
         block=True
         pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"\n"+nsp*" "
         pcmd+="if(False):\n"+nsp*" "
@@ -825,10 +830,14 @@ def _assign(y,x):
         if(swN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
+        if(ALLblock.pop(-1)!="sw"):
+          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+          raise Exception
         swline.pop(-1)
         deblock=True
       elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
         whN+=1
+        ALLblock.append("wh")
         block=True
         whv.append("dummy")
         whstep.append("0")
@@ -842,6 +851,7 @@ def _assign(y,x):
       elif(cmd[:4]==list("ΓΙΑ ") and ablock):           # FOR ΜΕΣΩ WHILE
         whN+=1
         whline.append(str(nl))
+        ALLblock.append("wh")
         if("ΑΠΟ " not in line or "ΜΕΧΡΙ " not in line 
            or line.count("ΓΙΑ")>1 or line.count("ΑΠΟ")>1 or line.count("ΜΕΧΡΙ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
@@ -894,18 +904,25 @@ def _assign(y,x):
         if(whN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
+        if(ALLblock.pop(-1)!="wh"):
+          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
+          raise Exception
         whline.pop(-1)
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
       elif(line in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
         dwhN+=1
         dwhline.append(str(nl))
+        ALLblock.append("dwh")
         block=True
         pcmd="while(True):"
       elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
         dwhN-=1
         if(dwhN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
+          raise Exception
+        if(ALLblock.pop(-1)!="dwh"):
+          errmsg=("Αυτή η Δομή πρέπει να κλείσει παρακάτω")
           raise Exception
         dwhline.pop(-1)
         deblock=True
