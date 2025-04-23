@@ -420,7 +420,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   nl=0
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
-  whv,whstep=[],[]
+  whv,whstep,whline,dwhline,ifline,swline=[],[],[],[],[],[]
   cdict,vdict={},{}
   intl=floatl=strl=booll=False
   acounter=0
@@ -571,14 +571,14 @@ def _assign(y,x):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ ΓΡΑΜΜΗΣ"
         raise Exception
 
-      elif(line in rword("ΣΤΑΘΕΡΕΣ")):               #CONSTANTS
+      elif(line in rword("ΣΤΑΘΕΡΕΣ") and (tryblock or fblock or pblock)):               #CONSTANTS
         if(cblock+vblock+ablock):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΣΤΑΘΕΡΩΝ"
           raise Exception
         cblock=True
         #cdict[fname]=dict()
         pcmd="#"+line
-      elif(line in rword("ΜΕΤΑΒΛΗΤΕΣ")):            #VARIABLES
+      elif(line in rword("ΜΕΤΑΒΛΗΤΕΣ") and (tryblock or fblock or pblock)):            #VARIABLES
         if(vblock+ablock):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΜΕΤΑΒΛΗΤΩΝ"
           raise Exception
@@ -586,7 +586,7 @@ def _assign(y,x):
         vblock=True
         #vdict[fname]=dict()
         pcmd="#"+line
-      elif(line in rword("ΑΡΧΗ")):                     #ΑΡΧΗ
+      elif(line in rword("ΑΡΧΗ") and (tryblock or fblock or pblock)):                     #ΑΡΧΗ
         cblock=vblock=False
         acounter-=1
         ablock=True
@@ -596,7 +596,7 @@ def _assign(y,x):
           print("ΥΠΟΠΡΟΓΡΑΜΜΑ:",fname,
                 "ΣΤΑΘΕΡΕΣ:",list(cdict[fname].keys()),
                 "ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))       #full variable report
-      elif(cblock):                                            #CBLOCK
+      elif(cblock and (tryblock or fblock or pblock)):                                            #CBLOCK
         if(line.count('=')==1):
           eqpos=line.find('=')
           cname=line[:eqpos]
@@ -620,7 +620,7 @@ def _assign(y,x):
         else:
           errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΤΑΘΕΡΑΣ"# / <cname> = <cvalue>"
           raise Exception
-      elif(vblock):                                               #VBLOCK
+      elif(vblock and (tryblock or fblock or pblock)):                                               #VBLOCK
         if(line.count(":")!=1):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΩΝ"
           raise Exception
@@ -768,6 +768,7 @@ def _assign(y,x):
         pcmd=pcmd[:-1]
       elif(cmd[:3]==list("ΑΝ ") and ablock):           #IF
         ifN+=1
+        ifline.append(str(nl))
         block=True
         pcmd="if("
         if(cmd[-4:]!=list("ΤΟΤΕ")):
@@ -791,10 +792,12 @@ def _assign(y,x):
         if(ifN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΑΝ ΑΠΟ ΑΝ")
           raise Exception
+        ifline.pop(-1)
         deblock=True
       elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):           #SWITCH
-        ifN+=1
+        #ifN+=1
         swN+=1
+        swline.append(str(nl))
         block=True
         pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"\n"+nsp*" "
         pcmd+="if(False):\n"+nsp*" "
@@ -817,17 +820,19 @@ def _assign(y,x):
         nsp-=2
         pcmd="else:"
       elif(line in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):    #ENDSWITCH
-        ifN-=1
+        #ifN-=1
         swN-=1
         if(swN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ ΑΠΟ ΕΠΙΛΕΞΕ")
           raise Exception
+        swline.pop(-1)
         deblock=True
       elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
         whN+=1
         block=True
         whv.append("dummy")
         whstep.append("0")
+        whline.append(str(nl))
         pcmd=whv[-1]+"=0\n"+nsp*' ' # for +
         pcmd+="while("
         if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
@@ -836,6 +841,7 @@ def _assign(y,x):
         pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):"
       elif(cmd[:4]==list("ΓΙΑ ") and ablock):           # FOR ΜΕΣΩ WHILE
         whN+=1
+        whline.append(str(nl))
         if("ΑΠΟ " not in line or "ΜΕΧΡΙ " not in line 
            or line.count("ΓΙΑ")>1 or line.count("ΑΠΟ")>1 or line.count("ΜΕΧΡΙ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
@@ -888,10 +894,12 @@ def _assign(y,x):
         if(whN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
+        whline.pop(-1)
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
-      elif(line in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ")):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
+      elif(line in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
         dwhN+=1
+        dwhline.append(str(nl))
         block=True
         pcmd="while(True):"
       elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
@@ -899,6 +907,7 @@ def _assign(y,x):
         if(dwhN<0):
           errmsg=("ΠΕΡΙΣΣΟΤΕΡΕΣ ΜΕΧΡΙΣ_ΟΤΟΥ ΑΠΟ ΔΟΜΕΣ ΕΠΑΝΑΛΗΨΗΣ")
           raise Exception
+        dwhline.pop(-1)
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
@@ -923,13 +932,19 @@ def _assign(y,x):
         tryblock=True
         exe=True
         pcmd="def main():\n  N1=_NUM()\n"
-      elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):    #END MAIN
+      elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname] and tryblock and not fblock and not pblock):    #END MAIN
         tryblock=False
         if(ifN!=0):
-          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ"
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+ifline.pop(-1))
           raise Exception
-        if(dwhN+whN!=0):
-          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ"
+        if(swN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+swline.pop(-1))
+          raise Exception
+        if(whN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
+          raise Exception
+        if(dwhN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: "+dwhline.pop(-1))
           raise Exception
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
@@ -1002,21 +1017,24 @@ def _assign(y,x):
         #pcmd="_"+fname+xpr(cmd[len(fname):])#[2:]
         pcmd+="_"+fname+xpr(list("<--_assign("+ftypos+",")+cmd[len(fname)+3:])+")"
         nfvalue=False
-      elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
+      elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ") and fblock):         #ENDFUNCTION
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ")
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+ifline.pop(-1))
           raise Exception
-        if(dwhN+whN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ")
+        if(swN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+swline.pop(-1))
+          raise Exception
+        if(whN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
+          raise Exception
+        if(dwhN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: "+dwhline.pop(-1))
           raise Exception
         if(nfvalue):
           errmsg=("ΔΕΝ ΕΧΕΙ ΥΠΟΛΟΓΙΣΤΕΙ Η ΤΙΜΗ ΤΗΣ ΣΥΝΑΡΤΗΣΗΣ")
-          raise Exception
-        if(not ablock):
-          errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         ablock=False
         for a in vargs:
@@ -1060,15 +1078,21 @@ def _assign(y,x):
           pcmd+=a+","
         pcmd=pcmd[:-1]+"):"+"\n"
         pcmd+=" "*(nsp+2)+"N1=_NUM()\n"
-      elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
+      elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ") and pblock):    #ENDPROCEDURE
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ")
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+ifline.pop(-1))
           raise Exception
-        if(dwhN+whN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ")
+        if(swN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line"+swline.pop(-1))
+          raise Exception
+        if(whN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
+          raise Exception
+        if(dwhN!=0):
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: "+dwhline.pop(-1))
           raise Exception
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
@@ -1082,7 +1106,7 @@ def _assign(y,x):
         pcmd=pcmd[:-1]
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
-      elif(cmd[:7]==list("ΚΑΛΕΣΕ ")):          #ΚΑΛΕΣΕ
+      elif(cmd[:7]==list("ΚΑΛΕΣΕ ") and ablock):          #ΚΑΛΕΣΕ
         for posP in range(len(cmd)):
           if cmd[posP]=="(":
             break
