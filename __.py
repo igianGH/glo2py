@@ -420,8 +420,9 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   nl=0
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
-  whv,whstep,whline,dwhline,ifline,swline,ALLblock=[],[],[],[],[],[],[]
+  whv,whstep,whline,dwhline,ifline,swline,ALLblock,ALLline=[],[],[],[],[],[],[],[]
   blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
+  blockdict2={"if":"ΔΟΜΗ ΕΠΙΛΟΓΗΣ","sw":"ΔΟΜΗ ΕΠΙΛΟΓΗΣ","wh":"ΔΟΜΗ ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΔΟΜΗ ΕΠΑΝΑΛΗΨΗΣ"}
   cdict,vdict={},{}
   intl=floatl=strl=booll=False
   acounter=0
@@ -770,6 +771,7 @@ def _assign(y,x):
       elif(cmd[:3]==list("ΑΝ ") and ablock):           #IF
         ifN+=1
         ifline.append(str(nl))
+        ALLline.append(str(nl))
         ALLblock.append("if")
         block=True
         pcmd="if("
@@ -801,15 +803,18 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΑΝ\'")
           raise Exception
         if(ALLblock[-1]!="if"):
-          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         ifline.pop(-1)
+        ALLline.pop(-1)
         deblock=True
       elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):           #SWITCH
         #ifN+=1
         swN+=1
         swline.append(str(nl))
+        ALLline.append(str(nl))
         ALLblock.append("sw")
         #swblock=True
         block=True
@@ -846,11 +851,12 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
           raise Exception
         if(ALLblock[-1]!="sw"):
-          #errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ, line "+"\n"
-          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         swline.pop(-1)
+        ALLline.pop(-1)
         #swblock=False
         deblock=True
       elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
@@ -860,6 +866,7 @@ def _assign(y,x):
         whv.append("dummy")
         whstep.append("0")
         whline.append(str(nl))
+        ALLline.append(str(nl))
         pcmd=whv[-1]+"=0\n"+nsp*' ' # for +
         pcmd+="while("
         if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
@@ -869,6 +876,7 @@ def _assign(y,x):
       elif(cmd[:4]==list("ΓΙΑ ") and ablock):           # FOR ΜΕΣΩ WHILE
         whN+=1
         whline.append(str(nl))
+        ALLline.append(str(nl))
         ALLblock.append("wh")
         if("ΑΠΟ " not in line or "ΜΕΧΡΙ " not in line 
            or line.count("ΓΙΑ")>1 or line.count("ΑΠΟ")>1 or line.count("ΜΕΧΡΙ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
@@ -923,15 +931,18 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\'")
           raise Exception
         if(ALLblock[-1]!="wh"):
-          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         whline.pop(-1)
+        ALLline.pop(-1)
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
       elif(line in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):#"ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ" in line and ablock):    #DO
         dwhN+=1
         dwhline.append(str(nl))
+        ALLline.append(str(nl))
         ALLblock.append("dwh")
         block=True
         pcmd="while(True):"
@@ -941,10 +952,12 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\'")
           raise Exception
         if(ALLblock[-1]!="dwh"):
-          errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         dwhline.pop(-1)
+        ALLline.pop(-1)
         deblock=True
         pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+="):\n"+" "*(nsp+2)+"break"
@@ -972,16 +985,20 @@ def _assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname] and tryblock and not fblock and not pblock):    #END MAIN
         tryblock=False
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+ifline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(swN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+swline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(whN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(dwhN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+dwhline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
@@ -1059,19 +1076,20 @@ def _assign(y,x):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+ifline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(swN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+swline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(whN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(dwhN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+dwhline.pop(-1))
-          raise Exception
-        if(nfvalue):
-          errmsg=("ΔΕΝ ΕΧΕΙ ΥΠΟΛΟΓΙΣΤΕΙ Η ΤΙΜΗ ΤΗΣ ΣΥΝΑΡΤΗΣΗΣ")
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ablock=False
         for a in vargs:
@@ -1120,16 +1138,20 @@ def _assign(y,x):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
           raise Exception
         if(ifN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+ifline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(swN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ: line "+swline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(whN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+whline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(dwhN!=0):
-          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ: line "+dwhline.pop(-1))
+          errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         if(not ablock):
           errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
