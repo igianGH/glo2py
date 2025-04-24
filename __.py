@@ -788,7 +788,10 @@ def _assign(y,x):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
         pcmd+=xpr(cmd[10:-5],pblock,vargs)+"):"
-      elif(line in rword("ΑΛΛΙΩΣ") and ablock):           #ELSE  ##cmd[:6]==list("ΑΛΛΙΩΣ")
+      elif(line in rword("ΑΛΛΙΩΣ") and ablock):          #ELSE
+        if(ifN<0):
+          errmsg=("> unexpected \'ΑΛΛΙΩΣ\'")
+          raise Exception          
         block=True
         nsp-=2
         pcmd="else:"
@@ -843,6 +846,7 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
           raise Exception
         if(ALLblock[-1]!="sw"):
+          #errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ, line "+"\n"
           errmsg=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
