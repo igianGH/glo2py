@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("2404250124")
+  print("2604250202")
 
 def rword(w:str):
   '''
@@ -497,7 +497,7 @@ def assign(y,x):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n'''+"-"*80+"\n")
+\n#'''+"-"*79+"\n")
   if(segment):
     nsp=2
     exe=True
