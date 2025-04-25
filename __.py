@@ -455,7 +455,6 @@ import numpy as np
 import __ as _
 import sys
 import traceback
-
 class NUM:
   def __init__(self,value=1):
     self.value=value
@@ -482,7 +481,6 @@ class myA:
       n+=1
       print(n,l)
     return \"-\"*75+\"\\nWarning: το ~ δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
-
 def assign(y,x):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
@@ -499,7 +497,7 @@ def assign(y,x):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n''')
+\n'''+"-"*80+"\n")
   if(segment):
     nsp=2
     exe=True
