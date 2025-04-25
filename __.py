@@ -803,7 +803,7 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΑΝ\'")
           raise Exception
         if(ALLblock[-1]!="if"):
-          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
           errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
@@ -851,7 +851,7 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
           raise Exception
         if(ALLblock[-1]!="sw"):
-          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
           errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
@@ -931,7 +931,7 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\'")
           raise Exception
         if(ALLblock[-1]!="wh"):
-          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
           errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
@@ -952,7 +952,7 @@ def _assign(y,x):
           errmsg=("> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\'")
           raise Exception
         if(ALLblock[-1]!="dwh"):
-          errmsg=" ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
           errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
@@ -1201,6 +1201,10 @@ def _assign(y,x):
         errmsg=""
         if(not(tryblock or fblock or pblock)):
           errmsg="ΛΕΙΠΕΙ Η ΔΗΛΩΣΗ ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+        elif(not vblock and ("ΑΚΕΡΑΙΕΣ" in line or "ΧΑΡΑΚΤΗΡΕΣ" in line or "ΠΡΑΓΜΑΤΙΚΕΣ" in line or "ΛΟΓΙΚΕΣ" in line)):
+          errmsg="\n> expected \'ΜΕΤΑΒΛΗΤΕΣ\'"
+        elif(not cblock and ("=" in line)):
+          errmsg="\n> expected \'ΣΤΑΘΕΡΕΣ\'"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
@@ -1243,7 +1247,7 @@ def _assign(y,x):
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"+errmsg.replace("Exception()","> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
