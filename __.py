@@ -68,7 +68,7 @@ class _NUM:
     print("Σφάλμα: "+errmsg+"\n--> "+X)
   
 
-def source(code,fname="source"):
+def editor(code,fname="source"):
   '''
   Αποθηκεύει στο δίσκο str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ.
   code
@@ -79,7 +79,7 @@ def source(code,fname="source"):
   with open(fname,'w') as f:
     f.write(code)
 
-def interpret(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False):
+def interpreter(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False,raw=False):
   '''
   Μεταγλωττίζει και επιχειρεί να εκτελέσει κάθε γραμμή προγράμματος σε ΓΛΩΣΣΑ με μέθοδο transpiler.
   file
@@ -98,6 +98,9 @@ def interpret(file="source",developer=False,dline=True,segment=False,report=Fals
     αν έχει τιμή True τότε στη μεταγλώττιση εμφανίζονται οι δηλωμένες μεταβλητές του προγράμματος, default False
   '''
   try:
+    if(raw):
+      editor(file)
+      file="source"
     interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
   except:
     errmsg2=""
