@@ -79,7 +79,16 @@ def editor(code,fname="source"):
   with open(fname,'w') as f:
     f.write(code)
 
-def interpreter(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False,raw=False):
+def run(code):
+  '''
+  Καλεί τον editor και τον interpreter
+  code
+    str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ.
+  '''
+  editor(code)
+  interpreter()
+  
+def interpreter(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False):
   '''
   Μεταγλωττίζει και επιχειρεί να εκτελέσει κάθε γραμμή προγράμματος σε ΓΛΩΣΣΑ με μέθοδο transpiler.
   file
@@ -98,9 +107,6 @@ def interpreter(file="source",developer=False,dline=True,segment=False,report=Fa
     αν έχει τιμή True τότε στη μεταγλώττιση εμφανίζονται οι δηλωμένες μεταβλητές του προγράμματος, default False
   '''
   try:
-    if(raw):
-      editor(file)
-      file="source"
     interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
   except:
     errmsg2=""
@@ -425,14 +431,15 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="Fa
   swN=ifN=whN=dwhN=0
   whv,whstep,whline,dwhline,ifline,swline,ALLblock,ALLline=[],[],[],[],[],[],[],[]
   blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
-  blockdict2={"if":"ΔΟΜΗ ΕΠΙΛΟΓΗΣ","sw":"ΔΟΜΗ ΕΠΙΛΟΓΗΣ","wh":"ΔΟΜΗ ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΔΟΜΗ ΕΠΑΝΑΛΗΨΗΣ"}
+  blockdict2={"if":"ΕΠΙΛΟΓΗΣ","sw":"ΕΠΙΛΟΓΗΣ","wh":"ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΕΠΑΝΑΛΗΨΗΣ"}
   cdict,vdict={},{}
   intl=floatl=strl=booll=False
   acounter=0
   vblock=cblock=ablock=exe=tryblock=mblock=block=deblock=fblock=pblock=False
-  errmsg=""#"ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: L289"
+  errmsg=""
   vargs=[]
-  fout.write('''import random as r
+  fout.write('''
+import random as r
 import math as m
 import numpy as np
 import __ as _
