@@ -128,7 +128,7 @@ def interpret(file="source",developer=False,dline=True,segment=False,report=Fals
       elif("no attribute \'value\'" in sb):
         errmsg2+="\nΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι πίνακας"
       else:
-        errmsg2+="\n"+trb.split('\n')[0]
+        errmsg2+="\n"+trb.split('\n')[0].replace("invalid syntax","ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ")
     else:
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
