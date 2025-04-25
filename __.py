@@ -79,14 +79,16 @@ def editor(code,fname="source"):
   with open(fname,'w') as f:
     f.write(code)
 
-def run(code):
+def run(code,developer=False):
   '''
   Καλεί τον editor και τον interpreter
   code
-    str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ.
+    str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ
+  developer
+    αν έχει τιμή True τότε σε περίπτωση σφάλματος θα εμφανίσει το πλήρες μήνυμα, default False
   '''
   editor(code)
-  interpreter()
+  interpreter(developer=developer)
   
 def interpreter(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False):
   '''
