@@ -497,7 +497,7 @@ def assign(y,x):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n#'''+"-"*79+"\n")
+\n'''+"#"*80+"\n")
   if(segment):
     nsp=2
     exe=True
