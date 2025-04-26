@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("2604250202")
+  print("2704250020")
 
 def rword(w:str):
   '''
@@ -90,7 +90,7 @@ def run(code,developer=False):
   editor(code)
   interpreter(developer=developer)
   
-def interpreter(file="source",developer=False,dline=True,segment=False,report=False,randIN=True,test=False):
+def interpreter(file="source",developer=False,dline=True,rname=True,report=False,randIN=True,test=False):
   '''
   Μεταγλωττίζει και επιχειρεί να εκτελέσει κάθε γραμμή προγράμματος σε ΓΛΩΣΣΑ με μέθοδο transpiler.
   file
@@ -99,8 +99,8 @@ def interpreter(file="source",developer=False,dline=True,segment=False,report=Fa
     αν έχει τιμή True τότε σε περίπτωση σφάλματος θα εμφανίσει το πλήρες μήνυμα, default False
   dline
     αν έχει τιμή True τότε εμφανίζει την εκτιμώμενη γραμμή στην οποία εμφανίστηκε το σφάλμα, default True
-  segment
-    αν έχει τιμή False τότε το πηγαίο πρέπει να είναι πλήρες ΠΡΟΓΡΑΜΜΑ, default False
+  rname
+    αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
   report
     αν έχει τιμή True τότε όταν παράγεται μία τυχαία τιμή αντί εισόδου, αυτή εμφανίζεται. Default False
   randIN
@@ -109,7 +109,7 @@ def interpreter(file="source",developer=False,dline=True,segment=False,report=Fa
     αν έχει τιμή True τότε στη μεταγλώττιση εμφανίζονται οι δηλωμένες μεταβλητές του προγράμματος, default False
   '''
   try:
-    interpretM(file,segment=segment,report=str(report),randIN=randIN,test=test)
+    interpretM(file,rname=rname,report=report,randIN=randIN,test=test)
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
@@ -223,30 +223,34 @@ Reserved='''ΠΡΟΓΡΑΜΜΑ,ΣΥΝΑΡΤΗΣΗ,ΔΙΑΔΙΚΑΣΙΑ,ΜΕΤΑ�
 ΑΝ,ΤΟΤΕ,ΑΛΛΙΩΣ_ΑΝ,ΑΛΛΙΩΣ,ΤΕΛΟΣ_ΑΝ,ΕΠΙΛΕΞΕ,ΠΕΡΙΠΤΩΣΗ,ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ,ΟΣΟ,ΕΠΑΝΑΛΑΒΕ,ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ,
 ΜΕΧΡΙΣ_ΟΤΟΥ,ΓΙΑ,ΑΠΟ,ΜΕΧΡΙ,ΜΕ_ΒΗΜΑ,ΗΜ,ΣΥΝ,ΕΦ,ΛΟΓ,Ε,Α_Τ,Α_Μ,Τ_Ρ,MOD,DIV,ΟΧΙ,ΚΑΙ,Ή
 '''.replace("\n","").split(",")
+with open("names",'r') as fNAMES:
+  names=[]
+  for line in fNAMES:
+    names.append(line[:-1])
 
-def Rinput(v,report=False):
+def Rinput(v,report=False,rname=True):
   '''
   Επιστρέφει τυχαία τιμή με τύπο τον τύπο της v
   v
     μεταβλητή που θα λάβει τυχαία τιμή
   report
     αν είναι True τότε εμφανίζεται ποια τυχαία τιμή αποδόθηκε στη v, default False
+  rname
+    αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
   '''
   #v variable
   global letters
+  global names
   ndigits=r.randrange(1,9)
-  if v==int:
+  if(v==int or type(v)==int):
     v=(r.randrange(-10**ndigits,10**ndigits))
-  elif v==float:
+  elif(v==float or type(v)==float):
     v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
-  elif v==str:
-    v=("".join(r.choices(letters,k=ndigits)))
-  elif type(v)==int:
-    v=(r.randrange(-10**ndigits,10**ndigits))
-  elif type(v)==float:
-    v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
-  elif type(v)==str:
-    v=("".join(r.choices(letters,k=ndigits)))
+  elif(v==str or type(v)==str):
+    if(rname):
+      v=r.choice(names)
+    else:
+      v=("".join(r.choices(letters,k=ndigits)))
   if(report):
     print(">διαβάστηκε το",v)
   return v
@@ -408,7 +412,8 @@ def isname(s):
       return False
   return True
 
-def interpretM(file="source",randIN=True,cmp=False,aa=1,segment=False,report="False",test=False):
+def interpretM(file="source",randIN=True,cmp=False,aa=1,rname=False,report=False,test=False):
+  segment=False
   import importlib
   global letters,Reserved
   fin=open(file+"_",'w')
@@ -771,7 +776,7 @@ def assign(y,x):
             else:
               print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
             raise Exception
-          pcmd+=("_.Rinput("+(v)+","+report+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
+          pcmd+=("_.Rinput("+(v)+","+str(report)+","+str(rname)+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
         ifN+=1
