@@ -90,7 +90,7 @@ def run(code,developer=False):
   editor(code)
   interpreter(developer=developer)
   
-def interpreter(file="source",developer=False,dline=True,rname=True,report=False,randIN=True,test=False):
+def interpreter(file="source",developer=False,dline=True,smart=False,report=False,randIN=True,test=False):
   '''
   Μεταγλωττίζει και επιχειρεί να εκτελέσει κάθε γραμμή προγράμματος σε ΓΛΩΣΣΑ με μέθοδο transpiler.
   file
@@ -99,8 +99,8 @@ def interpreter(file="source",developer=False,dline=True,rname=True,report=False
     αν έχει τιμή True τότε σε περίπτωση σφάλματος θα εμφανίσει το πλήρες μήνυμα, default False
   dline
     αν έχει τιμή True τότε εμφανίζει την εκτιμώμενη γραμμή στην οποία εμφανίστηκε το σφάλμα, default True
-  rname
-    αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
+  smart
+    αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default False
   report
     αν έχει τιμή True τότε όταν παράγεται μία τυχαία τιμή αντί εισόδου, αυτή εμφανίζεται. Default False
   randIN
@@ -109,7 +109,7 @@ def interpreter(file="source",developer=False,dline=True,rname=True,report=False
     αν έχει τιμή True τότε στη μεταγλώττιση εμφανίζονται οι δηλωμένες μεταβλητές του προγράμματος, default False
   '''
   try:
-    interpretM(file,rname=rname,report=report,randIN=randIN,test=test)
+    interpretM(file,smart=smart,report=report,randIN=randIN,test=test)
   except:
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
@@ -197,21 +197,7 @@ def interpreter(file="source",developer=False,dline=True,rname=True,report=False
               print("----> "+str(snl+0-linecorr)+". ",line[:])
             break
       except StopIteration:
-        print("reached EOF")
-
-def compare(fn1="source1",fn2="source2",randIN=True):
-  interpretM(fname=fn1,cmp=True,aa=1,randIN=True)
-  interpretM(fname=fn2,cmp=True,aa=2,randIN=True)
-  f1,f2=open("log1",'r'),open("log2",'r')
-  l1,l2=(line for line in f1),(line for line in f2)
-  try:
-    while(True):
-      line1,line2 = next(l1),next(l2)
-      if(line1!=line2):
-        print(line1[:-1]+" | "+line2)
-  except StopIteration:
-    f1.close()
-    f2.close()
+        print(errmsg+"\n..\n"+errmsg2)
 
 l=[chr(ord("a")+i) for i in range(26)]
 l+=[chr(ord("A")+i) for i in range(26)]
@@ -224,18 +210,20 @@ Reserved='''ΠΡΟΓΡΑΜΜΑ,ΣΥΝΑΡΤΗΣΗ,ΔΙΑΔΙΚΑΣΙΑ,ΜΕΤΑ�
 ΜΕΧΡΙΣ_ΟΤΟΥ,ΓΙΑ,ΑΠΟ,ΜΕΧΡΙ,ΜΕ_ΒΗΜΑ,ΗΜ,ΣΥΝ,ΕΦ,ΛΟΓ,Ε,Α_Τ,Α_Μ,Τ_Ρ,MOD,DIV,ΟΧΙ,ΚΑΙ,Ή
 '''.replace("\n","").split(",")
 with open("names",'r') as fNAMES:
-  names=[]
+  names={}#[]
   for line in fNAMES:
-    names.append(line[:-1])
+    line=line.replace(" ","")
+    sep=line.find(":")
+    names[line[:sep]]=line[sep+1:-1]#names.append(line[:-1])
 
-def Rinput(v,report=False,rname=True):
+def Rinput(v,report=False,smartV=""):
   '''
   Επιστρέφει τυχαία τιμή με τύπο τον τύπο της v
   v
     μεταβλητή που θα λάβει τυχαία τιμή
   report
     αν είναι True τότε εμφανίζεται ποια τυχαία τιμή αποδόθηκε στη v, default False
-  rname
+  smart
     αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
   '''
   #v variable
@@ -247,10 +235,10 @@ def Rinput(v,report=False,rname=True):
   elif(v==float or type(v)==float):
     v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
   elif(v==str or type(v)==str):
-    if(rname):
-      v=r.choice(names)
+    if(smartV!=""):
+      v=r.choice([i for i in names.keys() if names[i] in smartV.split(",")])
     else:
-      v=("".join(r.choices(letters,k=ndigits)))
+      v=("".join(r.choices(letters[-24:],k=ndigits)))
   if(report):
     print(">διαβάστηκε το",v)
   return v
@@ -412,7 +400,7 @@ def isname(s):
       return False
   return True
 
-def interpretM(file="source",randIN=True,cmp=False,aa=1,rname=False,report=False,test=False):
+def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False,test=False):
   segment=False
   import importlib
   global letters,Reserved
@@ -776,7 +764,8 @@ def assign(y,x):
             else:
               print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
             raise Exception
-          pcmd+=("_.Rinput("+(v)+","+str(report)+","+str(rname)+"),")*(randIN)+"_.TCinput(),"*(1-randIN)
+          smartV= "" if smart else comment[comment.find("#")+1:].replace(" ","")+","
+          pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
         ifN+=1
