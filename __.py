@@ -764,7 +764,7 @@ def assign(y,x):
             else:
               print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ",list(vdict[fname].keys()))
             raise Exception
-          smartV= "" if smart else comment[comment.find("#")+1:].replace(" ","")+","
+          smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")+","
           pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
