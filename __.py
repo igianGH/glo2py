@@ -231,7 +231,7 @@ def Rinput(v,report=False,smartV=""):
   global names
   ndigits=r.randrange(1,9)
   if(v==bool or type(v)==bool):
-    raise ValueError("> ΔΕ ΜΠΟΡΕΙ ΝΑ ΔΟΘΕΙ ΛΟΓΙΚΗ ΤΙΜΗ ΑΠΟ ΤΗΝ ΕΙΣΟΔΟ")
+    raise SyntaxError("ΔΕ ΜΠΟΡΕΙ ΝΑ ΔΟΘΕΙ ΛΟΓΙΚΗ ΤΙΜΗ ΑΠΟ ΤΗΝ ΕΙΣΟΔΟ")
   if(v==int or type(v)==int):
     v=(r.randrange(-10**ndigits,10**ndigits))
   elif(v==float or type(v)==float):
