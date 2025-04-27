@@ -230,15 +230,19 @@ def Rinput(v,report=False,smartV=""):
   global letters
   global names
   ndigits=r.randrange(1,9)
+  if(v==bool or type(v)==bool):
+    raise ValueError("> ΔΕ ΜΠΟΡΕΙ ΝΑ ΔΟΘΕΙ ΛΟΓΙΚΗ ΤΙΜΗ ΑΠΟ ΤΗΝ ΕΙΣΟΔΟ")
   if(v==int or type(v)==int):
     v=(r.randrange(-10**ndigits,10**ndigits))
   elif(v==float or type(v)==float):
     v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
   elif(v==str or type(v)==str):
+    v=("".join(r.choices(letters[-24:],k=ndigits)))
     if(smartV!=""):
-      v=r.choice([i for i in names.keys() if names[i] in smartV.split(",")])
-    else:
-      v=("".join(r.choices(letters[-24:],k=ndigits)))
+      try:
+        v=r.choice([i for i in names.keys() if names[i] in smartV])#.split(",")
+      except:
+        0==0
   if(report):
     print(">διαβάστηκε το",v)
   return v
