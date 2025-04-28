@@ -377,11 +377,11 @@ def xpr(s,pblock=False,v=[]):
       s.pop(0)
       buffer+="^"
     elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="True"
+      pcmd+=" True "
       s=s[6:]
       buffer+="ΑΛΗΘΗΣ"
     elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="False"
+      pcmd+=" False "
       s=s[6:]
       buffer+="ΨΕΥΔΗΣ"
     elif(s[:3]==list("DIV") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
@@ -793,8 +793,8 @@ def assign(y,x):
         if(fblock):
           errmsg="η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        if(interS("+,-,*,/,^,(, MOD , DIV , ΚΑΙ , Ή , ΟΧΙ ".split(","),line)!=[]):
-          errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα της ΔΙΑΒΑΣΕ")
+        if(interS("+,-,*,/,(,%, and , or , not , True , False ".split(","),xpr(line))!=[]):
+          errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ")
           raise Exception
         temp=xpr(list(line[8:]))
         vars=temp.split(",")
