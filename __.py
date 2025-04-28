@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("2804251320")
+  print("2804252320")
 
 def interS(l1,l2):
   '''
@@ -162,7 +162,7 @@ def interpreter(file="source",developer=False,dline=True,smart=False,report=Fals
         errmsg2+="\n> ΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
       elif("math domain error" in sb or "class \'complex\'" in sb):
         errmsg2+="\n> ΔΕΝ ΟΡΙΖΕΤΑΙ Η ΑΡΙΘΜΗΤΙΚΗ ΠΡΑΞΗ"
-      elif("xceeds the limit" in sb):
+      elif("xceeds the limit" in sb or "OverflowError" in sb):
         errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ ΑΡΙΘΜΟΣ"
       else:
         errmsg2+="\n"+trb.split('\n')[0]
@@ -294,12 +294,12 @@ def xpr(s,pblock=False,v=[]):
   global numbersP
   if(type(s)==str):
     s=list(s)
-  buffer=""
-  s=[" "]+s
+  buffer=" "
+  #s=[" "]+s
   pcmd=""
   sarr=sfunc=False
   while(s!=[]):
-    buffer+=s[0]
+    #buffer+=s[0]
     if(s[0] in "\"\'"):
       pcmd+="\'"
       while(True):
@@ -315,92 +315,122 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=="["):
       sarr=True
       pcmd+=".ΤΙΜΗ"+s.pop(0)+"_.isindex("   #.value
+      buffer+="["
     elif(s[0]=='(' and sarr):
       sfunc=True
       pcmd+=s.pop(0)
+      buffer+="("
     elif(s[0]==')' and sfunc and sarr): #array and function
       sfunc=False
       pcmd+=s.pop(0)
+      buffer+=")"
     elif(s[0]=="]"):
       sarr=False
       pcmd+=")"+s.pop(0)
+      buffer+="]"
     elif(s[0]=="," and sarr and not sfunc):
       pcmd+=")][_.isindex("
       s.pop(0)
-    elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
-      pcmd+="not"
+      buffer+=","
+    elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" not "
       s=s[3:]
-    elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
-      pcmd+="and"
+      buffer+="ΟΧΙ"
+    elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" and "
       s=s[3:]
-    elif(s[:1]==list("Ή") and (len(s)<2 or s[1] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
-      pcmd+="or"
+      buffer+="ΚΑΙ"
+    elif(s[:1]==list("Ή") and (len(s)<2 or s[1] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" or "
       s=s[1:]
+      buffer+="Ή"
     elif(s[:2]==list("<>")):
       pcmd+="!="
       s=s[2:]
+      buffer+="<>"
     elif(s[:2]==list("<=")):
       pcmd+="<="
       s=s[2:]
+      buffer+="<="
     elif(s[:2]==list(">=")):
       pcmd+=">="
       s=s[2:]
+      buffer+=">="
     elif(s[:3]==list("<--")):
       pcmd+="="
       s=s[3:]
+      buffer+="<--"
     elif(s[0]=="+"):
       pcmd+="+0+"
       s.pop(0)
+      buffer+="+"
     elif(s[0]=="*"):
       pcmd+="*N1*"
       s.pop(0)
+      buffer+="*"
     elif(s[0]=="="):
       pcmd+="=="
       s.pop(0)
+      buffer+="=="
     elif(s[0]=="^"):
       pcmd+="**"
       s.pop(0)
-    elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<2 or buffer[-2] in numbersP)):
+      buffer+="^"
+    elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="True"
       s=s[6:]
-    elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<2 or buffer[-2] in numbersP)):
+      buffer+="ΑΛΗΘΗΣ"
+    elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="False"
       s=s[6:]
-    elif(s[:3]==list("DIV") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
+      buffer+="ΨΕΥΔΗΣ"
+    elif(s[:3]==list("DIV") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="//"
       s=s[3:]
-    elif(s[:3]==list("MOD") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
+      buffer+="DIV"
+    elif(s[:3]==list("MOD") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="%"
       s=s[3:]
-    elif(s[:4]==list("Τ_Ρ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="m.sqrt("
+      buffer+="MOD"
+    elif(s[:4]==list("Τ_Ρ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" m.sqrt("
       s=s[4:]
-    elif(s[:4]==list("Α_Τ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="abs("
+      buffer+="Τ_Ρ("
+    elif(s[:4]==list("Α_Τ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" abs("
       s=s[4:]
-    elif(s[:4]==list("Α_Μ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="int("
+      buffer+="Α_Τ("
+    elif(s[:4]==list("Α_Μ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" int("
       s=s[4:]
-    elif(s[:3]==list("ΗΜ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="m.sin(m.pi/180*"
+      buffer+="Α_Μ("
+    elif(s[:3]==list("ΗΜ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" m.sin(m.pi/180*"
       s=s[3:]
-    elif(s[:4]==list("ΣΥΝ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="m.cos(m.pi/180*"
+      buffer+="ΗΜ("
+    elif(s[:4]==list("ΣΥΝ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" m.cos(m.pi/180*"
       s=s[4:]
-    elif(s[:3]==list("ΕΦ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="m.tan(m.pi/180*"
+      buffer+="ΣΥΝ("
+    elif(s[:3]==list("ΕΦ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" m.tan(m.pi/180*"
       s=s[3:]
-    elif(s[:4]==list("ΛΟΓ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="m.log("
+      buffer+="ΕΦ("
+    elif(s[:4]==list("ΛΟΓ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" m.log("
       s=s[4:]
-    elif(s[:2]==list("Ε(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
-      pcmd+="m.exp("
+      buffer+="ΛΟΓ("
+    elif(s[:2]==list("Ε(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      pcmd+=" m.exp("
       s=s[2:]
+      buffer+="Ε("
     else:
-      if(s[0] in letters[:52] and buffer[-2] not in letters[:52]):
+      if(s[0] in letters[:52] and buffer[-1] not in letters[:52]):
         pcmd+="_"
-      pcmd+=s.pop(0)
-  return(pcmd[1:])
+      pcmd+=s[0]
+      buffer+=s.pop(0)
+    #print(buffer,"\ns:"+"".join(s).replace("\n",""),"\npcmd:"+pcmd.replace("\n",""))
+  return(pcmd)
 
 def isname(s):
   '''
