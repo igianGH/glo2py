@@ -100,7 +100,7 @@ def run(code,developer=False):
   editor(code)
   interpreter(developer=developer)
   
-def interpreter(file="source",developer=False,dline=True,smart=False,report=False,randIN=True,test=False):
+def interpreter(file="source",developer=False,dline=True,smart=True,report=False,randIN=True,test=False):
   '''
   Μεταγλωττίζει και επιχειρεί να εκτελέσει κάθε γραμμή προγράμματος σε ΓΛΩΣΣΑ με μέθοδο transpiler.
   file
