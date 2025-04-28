@@ -797,7 +797,7 @@ def assign(y,x):
         if(fblock):
           errmsg="η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        if(interS("+,-,*,/,(,%, and , or , not , True , False ".split(","),xpr(line))!=[]):
+        if(interS("+,-,*,/,%, and , or , not , True , False ".split(","),xpr(line))!=[] or "(" in line):
           errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ")
           raise Exception
         temp=xpr(list(line[8:]))
