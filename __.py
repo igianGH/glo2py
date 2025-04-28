@@ -132,18 +132,20 @@ def interpreter(file="source",developer=False,dline=True,smart=False,report=Fals
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("\'type\' and \'type\'" in sb and "unsupported operand" in sb 
+    if("\'type\'" in sb and "unsupported operand" in sb 
        or "not supported between instances" in sb and "\'type\'" in sb):
       linecorr=1
-      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\nΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
     elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
-    or "only concatenate" in sb or "no attribute \'value\'" in sb): # or "TypeError"
+      or "only concatenate" in sb or "no attribute \'value\'" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
         errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
       elif("name" in sb and "not defined" in sb):
-        errmsg2+="\n> Η ΜΕΤΑΒΛΗΤΗ "+sb[sb.find("name \'")+6:sb.find("\' is not defined")]+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
+        vname=sb[sb.find("name \'")+6:sb.find("\' is not defined")]
+        vname=vname if vname[0]!='_' else vname[1:]
+        errmsg2+="\n> Η ΜΕΤΑΒΛΗΤΗ "+vname+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
       elif("unsupported operand" in sb or "only concatenate" in sb):
         errmsg2+="\n> ΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       elif("no attribute \'value\'" in sb):
@@ -770,9 +772,11 @@ def assign(y,x):
           lbrpos=vname.find("[")
           vname=vname[:lbrpos]
         if(vname in cdict[fname].keys()):                                      #obsolete
+          vname=vname if vname[0]!='_' else vname[1:]
           errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
         if(vname not in vdict[fname].keys() and vname!=fname):
+          vname=vname if vname[0]!='_' else vname[1:]
           errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
           if(fname=="_main_"):
             print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#list(vdict[fname].keys()))  #ΤΙΜΗ
@@ -807,6 +811,7 @@ def assign(y,x):
             lbrpos=vname.find("[")
             vname=vname[:lbrpos]
           if(vname not in vdict[fname].keys() and vname!=fname):
+            vname=vname if vname[0]!='_' else vname[1:]
             errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
             if(fname=="_main_"):
               print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
@@ -957,6 +962,7 @@ def assign(y,x):
         whstep.append(step)
         vname=whv[-1]
         if(vname not in vdict[fname].keys() and vname!=fname):
+          vname=vname if vname[0]!='_' else vname[1:]
           errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
           if(fname=="_main_"):
             print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
