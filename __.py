@@ -214,6 +214,7 @@ l+=[chr(ord("A")+i) for i in range(26)]
 l+=[chr(ord("α")+i) for i in range(25)]
 l+=[chr(ord("Α")+i) for i in range(25) if i!=17]
 letters=l
+numbersP="(1234567890 "
 Reserved='''ΠΡΟΓΡΑΜΜΑ,ΣΥΝΑΡΤΗΣΗ,ΔΙΑΔΙΚΑΣΙΑ,ΜΕΤΑΒΛΗΤΕΣ,ΣΤΑΘΕΡΕΣ,ΑΚΕΡΑΙΕΣ,ΠΡΑΓΜΑΤΙΚΕΣ,ΧΑΡΑΚΤΗΡΕΣ,
 ΑΛΗΘΗΣ,ΨΕΥΔΗΣ,ΑΡΧΗ,ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ,ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ,ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ,ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ,
 ΑΝ,ΤΟΤΕ,ΑΛΛΙΩΣ_ΑΝ,ΑΛΛΙΩΣ,ΤΕΛΟΣ_ΑΝ,ΕΠΙΛΕΞΕ,ΠΕΡΙΠΤΩΣΗ,ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ,ΟΣΟ,ΕΠΑΝΑΛΑΒΕ,ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ,
@@ -290,6 +291,7 @@ def xpr(s,pblock=False,v=[]):
   v
     λίστα με τις μεταβλητές της ΔΙΑΔΙΚΑΣΙΑΣ. DEPRECATED
   '''
+  global numbersP
   if(type(s)==str):
     s=list(s)
   buffer=""
@@ -325,13 +327,13 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=="," and sarr and not sfunc):
       pcmd+=")][_.isindex("
       s.pop(0)
-    elif(s[:4]==list("ΟΧΙ ") or s[:4]==list("ΟΧΙ(")):
+    elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="not"
       s=s[3:]
-    elif(s[:4]==list("ΚΑΙ ") or s[:4]==list("ΚΑΙ(")):
+    elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="and"
       s=s[3:]
-    elif(s[:2]==list("Ή ") or s[:2]==list("Ή(")):
+    elif(s[:1]==list("Ή") and (len(s)<2 or s[1] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="or"
       s=s[1:]
     elif(s[:2]==list("<>")):
@@ -358,40 +360,40 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=="^"):
       pcmd+="**"
       s.pop(0)
-    elif(s[:6]==list("ΑΛΗΘΗΣ")):
+    elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="True"
       s=s[6:]
-    elif(s[:6]==list("ΨΕΥΔΗΣ")):
+    elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="False"
       s=s[6:]
-    elif(s[:3]==list("DIV")):
+    elif(s[:3]==list("DIV") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="//"
       s=s[3:]
-    elif(s[:3]==list("MOD")):
+    elif(s[:3]==list("MOD") and (len(s)<4 or s[3] in numbersP) and (len(buffer)<2 or buffer[-2] in numbersP)):
       pcmd+="%"
       s=s[3:]
-    elif(s[:4]==list("Τ_Ρ(")):
+    elif(s[:4]==list("Τ_Ρ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="m.sqrt("
       s=s[4:]
-    elif(s[:4]==list("Α_Τ(")):
+    elif(s[:4]==list("Α_Τ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="abs("
       s=s[4:]
-    elif(s[:4]==list("Α_Μ(")):
+    elif(s[:4]==list("Α_Μ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="int("
       s=s[4:]
-    elif(s[:3]==list("ΗΜ(")):
+    elif(s[:3]==list("ΗΜ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="m.sin(m.pi/180*"
       s=s[3:]
-    elif(s[:4]==list("ΣΥΝ(")):
+    elif(s[:4]==list("ΣΥΝ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="m.cos(m.pi/180*"
       s=s[4:]
-    elif(s[:3]==list("ΕΦ(")):
+    elif(s[:3]==list("ΕΦ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="m.tan(m.pi/180*"
       s=s[3:]
-    elif(s[:4]==list("ΛΟΓ(")):
+    elif(s[:4]==list("ΛΟΓ(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="m.log("
       s=s[4:]
-    elif(s[:2]==list("Ε(")):
+    elif(s[:2]==list("Ε(") and (len(buffer)<2 or buffer[-2] not in letters+"_")):
       pcmd+="m.exp("
       s=s[2:]
     else:
