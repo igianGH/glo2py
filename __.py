@@ -378,11 +378,11 @@ def xpr(s,pblock=False,v=[]):
       pcmd+="**"
       s.pop(0)
       buffer+="^"
-    elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+    elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+=" True "
       s=s[6:]
       buffer+="ΑΛΗΘΗΣ"
-    elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6]==" ") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+    elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+=" False "
       s=s[6:]
       buffer+="ΨΕΥΔΗΣ"
