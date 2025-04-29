@@ -249,13 +249,16 @@ def Rinput(v,report=False,smartV=""):
     v=(r.randrange(-10**ndigits,10**ndigits))
   elif(v==float or type(v)==float):
     v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
-  elif(v==str or type(v)==str):
-    v=("".join(r.choices(letters[-24:],k=ndigits)))
+  elif(v==str or type(v)==str):    
     if(smartV!=""):
+      smartV=smartV[:-1]  #cut ','
       try:
         v=r.choice([i for i in names.keys() if names[i] in smartV])#.split(",")
       except:
-        0==0
+        v=("".join(r.choices(letters[-24:],k=ndigits)))
+      if(":" in smartV or ";" in smartV or "|" in smartV or "/" in smartV or "," in smartV):
+        epos=max(smartV.find(":"),smartV.find(";"),smartV.find("|"),smartV.find("/"),smartV.rfind(","))+1
+        v= v if r.randrange(1,101)>5 else smartV[epos:]
   if(report):
     print(">διαβάστηκε το",v)
   return v
