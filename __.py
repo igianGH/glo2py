@@ -790,12 +790,12 @@ def assign(y,x):
 
       elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
         if(fblock):
-          errmsg="η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
+          errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
         pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
       elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
         if(fblock):
-          errmsg="η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
+          errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
         if(interS("+,-,*,/,%, and , or , not , True , False ".split(","),xpr(line))!=[] or "(" in line):
           errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ")
@@ -834,7 +834,7 @@ def assign(y,x):
         pcmd+=xpr(cmd[3:-5],pblock,vargs)+"):"
       elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):           #ELIF
         if(ifN<0):
-          errmsg=("> unexpected \'ΑΛΛΙΩΣ_ΑΝ\'")
+          errmsg=("\n> unexpected \'ΑΛΛΙΩΣ_ΑΝ\'")
           raise Exception
         block=True
         nsp-=2
@@ -845,7 +845,7 @@ def assign(y,x):
         pcmd+=xpr(cmd[10:-5],pblock,vargs)+"):"
       elif(line in rword("ΑΛΛΙΩΣ") and ablock):          #ELSE
         if(ifN<0):
-          errmsg=("> unexpected \'ΑΛΛΙΩΣ\'")
+          errmsg=("\n> unexpected \'ΑΛΛΙΩΣ\'")
           raise Exception          
         block=True
         nsp-=2
@@ -853,11 +853,11 @@ def assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
         ifN-=1
         if(ifN<0):
-          errmsg=("> unexpected \'ΤΕΛΟΣ_ΑΝ\'")
+          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΑΝ\'")
           raise Exception
         if(ALLblock[-1]!="if"):
-          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
-          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         ifline.pop(-1)
@@ -874,7 +874,7 @@ def assign(y,x):
         pcmd+="  0"
       elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
         if(swN<0):
-          errmsg="> unexpected \'ΠΕΡΙΠΤΩΣΗ\'"
+          errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ\'"
           raise Exception
         block=True
         nsp-=2
@@ -890,7 +890,7 @@ def assign(y,x):
           pcmd+=xpr(cmd[10:],pblock,vargs)+"):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
         if(swN<0):
-          errmsg="> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\'"
+          errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\'"
           raise Exception
         block=True
         nsp-=2
@@ -898,11 +898,11 @@ def assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):    #ENDSWITCH
         swN-=1
         if(swN<0):
-          errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
+          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
           raise Exception
         if(ALLblock[-1]!="sw"):
-          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
-          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         swline.pop(-1)
@@ -978,11 +978,11 @@ def assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                                        #ENDFOR/WHILE
         whN-=1
         if(whN<0):
-          errmsg=("> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\'")
+          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\'")
           raise Exception
         if(ALLblock[-1]!="wh"):
-          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
-          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         whline.pop(-1)
@@ -999,11 +999,11 @@ def assign(y,x):
       elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
         dwhN-=1
         if(dwhN<0):
-          errmsg=("> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\'")
+          errmsg=("\n> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\'")
           raise Exception
         if(ALLblock[-1]!="dwh"):
-          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]+"\n"
-          errmsg+=("> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+          errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
+          errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         ALLblock.pop(-1)
         dwhline.pop(-1)
