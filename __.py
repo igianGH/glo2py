@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("2804252320")
+  print("3004252320")
 
 def interS(l1,l2):
   '''
@@ -520,7 +520,7 @@ class myA:
     n=0
     for l in self.ΤΙΜΗ:
       n+=1
-      print(n,l)
+      print(str(n)+\".\",l)
     return \"-\"*75+\"\\nWarning: το ~ δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
 def assign(y,x):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
@@ -532,12 +532,12 @@ def assign(y,x):
       tt[j]=tGL[i]
     j+=1
   if(tt[1]=="ΠΙΝΑΚΑΣ"):
-    raise RuntimeError("Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
+    raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
   if(tt[2]==tt[1]):
     return x
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
-  raise RuntimeError("Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
+  raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
 \n'''+"#"*80+"\n")
   if(segment):
     nsp=2
@@ -776,7 +776,10 @@ def assign(y,x):
           errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
           raise Exception
         if(vname not in vdict[fname].keys() and vname!=fname):
-          vname=vname if vname[0]!='_' else vname[1:]
+          vname=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
+          if(not isname(vname)):
+            errmsg="\n> ΕΚΧΩΡΗΣΗ επιτρέπεται ΜΟΝΟ σε ΜΕΤΑΒΛΗΤΗ"
+            raise Exception
           errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
           if(fname=="_main_"):
             print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#list(vdict[fname].keys()))  #ΤΙΜΗ
@@ -1349,7 +1352,7 @@ def assign(y,x):
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
