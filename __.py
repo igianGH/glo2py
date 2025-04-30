@@ -585,17 +585,21 @@ def assign(y,x):
       cflags+="[+ +] [* *] [/ /] [MOD MOD] [DIV DIV] -] [^ ^] "
       cflags+="(+ +) (* *) (/ /) (MOD MOD) (DIV DIV) -) (^ ^)"
       cflags=cflags.split(" ")
-      if(":" in line and not vblock):
+      if("@" in line or "#" in line or "$" in line or "%" in line or "?" in line 
+        or ";" in line or "\\" in line or "΅" in line or "`" in line):
+        errmsg="\n> ΜΗ ΕΠΙΤΡΕΠΤΟΣ ΧΑΡΑΚΤΗΡΑΣ"
+        raise Exception
+      if(":" in line and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
         errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
         raise Exception
       if(line.count('\"')>0 or line.count('\'')%2==1):
-        errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
+        errmsg="\n> ΜΗ ΕΓΚΥΡΗ χρήση ΕΙΣΑΓΩΓΙΚΩΝ"
         raise Exception
       while("\"" in lineNS):      # ignore "strings"
         pos1=lineNS.find("\"")
         pos2=lineNS[pos1+1:].find("\"")+pos1+1
         if("\'" in lineNS[pos1:pos2]):
-          errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
+          errmsg="\n> ΜΗ ΕΓΚΥΡΗ χρήση ΕΙΣΑΓΩΓΙΚΩΝ"
           raise Exception
         lineNS=lineNS[:pos1]+"_"+lineNS[pos2+1:]
       while("\'" in lineNS):      # ignore 'strings'
@@ -764,13 +768,19 @@ def assign(y,x):
             if(vname[-1]==" "):
               vname=vname[:-1]
           if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
-            errmsg="\n> η "+vname+" έχει δηλωθεί 2 φορές"
+            errmsg="\n> η \'"+vname+"\' έχει δηλωθεί 2 φορές"
             raise Exception
           elif(vname in Reserved):
-            errmsg="\n> το "+vname+" είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg="\n> το \'"+vname+"\' είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           elif(not isname(vname)):
-            errmsg="\n> το "+vname+" είναι ΜΗ ΕΓΚΥΡΟ όνομα ΜΕΤΑΒΛΗΤΗΣ"
+            errmsg="\n> το \'"+vname+"\' είναι ΜΗ ΕΓΚΥΡΟ όνομα ΜΕΤΑΒΛΗΤΗΣ"
+            raise Exception
+          elif(vname in vdict.keys() or vname in cdict.keys()):
+            errmsg="\n> \'"+vname+"\' είναι όνομα ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+            raise Exception
+          elif(vname==PROname):
+            errmsg="\n> \'"+vname+"\' είναι το όνομα του ΠΡΟΓΡΑΜΜΑΤΟΣ"
             raise Exception
           else:
             vdict[fname][vname]=vtype
@@ -782,7 +792,7 @@ def assign(y,x):
           pcmd+=xpr(vname)+"="+vval+"\n"+" "*(nsp)
 
       elif(line.count("<--")==1 and ablock and                                             #ASSIGNMENT
-           not( fname in line and line[len(fname)] not in letters+list("0123456789_") )):   #return handled elsewhere
+           not( fname==line[:len(fname)] and line[len(fname)] not in letters+list("0123456789_") )):   #return handled elsewhere
         aspos=line.find("<--")
         vname=line[:aspos]
         if(vname[-1]==" "):
@@ -791,15 +801,21 @@ def assign(y,x):
           lbrpos=vname.find("[")
           vname=vname[:lbrpos]
         if(vname in cdict[fname].keys()):                                      #obsolete
-          vname=vname if vname[0]!='_' else vname[1:]
-          errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ τιμής στη ΣΤΑΘΕΡΑ "+vname
+          #vnamecl=vname if vname[0]!='_' else vname[1:]
+          errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ τιμής στη ΣΤΑΘΕΡΑ "+vname#cl
           raise Exception
-        if(vname not in vdict[fname].keys() and vname!=fname):
-          vname=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
+        if(vname not in vdict[fname].keys()):# and vname!=fname):
+          #vnamecl=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
           if(not isname(vname)):
             errmsg="\n> ΕΚΧΩΡΗΣΗ επιτρέπεται ΜΟΝΟ σε ΜΕΤΑΒΛΗΤΗ"
             raise Exception
-          errmsg="\n> ΔΕΝ έχει δηλωθεί η ΜΕΤΑΒΛΗΤΗ "+vname
+          if(vname in vdict.keys() or vname in cdict.keys()):
+            errmsg="\n> \'"+vname+"\' είναι όνομα ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
+            raise Exception
+          if(vname==PROname):
+            errmsg="\n> \'"+vname+"\' είναι το όνομα του ΠΡΟΓΡΑΜΜΑΤΟΣ"
+            raise Exception
+          errmsg="\n> ΔΕΝ έχει δηλωθεί η ΜΕΤΑΒΛΗΤΗ "+vname#cl
           if(fname=="_main_"):
             print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           else:
@@ -1178,7 +1194,11 @@ def assign(y,x):
           pcmd+=xpr(a)+","
         pcmd=pcmd[:-1]+"\n"
         pcmd+=" "*(nsp+2)+"N1=NUM()\n"
-      elif(fblock and fname==line[:lfn] and ("<--"==line[lfn:lfn+3] or " <--"==line[lfn:lfn+4])): #RETURN
+      elif(fname==line[:len(fname)] and ("<--"==line[len(fname):len(fname)+3] 
+        or " <--"==line[len(fname):len(fname)+4])):                                       #RETURN
+        if(not fblock):
+          errmsg="\n> αυτή η σύνταξη επιτρέπεται μόνο μέσα σε ΣΥΝΑΡΤΗΣΕΙΣ"
+          raise Exception
         pcmd+="__"+xpr(fname)+xpr(list("<--"))+"assign("+ftypos+","+xpr(cmd[len(fname)+3:])+")"
         nfvalue=False
       elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
