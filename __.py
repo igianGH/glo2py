@@ -253,14 +253,12 @@ def Rinput(v,report=False,smartV=""):
     if(smartV!=""):
       smartV=smartV[:-1]  #cut ','
       try:
-        v=r.choice([i for i in names.keys() if names[i] in smartV])#.split(",")
+        v=r.choice([i for i in names.keys() if names[i] in smartV])
       except:
         v=("".join(r.choices(letters[-24:],k=ndigits)))
-      if(":" in smartV or ";" in smartV or "|" in smartV or "/" in smartV or "," in smartV):
-        epos=max(smartV.find(":"),smartV.find(";"),smartV.find("|"),smartV.find("/"),smartV.rfind(","))+1
-        v2=smartV[epos:]
-        flag2=[i for i in names.keys() if names[i] in v2]!=[] #v2 in names.values()
-        v= v if (r.randrange(1,101)>5 or flag2) else v2
+      if("," in smartV):
+        v2=[j for j in smartV.split(",") if [i for i in names.keys() if names[i] in j]==[]]
+        v = v if (r.randrange(1,101)>5 or v2==[]) else r.choice(v2)
   if(report):
     print(">διαβάστηκε το",v)
   return v
