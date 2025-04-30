@@ -156,7 +156,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       if("invalid literal" in sb):
-        errmsg2+="\n> ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
+        errmsg2+="\n> ΕΚΧΩΡΗΣΗ τιμής ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
       elif("index" in sb and "out of bounds" in sb or "valid indices" in sb
           or "indices must be integers" in sb or "index out of range" in sb):
         errmsg2+="\n> ΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
@@ -165,7 +165,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       elif("math domain error" in sb or "class \'complex\'" in sb):
         errmsg2+="\n> ΔΕΝ ΟΡΙΖΕΤΑΙ Η ΑΡΙΘΜΗΤΙΚΗ ΠΡΑΞΗ"
       elif("xceeds the limit" in sb or "OverflowError" in sb):
-        errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ ΑΡΙΘΜΟΣ"
+        errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ αριθμός"
       else:
         errmsg2+="\n"+trb.split('\n')[0]
     print("-"*75+'\n'+errmsg2)
@@ -244,7 +244,7 @@ def Rinput(v,report=False,smartV=""):
   global names
   ndigits=r.randrange(1,9)
   if(v==bool or type(v)==bool):
-    raise SyntaxError("ΔΕ ΜΠΟΡΕΙ ΝΑ ΔΟΘΕΙ ΛΟΓΙΚΗ ΤΙΜΗ ΑΠΟ ΤΗΝ ΕΙΣΟΔΟ")
+    raise SyntaxError("ΔΕ μπορεί να δοθεί ΛΟΓΙΚΗ ΤΙΜΗ από την ΕΙΣΟΔΟ")
   if(v==int or type(v)==int):
     v=(r.randrange(-10**ndigits,10**ndigits))
   elif(v==float or type(v)==float):
@@ -680,16 +680,16 @@ def assign(y,x):
           if(cname[-1]==" "):
             cname=cname[:-1]
           if(not isname(cname)):
-            errmsg=cname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΣΤΑΘΕΡΑΣ"
+            errmsg="> το "+cname+" είναι ΜΗ ΕΓΚΥΡΟ όνομα ΣΤΑΘΕΡΑΣ"
             raise Exception
           cvalue=line[eqpos+1:]
           if(cvalue[-1]==" "):
             cvalue=cvalue[:-1]
           if(cname in cdict[fname].keys()):
-            errmsg=cname+" : ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
+            errmsg="> η "+cname+" : έχει δηλωθεί"
             raise Exception
           elif(cname in Reserved):
-            errmsg=cname+" : ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg="> το "+cname+" είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           else:
             cdict[fname][cname]=cvalue
@@ -709,25 +709,25 @@ def assign(y,x):
           case "ΑΚΕΡΑΙΕΣ":
             vtype="int"
             if(intl):
-              errmsg="\n> ΥΠΑΡΧΕΙ ΠΑΡΑΠΑΝΩ ΔΗΛΩΣΗ ΑΚΕΡΑΙΩΝ"
+              errmsg="\n> υπάρχει παραπάνω δήλωση ΑΚΕΡΑΙΩΝ"
               raise Exception
             intl=True
           case "ΠΡΑΓΜΑΤΙΚΕΣ":
             vtype="float"
             if(floatl):
-              errmsg="\n> ΥΠΑΡΧΕΙ ΠΑΡΑΠΑΝΩ ΔΗΛΩΣΗ ΠΡΑΓΜΑΤΙΚΩΝ"
+              errmsg="\n> υπάρχει παραπάνω δήλωση ΠΡΑΓΜΑΤΙΚΩΝ"
               raise Exception
             floatl=True
           case "ΧΑΡΑΚΤΗΡΕΣ":
             vtype="str"
             if(strl):
-              errmsg="\n> ΥΠΑΡΧΕΙ ΠΑΡΑΠΑΝΩ ΔΗΛΩΣΗ ΧΑΡΑΚΤΗΡΩΝ"
+              errmsg="\n> υπάρχει παραπάνω δήλωση ΧΑΡΑΚΤΗΡΩΝ"
               raise Exception
             strl=True
           case "ΛΟΓΙΚΕΣ":
             vtype="bool"
             if(booll):
-              errmsg="\n> ΥΠΑΡΧΕΙ ΠΑΡΑΠΑΝΩ ΔΗΛΩΣΗ ΛΟΓΙΚΩΝ"
+              errmsg="\n> υπάρχει παραπάνω δήλωση ΛΟΓΙΚΩΝ"
               raise Exception
             booll=True
           case default:
@@ -764,13 +764,13 @@ def assign(y,x):
             if(vname[-1]==" "):
               vname=vname[:-1]
           if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
-            errmsg=vname+" : ΕΧΕΙ ΔΗΛΩΘΕΙ ΠΑΡΑΠΑΝΩ"
+            errmsg="\n> η "+vname+" έχει δηλωθεί 2 φορές"
             raise Exception
           elif(vname in Reserved):
-            errmsg=vname+" : ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg="\n> το "+vname+" είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           elif(not isname(vname)):
-            errmsg=vname+" : ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΜΕΤΑΒΛΗΤΗΣ"
+            errmsg="\n> το "+vname+" είναι ΜΗ ΕΓΚΥΡΟ όνομα ΜΕΤΑΒΛΗΤΗΣ"
             raise Exception
           else:
             vdict[fname][vname]=vtype
@@ -792,18 +792,18 @@ def assign(y,x):
           vname=vname[:lbrpos]
         if(vname in cdict[fname].keys()):                                      #obsolete
           vname=vname if vname[0]!='_' else vname[1:]
-          errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ ΤΙΜΗΣ ΣΤΗ ΣΤΑΘΕΡΑ "+vname
+          errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ τιμής στη ΣΤΑΘΕΡΑ "+vname
           raise Exception
         if(vname not in vdict[fname].keys() and vname!=fname):
           vname=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
           if(not isname(vname)):
             errmsg="\n> ΕΚΧΩΡΗΣΗ επιτρέπεται ΜΟΝΟ σε ΜΕΤΑΒΛΗΤΗ"
             raise Exception
-          errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
+          errmsg="\n> ΔΕΝ έχει δηλωθεί η ΜΕΤΑΒΛΗΤΗ "+vname
           if(fname=="_main_"):
-            print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
+            print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           else:
-            print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
+            print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd="try:\n"+" "*(nsp+2)
         pcmd+=xpr(list(line[:aspos]+"<--"))+"assign("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
@@ -836,9 +836,9 @@ def assign(y,x):
             vname=vname if vname[0]!='_' else vname[1:]
             errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
             if(fname=="_main_"):
-              print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+              print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
             else:
-              print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+              print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
             raise Exception
           smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")#+","
           pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
@@ -856,7 +856,7 @@ def assign(y,x):
         pcmd+=xpr(cmd[3:-4],pblock,vargs)+"):"
       elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):           #ELIF
         if(ifN<0):
-          errmsg=("\n> unexpected \'ΑΛΛΙΩΣ_ΑΝ\'")
+          errmsg=("\n> unexpected \'ΑΛΛΙΩΣ_ΑΝ\' εκτός δομής επιλογής")
           raise Exception
         block=True
         nsp-=2
@@ -867,7 +867,7 @@ def assign(y,x):
         pcmd+=xpr(cmd[10:-4],pblock,vargs)+"):"
       elif(line in rword("ΑΛΛΙΩΣ") and ablock):          #ELSE
         if(ifN<0):
-          errmsg=("\n> unexpected \'ΑΛΛΙΩΣ\'")
+          errmsg=("\n> unexpected \'ΑΛΛΙΩΣ\' εκτός δομής επιλογής")
           raise Exception          
         block=True
         nsp-=2
@@ -875,7 +875,7 @@ def assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
         ifN-=1
         if(ifN<0):
-          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΑΝ\'")
+          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΑΝ\' εκτός δομής επιλογής")
           raise Exception
         if(ALLblock[-1]!="if"):
           errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
@@ -896,7 +896,7 @@ def assign(y,x):
         pcmd+="  0"
       elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
         if(swN<0):
-          errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ\'"
+          errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ\' εκτός δομής επιλογής"
           raise Exception
         block=True
         nsp-=2
@@ -912,7 +912,7 @@ def assign(y,x):
           pcmd+=xpr(cmd[10:],pblock,vargs)+"):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
         if(swN<0):
-          errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\'"
+          errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\' εκτός δομής επιλογής"
           raise Exception
         block=True
         nsp-=2
@@ -920,7 +920,7 @@ def assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):    #ENDSWITCH
         swN-=1
         if(swN<0):
-          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\'")
+          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\' εκτός δομής επιλογής")
           raise Exception
         if(ALLblock[-1]!="sw"):
           errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
@@ -940,7 +940,7 @@ def assign(y,x):
         ALLline.append(str(nl))
         pcmd=whv[-1]+"=0\n"+nsp*' ' # for +
         pcmd+="while("
-        if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ")):
+        if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ") or cmd[-10:] in letters+["_"]):
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΕΠΑΝΑΛΑΒΕ"
           raise Exception
         pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):"
@@ -951,7 +951,7 @@ def assign(y,x):
         ALLblock.append("wh")
         if(" ΑΠΟ " not in line or " ΜΕΧΡΙ " not in line 
            or " ΓΙΑ " in line[4:] or line.count(" ΑΠΟ ")>1 or line.count(" ΜΕΧΡΙ ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
-          errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
+          errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ της εντολής ΓΙΑ"
           raise Exception
         block=True
         pos1=4
@@ -973,7 +973,7 @@ def assign(y,x):
 
         if("ΜΕ_ΒΗΜΑ" in line):
           if(" ΜΕ_ΒΗΜΑ " not in line):
-            errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
+            errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ της εντολής ΓΙΑ"
             raise Exception
           pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
           step=xpr(cmd[pos4:],pblock,vargs)
@@ -1001,7 +1001,7 @@ def assign(y,x):
       elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                                        #ENDFOR/WHILE
         whN-=1
         if(whN<0):
-          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\'")
+          errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\' εκτός δομής επανάληψης")
           raise Exception
         if(ALLblock[-1]!="wh"):
           errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
@@ -1022,7 +1022,7 @@ def assign(y,x):
       elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
         dwhN-=1
         if(dwhN<0):
-          errmsg=("\n> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\'")
+          errmsg=("\n> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\' εκτός δομής επανάληψης")
           raise Exception
         if(ALLblock[-1]!="dwh"):
           errmsg="ΑΝΟΙΧΤΗ ΔΟΜΗ "+blockdict2[ALLblock[-1]]+" in line "+ALLline[-1]
@@ -1327,9 +1327,9 @@ def assign(y,x):
         if(not(tryblock or fblock or pblock)):
           errmsg="\n> ΛΕΙΠΕΙ Η ΔΗΛΩΣΗ ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
         elif(not vblock and ("ΑΚΕΡΑΙΕΣ" in line or "ΧΑΡΑΚΤΗΡΕΣ" in line or "ΠΡΑΓΜΑΤΙΚΕΣ" in line or "ΛΟΓΙΚΕΣ" in line)):
-          errmsg="ΜΗ έγκυρη δήλωση ΜΕΤΑΒΛΗΤΗΣ\n> expected \'ΜΕΤΑΒΛΗΤΕΣ\'"
+          errmsg="ΜΗ έγκυρη δήλωση ΜΕΤΑΒΛΗΤΗΣ εκτός δηλωτικού τμήματος ΜΕΤΑΒΛΗΤΩΝ"
         elif(not cblock and ("=" in line)):
-          errmsg="ΜΗ έγκυρη δήλωση ΣΤΑΘΕΡΑΣ\n> expected \'ΣΤΑΘΕΡΕΣ\'"
+          errmsg="ΜΗ έγκυρη δήλωση ΣΤΑΘΕΡΑΣ εκτός δηλωτικού τμήματος ΣΤΑΘΕΡΩΝ"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
