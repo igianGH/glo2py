@@ -967,9 +967,10 @@ def assign(y,x):
         whv.append(xpr(cmd[4:pos1-1],pblock,vargs))
         whstep.append(step)
         vname=whv[-1]
-        if(vname not in vdict[fname].keys() and vname!=fname):
-          vname=vname if vname[0]!='_' else vname[1:]
-          errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
+        vnamecl=vname if vname[0]!='_' else vname[1:]
+        if(vnamecl not in vdict[fname].keys() and vname!=fname):
+          #vname=vname if vname[0]!='_' else vname[1:]
+          errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vnamecl
           if(fname=="_main_"):
             print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
           else:
