@@ -258,7 +258,9 @@ def Rinput(v,report=False,smartV=""):
         v=("".join(r.choices(letters[-24:],k=ndigits)))
       if(":" in smartV or ";" in smartV or "|" in smartV or "/" in smartV or "," in smartV):
         epos=max(smartV.find(":"),smartV.find(";"),smartV.find("|"),smartV.find("/"),smartV.rfind(","))+1
-        v= v if r.randrange(1,101)>5 else smartV[epos:]
+        v2=smartV[epos:]
+        flag2=[i for i in names.keys() if names[i] in v2]!=[] #v2 in names.values()
+        v= v if (r.randrange(1,101)>5 or flag2) else v2
   if(report):
     print(">διαβάστηκε το",v)
   return v
