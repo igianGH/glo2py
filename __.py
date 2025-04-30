@@ -1312,9 +1312,9 @@ def assign(y,x):
         if(not(tryblock or fblock or pblock)):
           errmsg="\n> ΛΕΙΠΕΙ Η ΔΗΛΩΣΗ ΠΡΟΓΡΑΜΜΑΤΟΣ/ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
         elif(not vblock and ("ΑΚΕΡΑΙΕΣ" in line or "ΧΑΡΑΚΤΗΡΕΣ" in line or "ΠΡΑΓΜΑΤΙΚΕΣ" in line or "ΛΟΓΙΚΕΣ" in line)):
-          errmsg="\n> expected \'ΜΕΤΑΒΛΗΤΕΣ\'"
+          errmsg="ΜΗ έγκυρη δήλωση ΜΕΤΑΒΛΗΤΗΣ\n> expected \'ΜΕΤΑΒΛΗΤΕΣ\'"
         elif(not cblock and ("=" in line)):
-          errmsg="\n> expected \'ΣΤΑΘΕΡΕΣ\'"
+          errmsg="ΜΗ έγκυρη δήλωση ΣΤΑΘΕΡΑΣ\n> expected \'ΣΤΑΘΕΡΕΣ\'"
         raise Exception
 
       if(pcmd not in ["","\n"]):              # save line
