@@ -141,11 +141,11 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
-        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα?"
+        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα ή τελεστή?"
       elif("name" in sb and "not defined" in sb):
         vname=sb[sb.find("name \'")+6:sb.find("\' is not defined")]
-        vname=vname if vname[0]!='_' else vname[1:]
-        errmsg2+="\n> Η ΜΕΤΑΒΛΗΤΗ "+vname+" ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ"
+        vnamecl=vname if vname[0]!='_' else vname[1:]
+        errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vnamecl
       elif("unsupported operand" in sb or "only concatenate" in sb):
         errmsg2+="\n> ΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       elif("no attribute \'value\'" in sb):
@@ -285,6 +285,16 @@ def TCinput(prompt="> "):
     if(p==1):
       return float(temp)
   return temp
+
+def eprint(*PP):
+  '''
+  Καλεί την print εκτός αν κάποια τιμή είναι type, οπότε διακόπτει την εκτέλεση
+  '''
+  for p in PP:
+    if(type(p)==type):
+      raise RuntimeError("> κάποια μεταβλητή δεν έχει λάβει τιμή")
+    print(p,end=" ")
+  print("")
 
 def xpr(s,pblock=False,v=[]):
   '''
@@ -571,7 +581,13 @@ def assign(y,x):
           break
         dsp=line.find("  ")
         line=line[:dsp]+line[dsp+1:]
-      lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. .,".split(" ")
+      lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. ., "
+      cflags+="[+ +] [* *] [/ /] [MOD MOD] [DIV DIV] -] [^ ^] "
+      cflags+="(+ +) (* *) (/ /) (MOD MOD) (DIV DIV) -) (^ ^)"
+      cflags=cflags.split(" ")
+      if(":" in line and not vblock):
+        errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
+        raise Exception
       if(line.count('\"')>0 or line.count('\'')%2==1):
         errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΧΡΗΣΗ ΕΙΣΑΓΩΓΙΚΩΝ"
         raise Exception
@@ -785,9 +801,9 @@ def assign(y,x):
             raise Exception
           errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
           if(fname=="_main_"):
-            print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#list(vdict[fname].keys()))  #ΤΙΜΗ
+            print("ΤΟ ΠΡΟΓΡΑΜΜΑ",PROname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           else:
-            print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+            print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd="try:\n"+" "*(nsp+2)
         pcmd+=xpr(list(line[:aspos]+"<--"))+"assign("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
@@ -798,7 +814,7 @@ def assign(y,x):
         if(fblock):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        pcmd="print("+xpr(cmd[6:],pblock,vargs)+")"
+        pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
       elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
@@ -834,10 +850,10 @@ def assign(y,x):
         ALLblock.append("if")
         block=True
         pcmd="if("
-        if(cmd[-4:]!=list("ΤΟΤΕ")):
+        if(cmd[-4:]!=list("ΤΟΤΕ") or cmd[-5] in letters+["_"]):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
-        pcmd+=xpr(cmd[3:-5],pblock,vargs)+"):"
+        pcmd+=xpr(cmd[3:-4],pblock,vargs)+"):"
       elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):           #ELIF
         if(ifN<0):
           errmsg=("\n> unexpected \'ΑΛΛΙΩΣ_ΑΝ\'")
@@ -845,10 +861,10 @@ def assign(y,x):
         block=True
         nsp-=2
         pcmd="elif("
-        if(cmd[-4:]!=list("ΤΟΤΕ")):
+        if(cmd[-4:]!=list("ΤΟΤΕ") or cmd[-5] in letters+["_"]):
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
-        pcmd+=xpr(cmd[10:-5],pblock,vargs)+"):"
+        pcmd+=xpr(cmd[10:-4],pblock,vargs)+"):"
       elif(line in rword("ΑΛΛΙΩΣ") and ablock):          #ELSE
         if(ifN<0):
           errmsg=("\n> unexpected \'ΑΛΛΙΩΣ\'")
@@ -933,8 +949,8 @@ def assign(y,x):
         whline.append(str(nl))
         ALLline.append(str(nl))
         ALLblock.append("wh")
-        if("ΑΠΟ " not in line or "ΜΕΧΡΙ " not in line 
-           or line.count("ΓΙΑ")>1 or line.count("ΑΠΟ")>1 or line.count("ΜΕΧΡΙ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
+        if(" ΑΠΟ " not in line or " ΜΕΧΡΙ " not in line 
+           or " ΓΙΑ " in line[4:] or line.count(" ΑΠΟ ")>1 or line.count(" ΜΕΧΡΙ ")>1 or line.count("ΜΕ_ΒΗΜΑ")>1):
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
           raise Exception
         block=True
@@ -956,7 +972,7 @@ def assign(y,x):
         pos4=pos3+8
 
         if("ΜΕ_ΒΗΜΑ" in line):
-          if("ΜΕ_ΒΗΜΑ " not in line):
+          if(" ΜΕ_ΒΗΜΑ " not in line):
             errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ ΤΗΣ ΕΝΤΟΛΗΣ ΓΙΑ"
             raise Exception
           pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
