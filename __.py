@@ -249,9 +249,9 @@ def Rinput(v,report=False,smartV=""):
     v=(r.randrange(-10**ndigits,10**ndigits))
   elif(v==float or type(v)==float):
     v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
-  elif(v==str or type(v)==str):    
+  elif(v==str or type(v)==str):  
+    v=("".join(r.choices(letters[-24:],k=ndigits)))  
     if(smartV!=""):
-      smartV=smartV[:-1]  #cut ','
       try:
         v=r.choice([i for i in names.keys() if names[i] in smartV])
       except:
@@ -840,7 +840,7 @@ def assign(y,x):
             else:
               print("ΤΟ ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
             raise Exception
-          smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")+","
+          smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")#+","
           pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
