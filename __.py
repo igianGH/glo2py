@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205250020")
+  print("0205250120")
 
 def interS(l1,l2):
   '''
@@ -174,7 +174,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
         errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ αριθμός"
       else:
         errmsg2+="\n"+trb.split('\n')[0]
-    print("\n"+"-"*75+'\n'+errmsg2)
+    print("-"*75+'\n'+errmsg2)
     msnl=snl=0
     msnl=sb[:]
     foundline=False
@@ -233,7 +233,7 @@ with open("names",'r') as fNAMES:
   for line in fNAMES:
     line=line.replace(" ","")
     sep=line.find(":")
-    names[line[:sep]]=line[sep+1:-1]#names.append(line[:-1])
+    names[line[:sep]]=line[sep+1:-1]
 
 def Rinput(v,report=False,smartV=""):
   '''
@@ -246,7 +246,6 @@ def Rinput(v,report=False,smartV=""):
     αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
   '''
   #v variable
-  #print(v,type(v))  #---------------
   global letters
   global names
   ndigits=r.randrange(1,9)
@@ -540,15 +539,16 @@ class myA:
     self.dimension=d
   def __invert__(self):
     if(self.dimension==1 and len(self.ΤΙΜΗ)<21):
-      #print(self.ΤΙΜΗ)
       if( hasattr(self.ΤΙΜΗ[0],'typos') ):
         raise RuntimeError(\"> κάποια μεταβλητή δεν έχει λάβει τιμή\")
       print(\"[\"+str(self.ΤΙΜΗ[0]),end=\", \")
       for i in self.ΤΙΜΗ[1:-1]:
         if( hasattr(i,'typos') ):
+          print(\"\")
           raise RuntimeError(\"> κάποια μεταβλητή δεν έχει λάβει τιμή\")
         print(i,end=\", \")
       if( hasattr(self.ΤΙΜΗ[-1],'typos') ):
+        print(\"\")
         raise RuntimeError(\"> κάποια μεταβλητή δεν έχει λάβει τιμή\")
       print(str(self.ΤΙΜΗ[-1])+\"]\")
       return \"-\"*75+\"\\nWarning: το ~ δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
@@ -572,7 +572,6 @@ def assign2(y,x):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
   for i in [y,x]:
-    #tt[j]=tGL[type(i)] if type(i) in tGL.keys() else tGL[i.typos]
     if( i in tGL.keys() ):
       tt[j]=tGL[i]
     elif( type(i) in tGL.keys() ):
@@ -617,7 +616,7 @@ def assign(y,x):
         line=pline+line
         pline=""
       for cmpos in range(len(line)):    #COMMENTS
-        if(line[cmpos]=="!"):
+        if(line[cmpos]=="!" and line[:cmpos].count("\'")%2==0):
           comment=("   #"+line[cmpos+1:]).replace("\n","")
           line=line[:cmpos]
           break
@@ -637,13 +636,6 @@ def assign(y,x):
       cflags+="[+ +] [* *] [/ /] [MOD MOD] [DIV DIV] -] [^ ^] "
       cflags+="(+ +) (* *) (/ /) (MOD MOD) (DIV DIV) -) (^ ^)"
       cflags=cflags.split(" ")
-      if("@" in line or "#" in line or "$" in line or "%" in line or "?" in line 
-        or ";" in line or "\\" in line or "΅" in line or "`" in line):
-        errmsg="\n> ΜΗ ΕΠΙΤΡΕΠΤΟΣ ΧΑΡΑΚΤΗΡΑΣ"
-        raise Exception
-      if(":" in line and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
-        errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
-        raise Exception
       if(line.count('\"')>0 or line.count('\'')%2==1):
         errmsg="\n> ΜΗ ΕΓΚΥΡΗ χρήση ΕΙΣΑΓΩΓΙΚΩΝ"
         raise Exception
@@ -669,7 +661,14 @@ def assign(y,x):
           or lineNS[i-1] not in "0987654321"
           or lineNS[i+1] not in "0987654321")):
           errmsg = "\n> μη έγκυρη χρήση υποδιαστολής"
-          raise Exception 
+          raise Exception
+      if("@" in lineNS or "#" in lineNS or "$" in lineNS or "%" in lineNS or "?" in lineNS 
+        or ";" in lineNS or "\\" in lineNS or "΅" in lineNS or "`" in lineNS or "¨" in lineNS):
+        errmsg="\n> ΜΗ ΕΠΙΤΡΕΠΤΟΣ ΧΑΡΑΚΤΗΡΑΣ"
+        raise Exception
+      if(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
+        errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
+        raise Exception
       lpar=rpar=lc=rc=0
       for i in line:
         match i:
@@ -812,8 +811,6 @@ def assign(y,x):
             if(vname[-1]==" "):
               vname=vname[:-1]
             vdim=(v[lbrpos+1:rbrpos].replace(" ",""))
-            for i in range(len(vdim)-1,-1,-1):
-              vval="("+xpr(list(vdim[i]))+")*["+vval+"]"   #expression in Shape # OBSOLETE? -------
             vval="myA( ["+vdim+"],pholder("+vtype+") )"
           else:
             vval="pholder("+vtype+")"
@@ -896,7 +893,7 @@ def assign(y,x):
         vars=temp.split(",")
         pcmd=",".join([(v) for v in vars])+"="
         for v in vars:                        #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
-          vname = str(v)  # έχει προέλθει από xpr
+          vname = str(v)                      # έχει προέλθει από xpr
           vnamecl=vname if vname[0]!='_' else vname[1:]
           if(".ΤΙΜΗ[" in vnamecl):
             lbrpos=vnamecl.find(".ΤΙΜΗ[")  #.ΤΙΜΗ[
@@ -1138,7 +1135,6 @@ def assign(y,x):
           raise Exception
         block=True
         acounter+=1
-        #mblock=True
         tryblock=True
         exe=True
         pcmd="def main():\n  N1,B1,A1=NUM(),myB(),myA([1],int)\n"
@@ -1334,7 +1330,7 @@ def assign(y,x):
           pcmd+=xpr(a)+","
         pcmd=pcmd[:-1]+"):"+"\n"
         pcmd+=" "*(nsp+2)+"N1,B1,A1=NUM(),myB(),myA([1],int)\n"
-      elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
+      elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):                    #ENDPROCEDURE
         if(not pblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\'"
         if(not ablock):
@@ -1373,7 +1369,7 @@ def assign(y,x):
           if cmd[posP]=="(":
             break
         Xcmd=xpr(cmd)
-        nP=0  #number of open left(
+        nP=0              #number of open left(
         for i in range(len(Xcmd)):
           if(Xcmd[i]=='('):
             nP+=1
@@ -1423,9 +1419,6 @@ def assign(y,x):
     if(segment):
       nsp=0
       tryblock=0
-      #fout.write('''  except Exception as e:
-    #print(\"ΒΡΕΘΗΚΕ ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ...\")
-    #print(getattr(e, 'message', repr(e)))''')
     if(tryblock):              #ΕΝΤΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
       errmsg="\n> expected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"  #"ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
       raise Exception
@@ -1444,7 +1437,7 @@ def assign(y,x):
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
-    print("\n"+"-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
