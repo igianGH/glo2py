@@ -934,7 +934,7 @@ def assign(y,x):
           swRb=xpr(cmd[casepos+4:],pblock,vargs)
           pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1):"
         else:
-          pcmd+=xpr(cmd[10:],pblock,vargs)+") == B1):"
+          pcmd+=" "+xpr(cmd[10:],pblock,vargs)+") == B1):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
         if(swN<0):
           errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\' εκτός δομής επιλογής"
@@ -1013,9 +1013,9 @@ def assign(y,x):
           #vname=vname if vname[0]!='_' else vname[1:]
           errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vnamecl
           if(fname=="_main_"):
-            print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+            print("ΤΟ ΠΡΟΓΡΑΜΜΑ ΕΧΕΙ","ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])
           else:
-            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+            print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])
           raise Exception
         pcmd+=whv[-1]+"="+xpr(cmd[pos1+4:pos2],pblock,vargs)+"\n"+" "*nsp
         pcmd+="while( ("  #for "
