@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("3004252320")
+  print("0205250020")
 
 def interS(l1,l2):
   '''
@@ -133,15 +133,19 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
     if("\'type\'" in sb and "unsupported operand" in sb 
-       or "not supported between instances" in sb and "\'type\'" in sb):
+       or "not supported between instances" in sb and "\'type\'" in sb 
+       or "not supported between instances" in sb and "\'pholder\'" in sb):
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
     elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
-      or "only concatenate" in sb or "no attribute \'value\'" in sb): # or "TypeError"
+      or "only concatenate" in sb or "no attribute \'value\'" in sb
+      or "object is not subscriptable" in sb or "object is not callable" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
       if("comma" in sb):
         errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα ή τελεστή?"
+      elif("object is not subscriptable" in sb):
+        errmsg2+="\n> ΛΑΝΘΑΣΜΕΝΗ ΔΙΑΣΤΑΣΗ αντικειμένου"
       elif("name" in sb and "not defined" in sb):
         vname=sb[sb.find("name \'")+6:sb.find("\' is not defined")]
         vnamecl=vname if vname[0]!='_' else vname[1:]
@@ -149,7 +153,9 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       elif("unsupported operand" in sb or "only concatenate" in sb):
         errmsg2+="\n> ΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       elif("no attribute \'value\'" in sb):
-        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι πίνακας"
+        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
+      elif("object is not callable" in sb):
+        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΣΥΝΑΡΤΗΣΗ"
       else:
         errmsg2+="\n> "+trb.split('\n')[0].replace("invalid syntax","ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ")
     else:
@@ -168,7 +174,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
         errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ αριθμός"
       else:
         errmsg2+="\n"+trb.split('\n')[0]
-    print("-"*75+'\n'+errmsg2)
+    print("\n"+"-"*75+'\n'+errmsg2)
     msnl=snl=0
     msnl=sb[:]
     foundline=False
@@ -240,16 +246,17 @@ def Rinput(v,report=False,smartV=""):
     αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
   '''
   #v variable
+  #print(v,type(v))  #---------------
   global letters
   global names
   ndigits=r.randrange(1,9)
-  if(v==bool or type(v)==bool):
+  if(type(v)==bool or hasattr(v,'typos') and v.typos==bool):
     raise SyntaxError("ΔΕ μπορεί να δοθεί ΛΟΓΙΚΗ ΤΙΜΗ από την ΕΙΣΟΔΟ")
-  if(v==int or type(v)==int):
+  if(type(v)==int or hasattr(v,'typos') and v.typos==int):
     v=(r.randrange(-10**ndigits,10**ndigits))
-  elif(v==float or type(v)==float):
+  elif(type(v)==float or hasattr(v,'typos') and v.typos==float):
     v=(r.random()*r.randrange(-10**ndigits,10**ndigits))
-  elif(v==str or type(v)==str):  
+  elif(type(v)==str or hasattr(v,'typos') and v.typos==str):  
     v=("".join(r.choices(letters[-24:],k=ndigits)))  
     if(smartV!=""):
       try:
@@ -293,7 +300,7 @@ def eprint(*PP):
   Καλεί την print εκτός αν κάποια τιμή είναι type ή myA, οπότε διακόπτει την εκτέλεση
   '''
   for p in PP:
-    if(type(p)==type):
+    if(hasattr(p,'typos')):
       raise RuntimeError("> κάποια μεταβλητή δεν έχει λάβει τιμή")
     if(hasattr(p,'ΤΙΜΗ')):
       raise SyntaxError("δεν επιτρέπεται να δοθεί όρισμα ΠΙΝΑΚΑΣ στη ΓΡΑΨΕ")
@@ -513,6 +520,7 @@ import numpy as np
 import __ as _
 import sys
 import traceback
+from copy import deepcopy as cdc
 class NUM:
   def __init__(self,value=1):
     self.value=value
@@ -526,13 +534,23 @@ class myA:
     d=1
     while(shape!=[]):
       d+=1
-      A=[A[:] for i in range(shape.pop(-1))]
+      A=[cdc(A) for i in range(shape.pop(-1))]
     self.ΤΙΜΗ=A
     self.typos=typos
     self.dimension=d
   def __invert__(self):
     if(self.dimension==1 and len(self.ΤΙΜΗ)<21):
-      print(self.ΤΙΜΗ)
+      #print(self.ΤΙΜΗ)
+      if( hasattr(self.ΤΙΜΗ[0],'typos') ):
+        raise RuntimeError(\"> κάποια μεταβλητή δεν έχει λάβει τιμή\")
+      print(\"[\"+str(self.ΤΙΜΗ[0]),end=\", \")
+      for i in self.ΤΙΜΗ[1:-1]:
+        if( hasattr(i,'typos') ):
+          raise RuntimeError(\"> κάποια μεταβλητή δεν έχει λάβει τιμή\")
+        print(i,end=\", \")
+      if( hasattr(self.ΤΙΜΗ[-1],'typos') ):
+        raise RuntimeError(\"> κάποια μεταβλητή δεν έχει λάβει τιμή\")
+      print(str(self.ΤΙΜΗ[-1])+\"]\")
       return \"-\"*75+\"\\nWarning: το ~ δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
     n=0
     for l in self.ΤΙΜΗ:
@@ -547,6 +565,28 @@ class myB:
       return other
     else:
       raise SyntaxError("μη έγκυρη ΣΥΝΘΗΚΗ")
+class pholder:
+  def __init__(self,typos):
+    self.typos=typos
+def assign2(y,x):
+  tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
+  tt,j={},1
+  for i in [y,x]:
+    #tt[j]=tGL[type(i)] if type(i) in tGL.keys() else tGL[i.typos]
+    if( i in tGL.keys() ):
+      tt[j]=tGL[i]
+    elif( type(i) in tGL.keys() ):
+      tt[j]=tGL[type(i)]
+    else:
+      tt[j]=tGL[i.typos]
+    j+=1
+  if(tt[1]=="ΠΙΝΑΚΑΣ"):
+    raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
+  if(tt[2]==tt[1]):
+    return x
+  elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
+    return x
+  raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
 def assign(y,x):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
@@ -773,12 +813,11 @@ def assign(y,x):
               vname=vname[:-1]
             vdim=(v[lbrpos+1:rbrpos].replace(" ",""))
             for i in range(len(vdim)-1,-1,-1):
-              vval="("+xpr(list(vdim[i]))+")*["+vval+"]"              #expression in Shape
-            vval="myA(["+vdim+"],"+vtype+")"
+              vval="("+xpr(list(vdim[i]))+")*["+vval+"]"   #expression in Shape # OBSOLETE? -------
+            vval="myA( ["+vdim+"],pholder("+vtype+") )"
           else:
-            vname=v
-            if(vname[-1]==" "):
-              vname=vname[:-1]
+            vval="pholder("+vtype+")"
+            vname=v[:-1] if v[-1]==" " else v[:]
           if(vname in vdict[fname].keys() or vname in cdict[fname].keys()):
             errmsg="\n> η \'"+vname+"\' έχει δηλωθεί 2 φορές"
             raise Exception
@@ -799,7 +838,7 @@ def assign(y,x):
             vdict[fname][vname+".ΤΙΜΗ"]=vtype
           pcmd+="try:#//"+str(nl)+"\n"+" "*(nsp+2)
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp+2)
-          pcmd+="assign("+vtype+","+xpr(vname)+vsub+")\n"+" "*(nsp)
+          pcmd+="assign2("+vtype+","+xpr(vname)+vsub+")\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+=xpr(vname)+"="+vval+"\n"+" "*(nsp)
 
@@ -837,7 +876,7 @@ def assign(y,x):
             print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd="try:#//"+str(nl)+"\n"+" "*(nsp+2)
-        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
+        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
         pcmd+="raise RuntimeError(e) from e"                                #TYPE CHECK
 
@@ -846,7 +885,7 @@ def assign(y,x):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
         pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
-      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT ΠΙΝΑΚΑ
+      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
@@ -1212,7 +1251,7 @@ def assign(y,x):
         if(not fblock):
           errmsg="\n> αυτή η σύνταξη επιτρέπεται μόνο μέσα σε ΣΥΝΑΡΤΗΣΕΙΣ"
           raise Exception
-        pcmd+="__"+xpr(fname)+xpr(list("<--"))+"assign("+ftypos+","+xpr(cmd[len(fname)+3:])+")"
+        pcmd+="__"+xpr(fname)+xpr(list("<--"))+"assign2("+ftypos+","+xpr(cmd[len(fname)+3:])+")"
         nfvalue=False
       elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
         if(not fblock):
@@ -1405,7 +1444,7 @@ def assign(y,x):
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("\n"+"-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
   #import source                 #EXECUTION
