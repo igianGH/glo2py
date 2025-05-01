@@ -259,6 +259,8 @@ def Rinput(v,report=False,smartV=""):
       if("," in smartV):
         v2=[j for j in smartV.split(",") if [i for i in names.keys() if names[i] in j]==[]]
         v = v if (r.randrange(1,101)>5 or v2==[]) else r.choice(v2)
+  elif(hasattr(v,'ΤΙΜΗ')):
+    raise RuntimeError("> δεν επιτρέπεται να δοθεί όρισμα ΠΙΝΑΚΑΣ στη ΔΙΑΒΑΣΕ")
   if(report):
     print(">διαβάστηκε το",v)
   return v
@@ -288,11 +290,13 @@ def TCinput(prompt="> "):
 
 def eprint(*PP):
   '''
-  Καλεί την print εκτός αν κάποια τιμή είναι type, οπότε διακόπτει την εκτέλεση
+  Καλεί την print εκτός αν κάποια τιμή είναι type ή myA, οπότε διακόπτει την εκτέλεση
   '''
   for p in PP:
     if(type(p)==type):
       raise RuntimeError("> κάποια μεταβλητή δεν έχει λάβει τιμή")
+    if(hasattr(p,'ΤΙΜΗ')):
+      raise SyntaxError("δεν επιτρέπεται να δοθεί όρισμα ΠΙΝΑΚΑΣ στη ΓΡΑΨΕ")
     print(p,end=" ")
   print("")
 
@@ -793,7 +797,7 @@ def assign(y,x):
           else:
             vdict[fname][vname]=vtype
             vdict[fname][vname+".ΤΙΜΗ"]=vtype
-          pcmd+="try:\n"+" "*(nsp+2)
+          pcmd+="try:#//"+str(nl)+"\n"+" "*(nsp+2)
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp+2)
           pcmd+="assign("+vtype+","+xpr(vname)+vsub+")\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
@@ -832,7 +836,7 @@ def assign(y,x):
           else:
             print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
-        pcmd="try:\n"+" "*(nsp+2)
+        pcmd="try:#//"+str(nl)+"\n"+" "*(nsp+2)
         pcmd+=xpr(list(line[:aspos]+"<--"))+"assign("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
         pcmd+="raise RuntimeError(e) from e"                                #TYPE CHECK
@@ -842,7 +846,7 @@ def assign(y,x):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
         pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
-      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
+      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT ΠΙΝΑΚΑ
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
@@ -861,13 +865,13 @@ def assign(y,x):
           if(vnamecl not in vdict[fname].keys() and vnamecl!=fname):
             errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
             if(fname=="_main_"):
-              print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+              print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
             else:
-              print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
+              print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
             raise Exception
           smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")#+","
           pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
-        pcmd=pcmd[:-1]
+        pcmd=pcmd[:-1]  #delete comma
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
         ifN+=1
         ifline.append(str(nl))
@@ -916,7 +920,7 @@ def assign(y,x):
         ALLline.append(str(nl))
         ALLblock.append("sw")
         block=True
-        pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"\n"+nsp*" "
+        pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"#//"+str(nl)+"\n"+nsp*" "
         pcmd+="if(False):\n"+nsp*" "
         pcmd+="  0"
       elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
@@ -925,7 +929,7 @@ def assign(y,x):
           raise Exception
         block=True
         nsp-=2
-        pcmd="elif( (sw"+str(swN)
+        pcmd="elif( (sw"+str(swN) #ΠΕΡΙΠΤΩΣΗ ~ elif
         if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
           pcmd+=" in ("+xpr(cmd[10:],pblock,vargs)+",)) == B1):"
         elif(",..," in line):
@@ -1098,7 +1102,7 @@ def assign(y,x):
         #mblock=True
         tryblock=True
         exe=True
-        pcmd="def main():\n  N1,B1=NUM(),myB()\n"
+        pcmd="def main():\n  N1,B1,A1=NUM(),myB(),myA([1],int)\n"
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):     #END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
@@ -1202,7 +1206,7 @@ def assign(y,x):
         for a in vargs:
           pcmd+=xpr(a)+","
         pcmd=pcmd[:-1]+"\n"
-        pcmd+=" "*(nsp+2)+"N1=NUM()\n"
+        pcmd+=" "*(nsp+2)+"N1,B1,A1=NUM(),myB(),myA([1],int)\n"
       elif(fname==line[:len(fname)] and ("<--"==line[len(fname):len(fname)+3] 
         or " <--"==line[len(fname):len(fname)+4])):                                       #RETURN
         if(not fblock):
@@ -1290,7 +1294,7 @@ def assign(y,x):
         for a in vargs:
           pcmd+=xpr(a)+","
         pcmd=pcmd[:-1]+"):"+"\n"
-        pcmd+=" "*(nsp+2)+"N1=NUM()\n"
+        pcmd+=" "*(nsp+2)+"N1,B1,A1=NUM(),myB(),myA([1],int)\n"
       elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):    #ENDPROCEDURE
         if(not pblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\'"
