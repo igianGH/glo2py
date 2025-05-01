@@ -535,6 +535,14 @@ class myA:
       n+=1
       print(str(n)+\".\",l)
     return \"-\"*75+\"\\nWarning: το ~ δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
+class myB:
+  def __init__(self,value=True):
+    self.value=value
+  def __eq__(self,other):
+    if(type(other)==bool):
+      return other
+    else:
+      raise SyntaxError("μη έγκυρη ΣΥΝΘΗΚΗ")
 def assign(y,x):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
@@ -844,16 +852,14 @@ def assign(y,x):
         temp=xpr(list(line[8:]))
         vars=temp.split(",")
         pcmd=",".join([(v) for v in vars])+"="
-        for v in vars:
-          vname = str(v)                              #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
-          if(vname[0]=="_"):
-            vname=vname[1:]
-          if("[" in vname):
-            lbrpos=vname.find("[")
-            vname=vname[:lbrpos]
-          if(vname not in vdict[fname].keys() and vname!=fname):
-            vname=vname if vname[0]!='_' else vname[1:]
-            errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vname
+        for v in vars:                        #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
+          vname = str(v)  # έχει προέλθει από xpr
+          vnamecl=vname if vname[0]!='_' else vname[1:]
+          if(".ΤΙΜΗ[" in vnamecl):
+            lbrpos=vnamecl.find(".ΤΙΜΗ[")  #.ΤΙΜΗ[
+            vnamecl=vnamecl[:lbrpos-1] if vnamecl[lbrpos-1] == " " else vnamecl[:lbrpos]
+          if(vnamecl not in vdict[fname].keys() and vnamecl!=fname):
+            errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
             if(fname=="_main_"):
               print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
             else:
@@ -868,22 +874,22 @@ def assign(y,x):
         ALLline.append(str(nl))
         ALLblock.append("if")
         block=True
-        pcmd="if("
+        pcmd="if( ("
         if(cmd[-4:]!=list("ΤΟΤΕ") or cmd[-5] in letters+["_"]):
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
-        pcmd+=xpr(cmd[3:-4],pblock,vargs)+"):"
-      elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):           #ELIF
+        pcmd+=xpr(cmd[3:-4],pblock,vargs)+") == B1):"  #against tuple
+      elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):                  #ELIF
         if(ifN<0):
           errmsg=("\n> unexpected \'ΑΛΛΙΩΣ_ΑΝ\' εκτός δομής επιλογής")
           raise Exception
         block=True
         nsp-=2
-        pcmd="elif("
+        pcmd="elif( ("
         if(cmd[-4:]!=list("ΤΟΤΕ") or cmd[-5] in letters+["_"]):
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
-        pcmd+=xpr(cmd[10:-4],pblock,vargs)+"):"
+        pcmd+=xpr(cmd[10:-4],pblock,vargs)+") == B1):"
       elif(line in rword("ΑΛΛΙΩΣ") and ablock):          #ELSE
         if(ifN<0):
           errmsg=("\n> unexpected \'ΑΛΛΙΩΣ\' εκτός δομής επιλογής")
@@ -919,16 +925,16 @@ def assign(y,x):
           raise Exception
         block=True
         nsp-=2
-        pcmd="elif(sw"+str(swN)
+        pcmd="elif( (sw"+str(swN)
         if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
-          pcmd+=" in ("+xpr(cmd[10:],pblock,vargs)+",)):"
+          pcmd+=" in ("+xpr(cmd[10:],pblock,vargs)+",)) == B1):"
         elif(",..," in line):
           casepos=line.find(",..,")
           swRa=xpr(cmd[10:casepos],pblock,vargs)
           swRb=xpr(cmd[casepos+4:],pblock,vargs)
-          pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))):"
+          pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1):"
         else:
-          pcmd+=xpr(cmd[10:],pblock,vargs)+"):"
+          pcmd+=xpr(cmd[10:],pblock,vargs)+") == B1):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
         if(swN<0):
           errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\' εκτός δομής επιλογής"
@@ -958,11 +964,11 @@ def assign(y,x):
         whline.append(str(nl))
         ALLline.append(str(nl))
         pcmd=whv[-1]+"=0\n"+nsp*' ' # for +
-        pcmd+="while("
+        pcmd+="while( ("
         if(cmd[-9:]!=list("ΕΠΑΝΑΛΑΒΕ") or cmd[-10:] in letters+["_"]):
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΕΠΑΝΑΛΑΒΕ"
           raise Exception
-        pcmd+=xpr(cmd[4:-10],pblock,vargs)+"):"
+        pcmd+=xpr(cmd[4:-10],pblock,vargs)+") == B1):"
       elif(cmd[:4]==list("ΓΙΑ ") and ablock):           # FOR ΜΕΣΩ WHILE
         whN+=1
         whline.append(str(nl))
@@ -994,10 +1000,10 @@ def assign(y,x):
           if(" ΜΕ_ΒΗΜΑ " not in line):
             errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ της εντολής ΓΙΑ"
             raise Exception
-          pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)\n"+" "*nsp
+          pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)#//"+str(nl)+"\n"+" "*nsp
           step=xpr(cmd[pos4:],pblock,vargs)
         else:
-          pcmd="correction"+str(whN)+"=1\n"+" "*nsp
+          pcmd="correction"+str(whN)+"=1#//"+str(nl)+"\n"+" "*nsp
           step="1"
         whv.append(xpr(cmd[4:pos1-1],pblock,vargs))
         whstep.append(step)
@@ -1012,11 +1018,11 @@ def assign(y,x):
             print("ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"ΕΧΕΙ ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i])#,list(vdict[fname].keys()))
           raise Exception
         pcmd+=whv[-1]+"="+xpr(cmd[pos1+4:pos2],pblock,vargs)+"\n"+" "*nsp
-        pcmd+="while("  #for "
+        pcmd+="while( ("  #for "
         if("ΜΕ_ΒΗΜΑ" in line):
-          pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction"+str(whN)+" <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction"+str(whN)+"):"
+          pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction"+str(whN)+" <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction"+str(whN)+") == B1):"
         else:
-          pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+"):\n"+" "*nsp
+          pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+") == B1):\n"+" "*nsp
       elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                                        #ENDFOR/WHILE
         whN-=1
         if(whN<0):
@@ -1051,8 +1057,8 @@ def assign(y,x):
         dwhline.pop(-1)
         ALLline.pop(-1)
         deblock=True
-        pcmd="if("+xpr(list("".join(cmd[12:])),pblock,vargs)
-        pcmd+="):\n"+" "*(nsp+2)+"break"
+        pcmd="if( ("+xpr(list("".join(cmd[12:])),pblock,vargs)
+        pcmd+=") == B1):\n"+" "*(nsp+2)+"break"
       elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ---------------------------------------------------------------
         fname="_main_"
         PROname=line[10:]
@@ -1092,7 +1098,7 @@ def assign(y,x):
         #mblock=True
         tryblock=True
         exe=True
-        pcmd="def main():\n  N1=NUM()\n"
+        pcmd="def main():\n  N1,B1=NUM(),myB()\n"
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):     #END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
