@@ -684,16 +684,16 @@ def assign(y,x):
           if(cname[-1]==" "):
             cname=cname[:-1]
           if(not isname(cname)):
-            errmsg="> το "+cname+" είναι ΜΗ ΕΓΚΥΡΟ όνομα ΣΤΑΘΕΡΑΣ"
+            errmsg="> το \'"+cname+"\' είναι ΜΗ ΕΓΚΥΡΟ όνομα ΣΤΑΘΕΡΑΣ"
             raise Exception
           cvalue=line[eqpos+1:]
           if(cvalue[-1]==" "):
             cvalue=cvalue[:-1]
           if(cname in cdict[fname].keys()):
-            errmsg="> η "+cname+" : έχει δηλωθεί"
+            errmsg="> η \'"+cname+"\' έχει δηλωθεί 2 φορές"
             raise Exception
           elif(cname in Reserved):
-            errmsg="> το "+cname+" είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+            errmsg="> το \'"+cname+"\' είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
             raise Exception
           else:
             cdict[fname][cname]=cvalue
@@ -800,9 +800,12 @@ def assign(y,x):
         if("[" in vname):
           lbrpos=vname.find("[")
           vname=vname[:lbrpos]
+        if(vname in Reserved):
+          errmsg="\n> το \'"+vname+"\' είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
+          raise Exception
         if(vname in cdict[fname].keys()):                                      #obsolete
           #vnamecl=vname if vname[0]!='_' else vname[1:]
-          errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ τιμής στη ΣΤΑΘΕΡΑ "+vname#cl
+          errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ τιμής στη ΣΤΑΘΕΡΑ \'"+vname+"\'"#cl
           raise Exception
         if(vname not in vdict[fname].keys()):# and vname!=fname):
           #vnamecl=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
@@ -815,11 +818,11 @@ def assign(y,x):
           if(vname==PROname):
             errmsg="\n> \'"+vname+"\' είναι το όνομα του ΠΡΟΓΡΑΜΜΑΤΟΣ"
             raise Exception
-          errmsg="\n> ΔΕΝ έχει δηλωθεί η ΜΕΤΑΒΛΗΤΗ "+vname#cl
+          errmsg="\n> ΔΕΝ έχει δηλωθεί η ΜΕΤΑΒΛΗΤΗ \'"+vname+"\'"#cl
           if(fname=="_main_"):
-            print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
+            print("το ΠΡΟΓΡΑΜΜΑ \'"+PROname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           else:
-            print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
+            print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd="try:\n"+" "*(nsp+2)
         pcmd+=xpr(list(line[:aspos]+"<--"))+"assign("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
