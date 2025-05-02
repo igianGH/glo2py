@@ -360,15 +360,15 @@ def xpr(s,pblock=False,v=[]):
       s.pop(0)
       buffer+=","
     elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" not "
+      pcmd+="not "
       s=s[3:]
       buffer+="ΟΧΙ"
     elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" and "
+      pcmd+="and "
       s=s[3:]
       buffer+="ΚΑΙ"
     elif(s[:1]==list("Ή") and (len(s)<2 or s[1] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" or "
+      pcmd+="or "
       s=s[1:]
       buffer+="Ή"
     elif(s[:2]==list("<>")):
@@ -404,11 +404,11 @@ def xpr(s,pblock=False,v=[]):
       s.pop(0)
       buffer+="^"
     elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" True "
+      pcmd+="True "
       s=s[6:]
       buffer+="ΑΛΗΘΗΣ"
     elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" False "
+      pcmd+="False "
       s=s[6:]
       buffer+="ΨΕΥΔΗΣ"
     elif(s[:3]==list("DIV") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
@@ -420,35 +420,35 @@ def xpr(s,pblock=False,v=[]):
       s=s[3:]
       buffer+="MOD"
     elif(s[:4]==list("Τ_Ρ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" m.sqrt("
+      pcmd+="m.sqrt("
       s=s[4:]
       buffer+="Τ_Ρ("
     elif(s[:4]==list("Α_Τ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" abs("
+      pcmd+="abs("
       s=s[4:]
       buffer+="Α_Τ("
     elif(s[:4]==list("Α_Μ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" int("
+      pcmd+="int("
       s=s[4:]
       buffer+="Α_Μ("
     elif(s[:3]==list("ΗΜ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" m.sin(m.pi/180*"
+      pcmd+="m.sin(m.pi/180*"
       s=s[3:]
       buffer+="ΗΜ("
     elif(s[:4]==list("ΣΥΝ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" m.cos(m.pi/180*"
+      pcmd+="m.cos(m.pi/180*"
       s=s[4:]
       buffer+="ΣΥΝ("
     elif(s[:3]==list("ΕΦ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" m.tan(m.pi/180*"
+      pcmd+="m.tan(m.pi/180*"
       s=s[3:]
       buffer+="ΕΦ("
     elif(s[:4]==list("ΛΟΓ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" m.log("
+      pcmd+="m.log("
       s=s[4:]
       buffer+="ΛΟΓ("
     elif(s[:2]==list("Ε(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=" m.exp("
+      pcmd+="m.exp("
       s=s[2:]
       buffer+="Ε("
     else:
