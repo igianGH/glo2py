@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205250120")
+  print("0205252320")
 
 def interS(l1,l2):
   '''
@@ -151,7 +151,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       elif("name" in sb and "not defined" in sb):
         vname=sb[sb.find("name \'")+6:sb.find("\' is not defined")]
         vnamecl=vname if vname[0]!='_' else vname[1:]
-        errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vnamecl
+        errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
       elif("unsupported operand" in sb or "only concatenate" in sb):
         errmsg2+="\n> ΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       elif("no attribute \'value\'" in sb):
@@ -180,9 +180,9 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
     msnl=snl=0
     msnl=sb[:]
     foundline=False
-    while("#//" in msnl):
+    while("#<" in msnl):    #//
       foundline=True
-      msnl=msnl[msnl.find("#//")+3:]
+      msnl=msnl[msnl.find("#<")+2 : msnl.find(">#")]
     if(foundline):
       for i in range(len(msnl)):
         if(msnl[i] not in "0123456789"):
@@ -193,8 +193,8 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       with open(file+".py",'r') as fin:
         msize=0
         for line in fin:
-          if("#//" in line):                   # εύρεση γραμμής όπου απέτυχε η μετάφραση/εκτέλεση
-            snl=int(line[line.find("#//")+3:])
+          if("#<" in line):                   # εύρεση γραμμής όπου απέτυχε η μετάφραση/εκτέλεση #//
+            snl=int(line[line.find("#<")+2 : line.find(">#")])
           ics=dfl.SequenceMatcher(None,line,sb).find_longest_match()
           if(msize<ics.size):
             msize=ics.size
@@ -248,6 +248,10 @@ def Rinput(v,report=False,smartV=""):
     αν έχει τιμή True τότε αντί τυχαίων χαρακτήρων παράγονται ονόματα, default True
   '''
   #v variable
+  try:
+    v==v
+  except:
+    return TCinput()
   global letters
   global names
   ndigits=r.randrange(1,9)
@@ -273,13 +277,14 @@ def Rinput(v,report=False,smartV=""):
     print(">διαβάστηκε το",v)
   return v
 
-def TCinput(prompt="> "):
+def TCinput(prompt="ΕΙΣΟΔΟΣ: "):
   '''
   Λαμβάνει μία τιμή από την είσοδο και τη μετατρέπει από str στον κατάλληλο τύπο
   prompt
     εμφανίζεται για να δηλώσει ότι θα διαβαστεί τιμή από την είσοδο
   '''
   temp=input(prompt)
+  #print("")
   tfl=True
   for c in temp:
     if c not in "-0123456789.":
@@ -474,7 +479,11 @@ def isname(s):
   return True
 
 def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False,test=False):
-  segment=False
+  segment,segblock=True,False
+  with open(file,"r") as fin:     # ΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ -------------------------
+    for line in fin:
+      if(interS(["ΠΡΟΓΡΑΜΜΑ","ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ","ΣΥΝΑΡΤΗΣΗ","ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ","ΔΙΑΔΙΚΑΣΙΑ","ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"],line[:line.find("!")])!=[]):
+        segment=False
   import importlib
   global letters,Reserved
   fin=open(file+"_",'w')
@@ -570,7 +579,7 @@ class myB:
 class pholder:
   def __init__(self,typos):
     self.typos=typos
-def assign2(y,x):
+def assign2(y,x,segment=False):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
   for i in [y,x]:
@@ -604,11 +613,21 @@ def assign(y,x):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n'''+"#"*80+"\n")
-  if(segment):
-    nsp=2
+\n'''+"#"*80+"\n")        
+  if(segment and not segblock):      # ΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ ----------------------
+    randIN=False
+    segblock=True
+    tryblock=True
+    ablock=True
+    fname="_main_"
+    block=True
+    acounter+=1
     exe=True
-    fout.write("def main():\n")
+    print("-"*75+"\nΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ:\n"+"-"*75)
+    fout.write('''
+def main():
+  N1,B1,A1=NUM(),myB(),myA([1],int)
+\n''')
   try:
     for line in fin:
       nl+=1
@@ -705,8 +724,7 @@ def assign(y,x):
         pcmd=xpr(cmd,pblock,vargs)
       elif(line[-1] not in letters+list("0123456789])\n\t\"\' ")):
         errmsg="\n> ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ ΓΡΑΜΜΗΣ"
-        raise Exception
-
+        raise Exception 
       elif(line in rword("ΣΤΑΘΕΡΕΣ") and (tryblock or fblock or pblock)):               #CONSTANTS
         if(cblock+vblock+ablock):
           errmsg="\n> ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΣΤΑΘΕΡΩΝ"
@@ -835,14 +853,15 @@ def assign(y,x):
           else:
             vdict[fname][vname]=vtype
             vdict[fname][vname+".ΤΙΜΗ"]=vtype
-          pcmd+="try:#//"+str(nl)+"\n"+" "*(nsp+2)
+          pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp+2)
           pcmd+="assign2("+vtype+","+xpr(vname)+vsub+")\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+=xpr(vname)+"="+vval+"\n"+" "*(nsp)
 
-      elif(line.count("<--")==1 and ablock and                                             #ASSIGNMENT
-           not( fname==line[:len(fname)] and line[len(fname)] not in letters+list("0123456789_") )):   #return handled elsewhere
+      elif(line.count("<--")==1 and ablock and                                  #ASSIGNMENT
+           not( fname==line[:len(fname)] 
+           and line[len(fname)] not in letters+list("0123456789_") )):   #return handled elsewhere
         aspos=line.find("<--")
         vname=line[:aspos]
         if(vname[-1]==" "):
@@ -853,15 +872,21 @@ def assign(y,x):
         if(vname in Reserved):
           errmsg="\n> το \'"+vname+"\' είναι ΔΕΣΜΕΥΜΕΝΗ ΛΕΞΗ"
           raise Exception
-        if(vname in cdict[fname].keys()):                                      #obsolete
+        if(not segment and vname in cdict[fname].keys()):                                      
           #vnamecl=vname if vname[0]!='_' else vname[1:]
           errmsg="\n> ΔΕΝ ΕΠΙΤΡΕΠΕΤΑΙ ΕΚΧΩΡΗΣΗ τιμής στη ΣΤΑΘΕΡΑ \'"+vname+"\'"#cl
           raise Exception
-        if(vname not in vdict[fname].keys()):# and vname!=fname):
+        if(not isname(vname)):
+          errmsg="\n> ΕΚΧΩΡΗΣΗ επιτρέπεται ΜΟΝΟ σε ΜΕΤΑΒΛΗΤΗ"
+          raise Exception
+        if(segment):                                # αν δεν έχει πάρει τιμή δεν ελέγχεται ο τύπος
+          pcmd="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
+          pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp)
+          pcmd+="except NameError:\n"+" "*(nsp+2)
+          pcmd+=xpr(vname)+"="+xpr(cmd[aspos+3:])+"\n"+" "*(nsp)
+
+        if(not segment and vname not in vdict[fname].keys()):# and vname!=fname):
           #vnamecl=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
-          if(not isname(vname)):
-            errmsg="\n> ΕΚΧΩΡΗΣΗ επιτρέπεται ΜΟΝΟ σε ΜΕΤΑΒΛΗΤΗ"
-            raise Exception
           if(vname in vdict.keys() or vname in cdict.keys()):
             errmsg="\n> \'"+vname+"\' είναι όνομα ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ"
             raise Exception
@@ -874,10 +899,10 @@ def assign(y,x):
           else:
             print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
-        pcmd="try:#//"+str(nl)+"\n"+" "*(nsp+2)
+        pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
         pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
-        pcmd+="raise RuntimeError(e) from e"                                #TYPE CHECK
+        pcmd+="raise RuntimeError(e) from e"        #TYPE CHECK
 
       elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
         if(fblock):
@@ -893,14 +918,14 @@ def assign(y,x):
           raise Exception
         temp=xpr(list(line[8:]))
         vars=temp.split(",")
-        pcmd=",".join([(v) for v in vars])+"="
+        pcmd=",".join([(v) for v in vars])+"=" if not segment else ""
         for v in vars:                        #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
           vname = str(v)                      # έχει προέλθει από xpr
           vnamecl=vname if vname[0]!='_' else vname[1:]
           if(".ΤΙΜΗ[" in vnamecl):
             lbrpos=vnamecl.find(".ΤΙΜΗ[")  #.ΤΙΜΗ[
             vnamecl=vnamecl[:lbrpos-1] if vnamecl[lbrpos-1] == " " else vnamecl[:lbrpos]
-          if(vnamecl not in vdict[fname].keys() and vnamecl!=fname):
+          if(not segment and vnamecl not in vdict[fname].keys() and vnamecl!=fname):
             if(interS(list("+-*/^")+[" ΚΑΙ "," Ή "," ΟΧΙ "],vnamecl)!=[]):
               errmsg="\n> δεν επιτρέπεται να εκχωρηθεί τιμή σε ΕΚΦΡΑΣΗ"
               raise Exception
@@ -912,8 +937,19 @@ def assign(y,x):
                 print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
               raise Exception
           smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")#+","
-          pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
-        pcmd=pcmd[:-1]  #delete comma
+          #pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
+          if(not segment):
+            pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
+          else:                                # αν έχει πάρει τιμή ελέγχεται ο τύπος
+            pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)
+            pcmd+=(v)+"=="+(v)+"\n"+" "*(nsp+2)
+            pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+4)
+            pcmd+=v+"=assign2("+v+",_.TCinput())\n"+" "*(nsp+2)
+            pcmd+="except Exception as e:\n"+" "*(nsp+4)
+            pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")\n"+" "*(nsp) #//
+            pcmd+="except NameError:\n"+" "*(nsp+2)
+            pcmd+=v+"=_.TCinput()\n"+" "*(nsp)
+        pcmd=pcmd[:-1] if pcmd[-1]=="," else pcmd #delete comma..
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
         ifN+=1
         ifline.append(str(nl))
@@ -962,7 +998,7 @@ def assign(y,x):
         ALLline.append(str(nl))
         ALLblock.append("sw")
         block=True
-        pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"#//"+str(nl)+"\n"+nsp*" "
+        pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"#<"+str(nl)+">#\n"+nsp*" " #//
         pcmd+="if(False):\n"+nsp*" "
         pcmd+="  0"
       elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
@@ -1046,16 +1082,16 @@ def assign(y,x):
           if(" ΜΕ_ΒΗΜΑ " not in line):
             errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ της εντολής ΓΙΑ"
             raise Exception
-          pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)#//"+str(nl)+"\n"+" "*nsp
+          pcmd="correction"+str(whN)+"=1-2*("+xpr(cmd[pos4:],pblock,vargs)+"<0)#<"+str(nl)+">#\n"+" "*nsp #//
           step=xpr(cmd[pos4:],pblock,vargs)
         else:
-          pcmd="correction"+str(whN)+"=1#//"+str(nl)+"\n"+" "*nsp
+          pcmd="correction"+str(whN)+"=1#<"+str(nl)+">#\n"+" "*nsp
           step="1"
         whv.append(xpr(cmd[4:pos1-1],pblock,vargs))
         whstep.append(step)
         vname=whv[-1]
         vnamecl=vname if vname[0]!='_' else vname[1:]
-        if(vnamecl not in vdict[fname].keys() and vname!=fname):
+        if(not segment and vnamecl not in vdict[fname].keys() and vname!=fname):
           #vname=vname if vname[0]!='_' else vname[1:]
           errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ "+vnamecl
           if(fname=="_main_"):
@@ -1104,7 +1140,7 @@ def assign(y,x):
         ALLline.pop(-1)
         deblock=True
         pcmd="if( ("+xpr(list("".join(cmd[12:])),pblock,vargs)
-        pcmd+=") == B1):#//"+str(nl)+"\n"+" "*(nsp+2)+"break"
+        pcmd+=") == B1):#<"+str(nl)+">#\n"+" "*(nsp+2)+"break"  #//
       elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ---------------------------------------------------------------
         fname="_main_"
         PROname=line[10:]
@@ -1406,10 +1442,10 @@ def assign(y,x):
           errmsg="ΜΗ έγκυρη δήλωση ΣΤΑΘΕΡΑΣ εκτός δηλωτικού τμήματος ΣΤΑΘΕΡΩΝ"
         raise Exception
 
-      if(pcmd not in ["","\n"]):              # save line
+      if(pcmd not in ["","\n"]):              # save line ----------------------
         if(pcmd[-1]=="\n"):
           pcmd=pcmd[:-1]
-        fout.write(nsp*" "+pcmd+comment+"#//"+str(nl)+"\n")
+        fout.write(nsp*" "+pcmd+comment+"#<"+str(nl)+">#\n")  #//
       else:
         nl+=0
       if(block):
@@ -1421,10 +1457,25 @@ def assign(y,x):
       if(mblock):
         nsp+=2
         mblock=False
-
+    # endfor line in file  -----------------------------------------------------
     if(segment):
-      nsp=0
       tryblock=0
+      if(ifN!=0):
+        errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+        errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+        raise Exception
+      if(swN!=0):
+        errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
+        errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+        raise Exception
+      if(whN!=0):
+        errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+        errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+        raise Exception
+      if(dwhN!=0):
+        errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΑΝΑΛΛΗΨΗΣ in line "+ALLline.pop(-1))
+        errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
+        raise Exception
     if(tryblock):              #ΕΝΤΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ
       errmsg="\n> expected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"  #"ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
       raise Exception
