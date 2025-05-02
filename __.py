@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205252320")
+  print("0205250120")
 
 def interS(l1,l2):
   '''
@@ -138,7 +138,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       linecorr=1
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, κάποια μεταβλητή δεν έχει λάβει τιμή"
     elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
-      or "only concatenate" in sb or "no attribute \'value\'" in sb
+      or "only concatenate" in sb or "no attribute \'value\'" in sb or "not supported between instances of" in sb
       or "object is not subscriptable" in sb or "object is not callable" in sb): # or "TypeError"
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       linecorr=1
@@ -152,7 +152,8 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
         vname=sb[sb.find("name \'")+6:sb.find("\' is not defined")]
         vnamecl=vname if vname[0]!='_' else vname[1:]
         errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
-      elif("unsupported operand" in sb or "only concatenate" in sb):
+      elif("unsupported operand" in sb or "only concatenate" in sb 
+        or "not supported between instances of" in sb):
         errmsg2+="\n> ΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
       elif("no attribute \'value\'" in sb):
         errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
@@ -620,6 +621,7 @@ def assign(y,x):
     tryblock=True
     ablock=True
     fname="_main_"
+    cdict[fname],vdict[fname]=dict(),dict()
     block=True
     acounter+=1
     exe=True
@@ -687,9 +689,9 @@ def main():
         or ";" in lineNS or "\\" in lineNS or "΅" in lineNS or "`" in lineNS or "¨" in lineNS):
         errmsg="\n> ΜΗ ΕΠΙΤΡΕΠΤΟΣ ΧΑΡΑΚΤΗΡΑΣ"
         raise Exception
-      if(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
-        errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
-        raise Exception
+      #if(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
+        #errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
+        #raise Exception
       lpar=rpar=lc=rc=0
       for i in line:
         match i:
@@ -772,7 +774,8 @@ def main():
         else:
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΤΑΘΕΡΑΣ"
           raise Exception
-      elif(vblock and (tryblock or fblock or pblock)):                                               #VBLOCK
+      elif(vblock and (tryblock or fblock or pblock)
+        or segment and interS(["ΑΚΕΡΑΙΕΣ","ΠΡΑΓΜΑΤΙΚΕΣ","ΧΑΡΑΚΤΗΡΕΣ","ΛΟΓΙΚΕΣ"],line)!=[]): #VBLOCK
         if(line.count(":")!=1):
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΜΕΤΑΒΛΗΤΩΝ"
           raise Exception
@@ -858,6 +861,9 @@ def main():
           pcmd+="assign2("+vtype+","+xpr(vname)+vsub+")\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+=xpr(vname)+"="+vval+"\n"+" "*(nsp)
+      elif(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
+        errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
+        raise Exception
 
       elif(line.count("<--")==1 and ablock and                                  #ASSIGNMENT
            not( fname==line[:len(fname)] 
