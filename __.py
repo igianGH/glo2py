@@ -132,11 +132,11 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("\'type\'" in sb and "unsupported operand" in sb 
+    if("\'pholder\'" in sb and "unsupported operand" in sb 
        or "not supported between instances" in sb and "\'type\'" in sb 
        or "not supported between instances" in sb and "\'pholder\'" in sb):
       linecorr=1
-      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ ΕΚΦΡΑΣΗΣ, Κάποια μεταβλητή δεν έχει λάβει τιμή?"
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, κάποια μεταβλητή δεν έχει λάβει τιμή"
     elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
       or "only concatenate" in sb or "no attribute \'value\'" in sb
       or "object is not subscriptable" in sb or "object is not callable" in sb): # or "TypeError"
@@ -144,6 +144,8 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       linecorr=1
       if("comma" in sb):
         errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα ή τελεστή?"
+      elif("cannot assign to expression" in sb or "aybe you meant \'==\' instead of \'=\'" in sb):
+        errmsg2+="\n> δεν επιτρέπεται να εκχωρηθεί τιμή σε ΕΚΦΡΑΣΗ"
       elif("object is not subscriptable" in sb):
         errmsg2+="\n> ΛΑΝΘΑΣΜΕΝΗ ΔΙΑΣΤΑΣΗ αντικειμένου"
       elif("name" in sb and "not defined" in sb):
@@ -886,7 +888,7 @@ def assign(y,x):
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        if(interS("+,-,*,/,%, and , or , not , True , False ".split(","),xpr(line))!=[] or "(" in line):
+        if(False): #and interS("+,-,*,/,%, and , or , not , True , False ".split(","),xpr(line))!=[] or "(" in line):
           errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ")
           raise Exception
         temp=xpr(list(line[8:]))
@@ -899,12 +901,16 @@ def assign(y,x):
             lbrpos=vnamecl.find(".ΤΙΜΗ[")  #.ΤΙΜΗ[
             vnamecl=vnamecl[:lbrpos-1] if vnamecl[lbrpos-1] == " " else vnamecl[:lbrpos]
           if(vnamecl not in vdict[fname].keys() and vnamecl!=fname):
-            errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
-            if(fname=="_main_"):
-              print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
-            else:
-              print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
-            raise Exception
+            if(interS(list("+-*/^")+[" ΚΑΙ "," Ή "," ΟΧΙ "],vnamecl)!=[]):
+              errmsg="\n> δεν επιτρέπεται να εκχωρηθεί τιμή σε ΕΚΦΡΑΣΗ"
+              raise Exception
+            if("(" not in line):
+              errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
+              if(fname=="_main_"):
+                print("το ΠΡΟΓΡΑΜΜΑ",PROname,"έχει","ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
+              else:
+                print("το ΥΠΟΠΡΟΓΡΑΜΜΑ",fname,"έχει ΜΕΤΑΒΛΗΤΕΣ",[i for i in vdict[fname].keys() if "." not in i])
+              raise Exception
           smartV= "" if not smart else comment[comment.find("#")+1:].replace(" ","")#+","
           pcmd+=("_.Rinput("+(v)+","+str(report)+",\""+(smartV)+"\"),")*(randIN)+"_.TCinput(),"*(1-randIN)
         pcmd=pcmd[:-1]  #delete comma
@@ -1098,7 +1104,7 @@ def assign(y,x):
         ALLline.pop(-1)
         deblock=True
         pcmd="if( ("+xpr(list("".join(cmd[12:])),pblock,vargs)
-        pcmd+=") == B1):\n"+" "*(nsp+2)+"break"
+        pcmd+=") == B1):#//"+str(nl)+"\n"+" "*(nsp+2)+"break"
       elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ---------------------------------------------------------------
         fname="_main_"
         PROname=line[10:]
