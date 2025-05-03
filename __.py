@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205250120")
+  print("0405250020")
 
 def interS(l1,l2):
   '''
@@ -516,6 +516,8 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
     elif(teldict[teli[j]] != "^" and powblock):
       powblock=False
       ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]
+  if(powblock):
+    ss="("+ss
   if(ss[0]=="(" and ss[-1]==")"):
     ss=ss[1:-1]
   pcmd=ss
