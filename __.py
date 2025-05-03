@@ -1102,7 +1102,7 @@ def main():
             vpr=""
           else:
             vpr+=c
-        vprlist.append(vpr)
+        vprlist.append(xpr(vpr))
         pcmd="_.eprint("+",".join(vprlist)+")"
         #pcmd="_.eprint("+",".join([xpr(i) for i in line[6:].split(",")])+")"
         #pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
