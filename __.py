@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0405250020")
+  print("0205250133")
 
 def interS(l1,l2):
   '''
@@ -161,7 +161,8 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       errmsg2+="\n> πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων"
       rall={trb.rfind(ri):ri for ri in tGL.keys() if trb.rfind(ri)>-1}
       fr1,fr2=min(rall.keys()),max(rall.keys())
-      errmsg2+=" \'"+tGL[rall[fr1]]+"\' και \'"+tGL[rall[fr2]]+"\'"
+      if(fr1!=fr2):
+        errmsg2+=" \'"+tGL[rall[fr1]]+"\' και \'"+tGL[rall[fr2]]+"\'"
     elif("no attribute \'ΤΙΜΗ\'" in trb):
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
@@ -498,7 +499,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
       if(s[0] in "<>"):
         bflag=True
       buffer+=s.pop(0)
-  telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**".split(",")#,(,)
+  telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")#,(,),[,]
   teldict,teli={},[]
   ss=pcmd
   for i in range(len(ss)-1):
@@ -508,15 +509,27 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
     if( ss[i:i+1] in telestes ):
       teldict[i]=ss[i:i+1]
       teli.append(i)
-  powblock=False
+  pstack=[""]
+  if(len(teli)>0 and teldict[teli[-1]] == "^"):
+    pstack.append("^")
+    ss=ss+")"
   for j in range(len(teli)-1,0,-1):
-    if(teldict[teli[j-1]] == "^" and not powblock):
-      powblock=True
+    if(teldict[teli[j-1]] == "^" and pstack[-1]!="^"):
+      pstack.append("^")                                                        
       ss=ss[:teli[j]]+")"+ss[teli[j]:]
-    elif(teldict[teli[j]] != "^" and powblock):
-      powblock=False
+    elif(teldict[teli[j]] != "^" and teldict[teli[j]] not in "()[]" and pstack[-1]=="^"):
+      pstack.pop(-1)                                                            
       ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]
-  if(powblock):
+      if(teldict[teli[j-1]] == "^" and pstack[-1]!="^"):
+        pstack.append("^")                                                        
+        ss=ss[:teli[j]]+")"+ss[teli[j]:]
+    elif(teldict[teli[j]] == "]"):
+      pstack.append("]")
+    elif(teldict[teli[j]] == ")"):
+      pstack.append(")")
+    elif(teldict[teli[j]] in "(["):
+      pstack.pop(-1)
+  if(pstack[-1]=="^"):
     ss="("+ss
   if(ss[0]=="(" and ss[-1]==")"):
     ss=ss[1:-1]
@@ -1061,7 +1074,7 @@ def main():
         if(fblock):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
+        pcmd="_.eprint("+",".join([xpr(i) for i in line[6:].split(",")])+")"#pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
       elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
