@@ -499,7 +499,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
       if(s[0] in "<>"):
         bflag=True
       buffer+=s.pop(0)
-  telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")#,(,),[,]
+  telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")+[","]
   teldict,teli={},[]
   ss=pcmd
   for i in range(len(ss)-1):
