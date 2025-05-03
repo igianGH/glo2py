@@ -59,13 +59,109 @@ import traceback
 class NUM:
   def __init__(self,value=1):
     self.value=value
-  def __mul__(self,x):
+  def __mul__(self,x):  #NUM*x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     return self.value*x**1
-  def __rmul__(self,x):
+  def __rmul__(self,x): #x*NUM
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     return NUM(x**1)
+  def __add__(self,x):  #NUM0+x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value+x**1
+  def __radd__(self,x): #x+NUM0
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __sub__(self,x):  #NUM0-x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self+(-x)
+  def __rsub__(self,x): #x-NUM0
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __truediv__(self,x):  #NUM1/x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value/x**1
+  def __rtruediv__(self,x): #x/NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __floordiv__(self,x):  #NUM1//x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value//x**1
+  def __rfloordiv__(self,x): #x//NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __mod__(self,x):  #NUM1%x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value%x**1
+  def __rmod__(self,x): #x%NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __pow__(self,x):  #NUM1**x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __rpow__(self,x): #x**NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return x**self.value
+  def __xor__(self,x):  #NUM1**x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value**x
+  def __rxor__(self,x): #x**NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+class myB:
+  def __init__(self,value=True):
+    self.Bvalue=value
+  def __and__(self,other):
+    if(type(other)==bool):
+      return self.Bvalue and other
+    elif(hasattr(other,'Bvalue')):
+      return myB(self.Bvalue and other.Bvalue)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __rand__(self,other):
+    if(type(other)==bool):
+      return myB(other and True)
+    elif(hasattr(other,'Bvalue')):
+      return myB(other.Bvalue and True)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __or__(self,other):
+    if(type(other)==bool):
+      return self.Bvalue or other
+    elif(hasattr(other,'Bvalue')):
+      return myB(self.Bvalue or other.Bvalue)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __ror__(self,other):
+    if(type(other)==bool):
+      return myB(other or False)
+    elif(hasattr(other,'Bvalue')):
+      return myB(other.Bvalue or False)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __eq__(self,other):
+    if(type(other)==bool or hasattr(other,'Bvalue')):
+      return other
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
 \n''')
   X=xpr(list(code))
-  fOUT.write("def main():\n  N1=NUM()\n")
+  fOUT.write("def main():\n  N1,N0,B1=NUM(1),NUM(0),myB()\n")
   fOUT.write("  print("+X+')\n')
   fOUT.close()
   ##EXECUTION
@@ -363,7 +459,7 @@ def eprint(*PP):
     print(p,end=" ")
   print("")
 
-def xpr(s,pblock=False,v=[],swflag=False):
+def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
   '''
   Μετατρέπει λίστα χαρακτήρων σε έγκυρη έκφραση της ΓΛΩΣΣΑΣ
   s
@@ -377,8 +473,38 @@ def xpr(s,pblock=False,v=[],swflag=False):
   if(type(s)==str):
     s=list(s)
   buffer=" "
-  ss="".join(s)
-  #s=[" "]+s
+  s=["("]+s+[")"]
+  #ss=""#.join(s)
+  #for c in s:
+    #ss+=c
+  #print(ss)
+  ##s=[" "]+s
+  bad='''
+  telestes="+,-,*,/, DIV , MOD ,^,(,), Ή , ΚΑΙ ,<,>,=,<>,<=,>=".split(",")
+  for t in telestes:
+    ss.replace(t,t+"    ")
+  print(ss)
+  #print(telestes)
+  teldict={}
+  telestes="+    ,-    ,*    ,/    , DIV , MOD ,^    ,(    ,)    , Ή   , ΚΑΙ ,<    ,>    ,=    ,<>   ,<=   ,>=   ".split(",")
+  teli=[]
+  #print(telestes)
+  print(ss)
+  for i in range(len(ss)-5):
+    if( ss[i:i+5] in telestes):
+      teldict[i]=ss[i:i+5]
+      teli.append(i)
+  print(teli)
+  powblock=False
+  for j in range(len(teli)-1,-1,-1):
+    if(teldict[teli[j]] == "^     " and not powblock):
+      powblock=True
+      ss=ss[:teli[j]+5]+")"+ss[teli[j]+5:]
+    elif(teldict[teli[j]] != "^     " and powblock):
+      powblock=False
+      ss=ss[:teli[j]+5]+"("+ss[teli[j]+5:]
+  s=list(ss)
+  '''
   bflag=False
   pcmd=""
   sarr=sfunc=False
@@ -451,20 +577,27 @@ def xpr(s,pblock=False,v=[],swflag=False):
       s=s[3:]
       buffer+="<--"
     elif(s[0]=="+"):
-      pcmd+="+0+"
+      pcmd+="+N0+"
       s.pop(0)
       buffer+="+"
     elif(s[0]=="*"):
       pcmd+="*N1*"
       s.pop(0)
       buffer+="*"
+    elif(s[0]=="/"):
+      pcmd+="/N1/"
+      s.pop(0)
+      buffer+="/"
     elif(s[0]=="="):
       pcmd+="=="
       s.pop(0)
       bflag=True
       buffer+="=="
     elif(s[0]=="^"):
-      pcmd+="**"
+      if(ptype=="math"):
+        pcmd+="**N1**"
+      else:
+        pcmd+="^N1^"
       s.pop(0)
       buffer+="^"
     elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
@@ -478,11 +611,11 @@ def xpr(s,pblock=False,v=[],swflag=False):
       bflag=True
       buffer+="ΨΕΥΔΗΣ"
     elif(s[:3]==list("DIV") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="//"
+      pcmd+="//N1//"
       s=s[3:]
       buffer+="DIV"
     elif(s[:3]==list("MOD") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="%"
+      pcmd+="%N1%"
       s=s[3:]
       buffer+="MOD"
     elif(s[:4]==list("Τ_Ρ(") and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
@@ -525,6 +658,28 @@ def xpr(s,pblock=False,v=[],swflag=False):
         bflag=True
       buffer+=s.pop(0)
     #print(buffer,"\ns:"+"".join(s).replace("\n",""),"\npcmd:"+pcmd.replace("\n",""))
+  telestes="+,-,*,/,//,%,^,(,),|,&,<,>,=,==,<>,<=,>=,**".split(",")
+  teldict,teli={},[]
+  ss=pcmd
+  for i in range(len(ss)-1):
+    if( ss[i:i+2] in telestes ):
+      teldict[i]=ss[i:i+2]
+      teli.append(i)
+    if( ss[i:i+1] in telestes ):
+      teldict[i]=ss[i:i+1]
+      teli.append(i)
+  powblock=False
+  for j in range(len(teli)-1,0,-1):
+    if(teldict[teli[j-1]] == "^" and not powblock):
+      powblock=True
+      ss=ss[:teli[j]]+")"+ss[teli[j]:]
+    elif(teldict[teli[j]] != "^" and powblock):
+      powblock=False
+      ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]
+  #print(ss)
+  if(ss[0]=="(" and ss[-1]==")"):
+    ss=ss[1:-1]
+  pcmd=ss
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag and not swflag) else "") )
 
 def isname(s):
@@ -597,9 +752,69 @@ from copy import deepcopy as cdc
 class NUM:
   def __init__(self,value=1):
     self.value=value
-  def __mul__(self,x):
+  def __mul__(self,x):  #NUM*x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     return self.value*x**1
-  def __rmul__(self,x):
+  def __rmul__(self,x): #x*NUM
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __add__(self,x):  #NUM0+x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value+x**1
+  def __radd__(self,x): #x+NUM0
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __sub__(self,x):  #NUM0-x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self+(-x)
+  def __rsub__(self,x): #x-NUM0
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __truediv__(self,x):  #NUM1/x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value/x**1
+  def __rtruediv__(self,x): #x/NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __floordiv__(self,x):  #NUM1//x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value//x**1
+  def __rfloordiv__(self,x): #x//NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __mod__(self,x):  #NUM1%x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value%x**1
+  def __rmod__(self,x): #x%NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __pow__(self,x):  #NUM1**x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return NUM(x**1)
+  def __rpow__(self,x): #x**NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return x**self.value
+  def __xor__(self,x):  #NUM1**x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    return self.value**x
+  def __rxor__(self,x): #x**NUM1
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     return NUM(x**1)
 class myA:
   def __init__(self,shape,typos):
@@ -670,7 +885,7 @@ class myB:
 class pholder:
   def __init__(self,typos):
     self.typos=typos
-def assign2(y,x,segment=False):
+def assign2(y,x,segment=False,nl=1):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
   for i in [y,x]:
@@ -720,7 +935,7 @@ def assign(y,x):
     print("-"*75+"\nΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ:\n"+"-"*75)
     fout.write('''
 def main():
-  N1,B1,A1=NUM(),myB(),myA([1],int)
+  N1,N0,B1,A1=NUM(1),NUM(0),myB(),myA([1],int)
 \n''')
   try:
     for line in fin:
@@ -949,8 +1164,8 @@ def main():
             vdict[fname][vname]=vtype
             vdict[fname][vname+".ΤΙΜΗ"]=vtype
           pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
-          pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp+2)
-          pcmd+="assign2("+vtype+","+xpr(vname)+vsub+")\n"+" "*(nsp)
+          pcmd+=xpr(vname)+"=="+xpr(vname)+"#<"+str(nl)+">#\n"+" "*(nsp+2)
+          pcmd+="assign2("+vtype+","+xpr(vname)+vsub+")#<"+str(nl)+">#\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+=xpr(vname)+"="+vval+"\n"+" "*(nsp)
       elif(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
@@ -981,7 +1196,11 @@ def main():
           pcmd="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
-          pcmd+=xpr(vname)+"="+xpr(cmd[aspos+3:])+"\n"+" "*(nsp)
+          pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+4)
+          pcmd+=xpr(vname)+"="+xpr(cmd[aspos+3:])+"#<"+str(nl)+">#\n"+" "*(nsp+2)
+          pcmd+="except Exception as e:\n"+" "*(nsp+4)
+          pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")\n"+" "*(nsp) #//
+          #pcmd+=xpr(vname)+"="+xpr(cmd[aspos+3:])+"\n"+" "*(nsp)
 
         if(not segment and vname not in vdict[fname].keys()):# and vname!=fname):
           #vnamecl=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
@@ -998,9 +1217,9 @@ def main():
             print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
-        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")\n"+" "*(nsp)
+        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")#<"+str(nl)+">#\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
-        pcmd+="raise RuntimeError(e) from e"        #TYPE CHECK
+        pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")"        #TYPE CHECK
 
       elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
         if(fblock):
@@ -1042,11 +1261,11 @@ def main():
             pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)
             pcmd+=(v)+"=="+(v)+"\n"+" "*(nsp+2)
             pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+4)
-            pcmd+=v+"=assign2("+v+",_.TCinput())\n"+" "*(nsp+2)
+            pcmd+=v+"=assign2("+v+",_.TCinput())#<"+str(nl)+">#\n"+" "*(nsp+2)
             pcmd+="except Exception as e:\n"+" "*(nsp+4)
             pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")\n"+" "*(nsp) #//
             pcmd+="except NameError:\n"+" "*(nsp+2)
-            pcmd+=v+"=_.TCinput()\n"+" "*(nsp)
+            pcmd+=v+"=_.TCinput()#<"+str(nl)+">#\n"+" "*(nsp) #διότι είναι μέσα στη for
         pcmd=pcmd[:-1] if pcmd[-1]=="," else pcmd #delete comma..
       elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
         ifN+=1
@@ -1277,7 +1496,7 @@ def main():
         acounter+=1
         tryblock=True
         exe=True
-        pcmd="def main():\n  N1,B1,A1=NUM(),myB(),myA([1],int)\n"
+        pcmd="def main():\n  N1,N0,B1,A1=NUM(1),NUM(0),myB(),myA([1],int)\n"
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):     #END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
