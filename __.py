@@ -1074,16 +1074,16 @@ def main():
         if(fblock):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        vstack=[""]
+        vstack=["0"]
         vprlist=[]
         vpr=""
         for c in line[6:]:
           if(c=="\'"):
             vpr+=c
-            if(vstack[-1]!="\'"):
-              vstack.append("\'")
-            else:
+            if(vstack[-1]=="\'"):
               vstack.pop(-1)
+            else:
+              vstack.append("\'")
           elif(c=="["):
             vpr+=c
             if(vstack[-1]!="\'"):
