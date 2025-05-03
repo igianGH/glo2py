@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205250133")
+  print("0205250120")
 
 def interS(l1,l2):
   '''
@@ -509,7 +509,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
     if( ss[i:i+1] in telestes ):
       teldict[i]=ss[i:i+1]
       teli.append(i)
-  pstack=[""]
+  pstack=list(range(10))
   if(len(teli)>0 and teldict[teli[-1]] == "^"):
     pstack.append("^")
     ss=ss+")"
@@ -529,9 +529,9 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
       pstack.append(")")
     elif(teldict[teli[j]] in "(["):
       pstack.pop(-1)
-  if(pstack[-1]=="^"):
+  if(len(pstack)>0 and pstack[-1]=="^"):
     ss="("+ss
-  if(ss[0]=="(" and ss[-1]==")"):
+  if(len(ss)>0 and ss[0]=="(" and ss[-1]==")"):
     ss=ss[1:-1]
   pcmd=ss
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
@@ -1074,7 +1074,38 @@ def main():
         if(fblock):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        pcmd="_.eprint("+",".join([xpr(i) for i in line[6:].split(",")])+")"#pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
+        vstack=[""]
+        vprlist=[]
+        vpr=""
+        for c in line[6:]:
+          if(c=="\'"):
+            vpr+=c
+            if(vstack[-1]!="\'"):
+              vstack.append("\'")
+            else:
+              vstack.pop(-1)
+          elif(c=="["):
+            vpr+=c
+            if(vstack[-1]!="\'"):
+              vstack.append("[")
+          elif(c=="("):
+            vpr+=c
+            if(vstack[-1]!="\'"):
+              vstack.append("(")
+          elif(c in "])"):
+            vpr+=c
+            if(vstack[-1]!="\'"):
+              vstack.pop(-1)
+          elif(c=="," and vstack[-1] not in "([\'"):
+            vprlist.append(xpr(vpr))
+            vstack=[""]
+            vpr=""
+          else:
+            vpr+=c
+        vprlist.append(vpr)
+        pcmd="_.eprint("+",".join(vprlist)+")"
+        #pcmd="_.eprint("+",".join([xpr(i) for i in line[6:].split(",")])+")"
+        #pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
       elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
