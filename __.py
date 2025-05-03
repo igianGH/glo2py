@@ -121,6 +121,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
   try:
     interpretM(file,smart=smart,report=report,randIN=randIN,test=test)
   except:
+    tGL={'int':"ΑΚΕΡΑΙΑ",'float':"ΠΡΑΓΜΑΤΙΚΗ",'str':"ΧΑΡΑΚΤΗΡΑΣ",'bool':"ΛΟΓΙΚΗ",'myA':"ΠΙΝΑΚΑΣ",'pholder':"NULL"}
     errmsg2=""
     errmsg=str(sys.exc_info()[1])
     trb=str(traceback.format_exc())
@@ -129,54 +130,102 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       print("\n"+trb)
     ierr=trb.rfind("Error:")
     trb=trb[ierr+7:]
+    linecorr=1
     if('%' in trb):
       imod=trb.find('%')
       trb=trb[:imod]+"MOD"+trb[imod+1:]
-    if("\'pholder\'" in sb and "unsupported operand" in sb 
-       or "not supported between instances" in sb and "\'type\'" in sb 
-       or "not supported between instances" in sb and "\'pholder\'" in sb):
-      linecorr=1
-      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, κάποια μεταβλητή δεν έχει λάβει τιμή"
-    elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
-      or "only concatenate" in sb or "no attribute \'value\'" in sb or "not supported between instances of" in sb
-      or "object is not subscriptable" in sb or "object is not callable" in sb): # or "TypeError"
+      imod=sb.find('%')
+      sb=sb[:imod]+"MOD"+sb[imod+1:]
+    #if("not supported between instances" in sb and "\'type\'" in sb):
+    #if("\'pholder\'" in sb and "unsupported operand" in sb):
+      #errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> αποτυχία ΑΠΟΤΙΜΗΣΗΣ, δεν έχουν λάβει τιμή όλες οι ΜΕΤΑΒΛΗΤΕΣ"
+    if( ("not supported between instances" in trb or "unsupported operand" in trb) and "\'pholder\'" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> η πράξη δεν ορίζεται μεταξύ"
+      rall={trb.rfind(ri):ri for ri in tGL.keys() if trb.rfind(ri)>-1}
+      fr1,fr2=min(rall.keys()),max(rall.keys())
+      errmsg2+=" \'"+tGL[rall[fr1]]+"\' και \'"+tGL[rall[fr2]]+"\'"
+      errmsg2+=" (πρέπει να λάβουν ΤΙΜΗ όλες οι ΜΕΤΑΒΛΗΤΕΣ)"
+    elif("cannot access local variable" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:\n> ΑΠΟΤΥΧΙΑ ΑΠΟΤΙΜΗΣΗΣ, η μεταβλητή \'"
+      rpos=trb.rfind("cannot access local variable")
+      errmsg2+=trb[trb[rpos:].find("\'")+1 : trb.rfind("\'")]+"\' δεν έχει λάβει τιμή"
+    #elif("yntax" in sb or "efined" in sb or "unsupported operand" in sb 
+      #or "only concatenate" in sb or "no attribute \'value\'" in sb or "not supported between instances of" in sb
+      #or "object is not subscriptable" in sb or "object is not callable" in sb): # or "TypeError"'ΤΙΜΗ'
+      #errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+    elif("comma" in trb):
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
-      linecorr=1
-      if("comma" in sb):
-        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα ή τελεστή?"
-      elif("cannot assign to expression" in sb or "aybe you meant \'==\' instead of \'=\'" in sb):
-        errmsg2+="\n> δεν επιτρέπεται να εκχωρηθεί τιμή σε ΕΚΦΡΑΣΗ"
-      elif("object is not subscriptable" in sb):
-        errmsg2+="\n> ΛΑΝΘΑΣΜΕΝΗ ΔΙΑΣΤΑΣΗ αντικειμένου"
-      elif("name" in sb and "not defined" in sb):
-        vname=sb[sb.find("name \'")+6:sb.find("\' is not defined")]
-        vnamecl=vname if vname[0]!='_' else vname[1:]
-        errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
-      elif("unsupported operand" in sb or "only concatenate" in sb 
-        or "not supported between instances of" in sb):
-        errmsg2+="\n> ΠΡΑΞΗ ΜΕΤΑΞΥ ΑΣΥΜΒΑΤΩΝ ΑΝΤΙΚΕΙΜΕΝΩΝ"
-      elif("no attribute \'value\'" in sb):
-        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
-      elif("object is not callable" in sb):
-        errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΣΥΝΑΡΤΗΣΗ"
-      else:
-        errmsg2+="\n> "+trb.split('\n')[0].replace("invalid syntax","ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ")
-    else:
-      linecorr=1
+      errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, Μήπως ξεχάσατε κάποιο κόμμα, κενό ή τελεστή?"
+    elif("cannot assign to expression" in trb or "aybe you meant \'==\' instead of \'=\'" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> δεν επιτρέπεται να εκχωρηθεί τιμή σε ΕΚΦΡΑΣΗ"
+    elif("object is not subscriptable" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> ΛΑΝΘΑΣΜΕΝΗ ΔΙΑΣΤΑΣΗ αντικειμένου"#sb[sb.find("\'")+1 : sb.rfind("\'")]+"\'"
+    elif("name" in trb and "not defined" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      vname=trb[trb.find("name \'")+6:trb.find("\' is not defined")]
+      vnamecl=vname if vname[0]!='_' else vname[1:]
+      errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
+    elif("only concatenate" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> μη επιτρεπτή πράξη σε ΧΑΡΑΚΤΗΡΕΣ"
+    elif("unsupported operand" in trb or "not supported between instances of" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων"
+      rall={trb.rfind(ri):ri for ri in tGL.keys() if trb.rfind(ri)>-1}
+      fr1,fr2=min(rall.keys()),max(rall.keys())
+      errmsg2+=" \'"+tGL[rall[fr1]]+"\' και \'"+tGL[rall[fr2]]+"\'"
+        #if("int" in sb):
+          #errmsg2+=" \'ΑΚΕΡΑΙΑ\' και"
+        #if("float" in sb):
+          #errmsg2+=" \'ΠΡΑΓΜΑΤΙΚΗ\' και"
+        #if("bool" in sb):
+          #errmsg2+=" \'ΛΟΓΙΚΗ\' και"
+        #if("str" in sb):
+          #errmsg2+=" \'ΧΑΡΑΚΤΗΡΑΣ\' και"
+        #if("myA" in sb):
+          #errmsg2+=" \'ΠΙΝΑΚΑΣ\'"
+        #errmsg2 = errmsg2[:-3] if errmsg2[-1]=="ι" else errmsg2
+        #if(False and "not supported between instances of" in sb):
+          #sb=sb[sb.find("not supported between instances of"):]
+          #rpos1=sb.find("\'")
+          #rpos2=sb[rpos1+1:].find("\'")
+          #rpos3=sb[rpos2+1:].find("\'")
+          #rpos4=sb[rpos3+1:].find("\'")
+          #rv12=sb[rpos1+1 : rpos2]
+          #rv34=sb[rpos3+1 : rpos4]
+          #rv12=tGL[rv12] if rv12 in tGL.keys() else rv12
+          #rv34=tGL[rv34] if rv34 in tGL.keys() else rv34        
+          #errmsg2+=rv12+"\', \'"+rv34+"\'"
+    elif("no attribute \'ΤΙΜΗ\'" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
+    elif("object is not callable" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΣΥΝΑΡΤΗΣΗ"
+    elif("yntax" in sb or "efined" in sb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> "+trb.split('\n')[0].replace("invalid syntax","ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ")
+    elif("invalid literal for int" in trb or "bad operand type for abs" in trb or "must be real number" in trb):
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
-      if("invalid literal" in sb):
-        errmsg2+="\n> ΕΚΧΩΡΗΣΗ τιμής ΛΑΝΘΑΣΜΕΝΟΥ ΤΥΠΟΥ"
-      elif("index" in sb and "out of bounds" in sb or "valid indices" in sb
-          or "indices must be integers" in sb or "index out of range" in sb):
-        errmsg2+="\n> ΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
-      elif("division by zero" in sb):
-        errmsg2+="\n> ΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
-      elif("math domain error" in sb or "class \'complex\'" in sb):
-        errmsg2+="\n> ΔΕΝ ΟΡΙΖΕΤΑΙ Η ΑΡΙΘΜΗΤΙΚΗ ΠΡΑΞΗ"
-      elif("xceeds the limit" in sb or "OverflowError" in sb):
-        errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ αριθμός"
-      else:
-        errmsg2+="\n"+trb.split('\n')[0]
+      errmsg2+="\n> το όρισμα έπρεπε να είναι ΑΡΙΘΜΗΤΙΚΗ ΤΙΜΗ"
+    elif("index" in trb and "out of bounds" in trb or "valid indices" in trb
+      or "indices must be integers" in trb or "index out of range" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\n> ΥΠΕΡΒΑΣΗ ΟΡΙΩΝ ΠΙΝΑΚΑ"
+    elif("division by zero" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\n> ΔΙΑΙΡΕΣΗ ΜΕ 0 (ΜΗΔΕΝ)"
+    elif("math domain error" in trb or "class \'complex\'" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\n> ΔΕΝ ΟΡΙΖΕΤΑΙ Η ΑΡΙΘΜΗΤΙΚΗ ΠΡΑΞΗ"
+    elif("xceeds the limit" in trb or "OverflowError" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\n> ΠΟΛΥ ΜΕΓΑΛΟΣ αριθμός"
+    else:
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\n"+trb.split('\n')[0]
     print("-"*75+'\n'+errmsg2)
     msnl=snl=0
     msnl=sb[:]
@@ -314,7 +363,7 @@ def eprint(*PP):
     print(p,end=" ")
   print("")
 
-def xpr(s,pblock=False,v=[]):
+def xpr(s,pblock=False,v=[],swflag=False):
   '''
   Μετατρέπει λίστα χαρακτήρων σε έγκυρη έκφραση της ΓΛΩΣΣΑΣ
   s
@@ -328,7 +377,9 @@ def xpr(s,pblock=False,v=[]):
   if(type(s)==str):
     s=list(s)
   buffer=" "
+  ss="".join(s)
   #s=[" "]+s
+  bflag=False
   pcmd=""
   sarr=sfunc=False
   while(s!=[]):
@@ -368,26 +419,32 @@ def xpr(s,pblock=False,v=[]):
     elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="not "
       s=s[3:]
+      bflag=True
       buffer+="ΟΧΙ"
     elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="and "
+      pcmd+=") & B1 & ("
       s=s[3:]
+      bflag=True
       buffer+="ΚΑΙ"
     elif(s[:1]==list("Ή") and (len(s)<2 or s[1] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="or "
+      pcmd+=") | B1 | ("
       s=s[1:]
+      bflag=True
       buffer+="Ή"
     elif(s[:2]==list("<>")):
       pcmd+="!="
       s=s[2:]
+      bflag=True
       buffer+="<>"
     elif(s[:2]==list("<=")):
       pcmd+="<="
       s=s[2:]
+      bflag=True
       buffer+="<="
     elif(s[:2]==list(">=")):
       pcmd+=">="
       s=s[2:]
+      bflag=True
       buffer+=">="
     elif(s[:3]==list("<--")):
       pcmd+="="
@@ -404,6 +461,7 @@ def xpr(s,pblock=False,v=[]):
     elif(s[0]=="="):
       pcmd+="=="
       s.pop(0)
+      bflag=True
       buffer+="=="
     elif(s[0]=="^"):
       pcmd+="**"
@@ -412,10 +470,12 @@ def xpr(s,pblock=False,v=[]):
     elif(s[:6]==list("ΑΛΗΘΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="True "
       s=s[6:]
+      bflag=True
       buffer+="ΑΛΗΘΗΣ"
     elif(s[:6]==list("ΨΕΥΔΗΣ") and (len(s)<7 or s[6] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="False "
       s=s[6:]
+      bflag=True
       buffer+="ΨΕΥΔΗΣ"
     elif(s[:3]==list("DIV") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+="//"
@@ -461,9 +521,11 @@ def xpr(s,pblock=False,v=[]):
       if(s[0] in letters[:52] and buffer[-1] not in letters[:52]):
         pcmd+="_"
       pcmd+=s[0]
+      if(s[0] in "<>"):
+        bflag=True
       buffer+=s.pop(0)
     #print(buffer,"\ns:"+"".join(s).replace("\n",""),"\npcmd:"+pcmd.replace("\n",""))
-  return(pcmd)
+  return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag and not swflag) else "") )
 
 def isname(s):
   '''
@@ -571,12 +633,40 @@ class myA:
     return \"-\"*75+\"\\nWarning: το ~ δεν επιτρέπεται στη ΓΛΩΣΣΑ\\n\"
 class myB:
   def __init__(self,value=True):
-    self.value=value
-  def __eq__(self,other):
+    self.Bvalue=value
+  def __and__(self,other):
     if(type(other)==bool):
+      return self.Bvalue and other
+    elif(hasattr(other,'Bvalue')):
+      return myB(self.Bvalue and other.Bvalue)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __rand__(self,other):
+    if(type(other)==bool):
+      return myB(other and True)
+    elif(hasattr(other,'Bvalue')):
+      return myB(other.Bvalue and True)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __or__(self,other):
+    if(type(other)==bool):
+      return self.Bvalue or other
+    elif(hasattr(other,'Bvalue')):
+      return myB(self.Bvalue or other.Bvalue)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __ror__(self,other):
+    if(type(other)==bool):
+      return myB(other or False)
+    elif(hasattr(other,'Bvalue')):
+      return myB(other.Bvalue or False)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+  def __eq__(self,other):
+    if(type(other)==bool or hasattr(other,'Bvalue')):
       return other
     else:
-      raise SyntaxError("μη έγκυρη ΣΥΝΘΗΚΗ")
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
 class pholder:
   def __init__(self,typos):
     self.typos=typos
@@ -591,8 +681,10 @@ def assign2(y,x,segment=False):
     else:
       tt[j]=tGL[i.typos]
     j+=1
+  if(tt[2]=="ΠΙΝΑΚΑΣ"):
+    raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας από ΠΙΝΑΚΑ")
   if(tt[1]=="ΠΙΝΑΚΑΣ"):
-    raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
+    raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας σε ΠΙΝΑΚΑ")
   if(tt[2]==tt[1]):
     return x
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
@@ -1015,14 +1107,14 @@ def main():
         nsp-=2
         pcmd="elif( (sw"+str(swN) #ΠΕΡΙΠΤΩΣΗ ~ elif
         if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
-          pcmd+=" in ("+xpr(cmd[10:],pblock,vargs)+",)) == B1):"
+          pcmd+=" in ("+xpr(cmd[10:],swflag=True)+",)) == B1):"
         elif(",..," in line):
           casepos=line.find(",..,")
-          swRa=xpr(cmd[10:casepos],pblock,vargs)
-          swRb=xpr(cmd[casepos+4:],pblock,vargs)
+          swRa=xpr(cmd[10:casepos],swflag=True)
+          swRb=xpr(cmd[casepos+4:],swflag=True)
           pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1):"
         else:
-          pcmd+=" "+xpr(cmd[10:],pblock,vargs)+") == B1):"
+          pcmd+=" "+xpr(cmd[10:],swflag=True)+") == B1):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
         if(swN<0):
           errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\' εκτός δομής επιλογής"
