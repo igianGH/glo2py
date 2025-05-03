@@ -46,120 +46,10 @@ def evaluate(code):
   code
     str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ.
   '''
+  global IGpreamble
   fname="source"
   fOUT=open(fname+".py",'w')
-  fOUT.write('''
-import random as r
-import math as m
-import numpy as np
-import __ as _
-import sys
-import traceback
-
-class NUM:
-  def __init__(self,value=1):
-    self.value=value
-  def __mul__(self,x):  #NUM*x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self.value*x**1
-  def __rmul__(self,x): #x*NUM
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __add__(self,x):  #NUM0+x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self.value+x**1
-  def __radd__(self,x): #x+NUM0
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __sub__(self,x):  #NUM0-x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self+(-x)
-  def __rsub__(self,x): #x-NUM0
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __truediv__(self,x):  #NUM1/x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self.value/x**1
-  def __rtruediv__(self,x): #x/NUM1
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __floordiv__(self,x):  #NUM1//x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self.value//x**1
-  def __rfloordiv__(self,x): #x//NUM1
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __mod__(self,x):  #NUM1%x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self.value%x**1
-  def __rmod__(self,x): #x%NUM1
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __pow__(self,x):  #NUM1**x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-  def __rpow__(self,x): #x**NUM1
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return x**self.value
-  def __xor__(self,x):  #NUM1**x
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return self.value**x
-  def __rxor__(self,x): #x**NUM1
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    return NUM(x**1)
-class myB:
-  def __init__(self,value=True):
-    self.Bvalue=value
-  def __and__(self,other):
-    if(type(other)==bool):
-      return self.Bvalue and other
-    elif(hasattr(other,'Bvalue')):
-      return myB(self.Bvalue and other.Bvalue)
-    else:
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-  def __rand__(self,other):
-    if(type(other)==bool):
-      return myB(other and True)
-    elif(hasattr(other,'Bvalue')):
-      return myB(other.Bvalue and True)
-    else:
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-  def __or__(self,other):
-    if(type(other)==bool):
-      return self.Bvalue or other
-    elif(hasattr(other,'Bvalue')):
-      return myB(self.Bvalue or other.Bvalue)
-    else:
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-  def __ror__(self,other):
-    if(type(other)==bool):
-      return myB(other or False)
-    elif(hasattr(other,'Bvalue')):
-      return myB(other.Bvalue or False)
-    else:
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-  def __eq__(self,other):
-    if(type(other)==bool or hasattr(other,'Bvalue')):
-      return other
-    else:
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-\n''')
+  fOUT.write(IGpreamble)
   X=xpr(list(code))
   fOUT.write("def main():\n  N1,N0,B1=NUM(1),NUM(0),myB()\n")
   fOUT.write("  print("+X+')\n')
@@ -272,28 +162,6 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       rall={trb.rfind(ri):ri for ri in tGL.keys() if trb.rfind(ri)>-1}
       fr1,fr2=min(rall.keys()),max(rall.keys())
       errmsg2+=" \'"+tGL[rall[fr1]]+"\' και \'"+tGL[rall[fr2]]+"\'"
-        #if("int" in sb):
-          #errmsg2+=" \'ΑΚΕΡΑΙΑ\' και"
-        #if("float" in sb):
-          #errmsg2+=" \'ΠΡΑΓΜΑΤΙΚΗ\' και"
-        #if("bool" in sb):
-          #errmsg2+=" \'ΛΟΓΙΚΗ\' και"
-        #if("str" in sb):
-          #errmsg2+=" \'ΧΑΡΑΚΤΗΡΑΣ\' και"
-        #if("myA" in sb):
-          #errmsg2+=" \'ΠΙΝΑΚΑΣ\'"
-        #errmsg2 = errmsg2[:-3] if errmsg2[-1]=="ι" else errmsg2
-        #if(False and "not supported between instances of" in sb):
-          #sb=sb[sb.find("not supported between instances of"):]
-          #rpos1=sb.find("\'")
-          #rpos2=sb[rpos1+1:].find("\'")
-          #rpos3=sb[rpos2+1:].find("\'")
-          #rpos4=sb[rpos3+1:].find("\'")
-          #rv12=sb[rpos1+1 : rpos2]
-          #rv34=sb[rpos3+1 : rpos4]
-          #rv12=tGL[rv12] if rv12 in tGL.keys() else rv12
-          #rv34=tGL[rv34] if rv34 in tGL.keys() else rv34        
-          #errmsg2+=rv12+"\', \'"+rv34+"\'"
     elif("no attribute \'ΤΙΜΗ\'" in trb):
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
@@ -430,7 +298,6 @@ def TCinput(prompt="ΕΙΣΟΔΟΣ: "):
     εμφανίζεται για να δηλώσει ότι θα διαβαστεί τιμή από την είσοδο
   '''
   temp=input(prompt)
-  #print("")
   tfl=True
   for c in temp:
     if c not in "-0123456789.":
@@ -468,43 +335,17 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
     αν είναι True τότε καλείται μέσα από ΔΙΑΔΙΚΑΣΙΑ, default False. DEPRECATED
   v
     λίστα με τις μεταβλητές της ΔΙΑΔΙΚΑΣΙΑΣ. DEPRECATED
+  swflag
+    αν είναι True τότε επιστρέφεται μία λιγότερη '(' στην αρχή της έκφρασης
+    γιατί καλείται από ΕΠΙΛΕΞΕ
+  ptype
+    str, αν είναι 'math' τότε ακολουθείται η ΜΑΘΗΜΑΤΙΚΗ προτεραιότητα για το ^
   '''
   global numbersP
   if(type(s)==str):
     s=list(s)
   buffer=" "
   s=["("]+s+[")"]
-  #ss=""#.join(s)
-  #for c in s:
-    #ss+=c
-  #print(ss)
-  ##s=[" "]+s
-  bad='''
-  telestes="+,-,*,/, DIV , MOD ,^,(,), Ή , ΚΑΙ ,<,>,=,<>,<=,>=".split(",")
-  for t in telestes:
-    ss.replace(t,t+"    ")
-  print(ss)
-  #print(telestes)
-  teldict={}
-  telestes="+    ,-    ,*    ,/    , DIV , MOD ,^    ,(    ,)    , Ή   , ΚΑΙ ,<    ,>    ,=    ,<>   ,<=   ,>=   ".split(",")
-  teli=[]
-  #print(telestes)
-  print(ss)
-  for i in range(len(ss)-5):
-    if( ss[i:i+5] in telestes):
-      teldict[i]=ss[i:i+5]
-      teli.append(i)
-  print(teli)
-  powblock=False
-  for j in range(len(teli)-1,-1,-1):
-    if(teldict[teli[j]] == "^     " and not powblock):
-      powblock=True
-      ss=ss[:teli[j]+5]+")"+ss[teli[j]+5:]
-    elif(teldict[teli[j]] != "^     " and powblock):
-      powblock=False
-      ss=ss[:teli[j]+5]+"("+ss[teli[j]+5:]
-  s=list(ss)
-  '''
   bflag=False
   pcmd=""
   sarr=sfunc=False
@@ -657,7 +498,6 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
       if(s[0] in "<>"):
         bflag=True
       buffer+=s.pop(0)
-    #print(buffer,"\ns:"+"".join(s).replace("\n",""),"\npcmd:"+pcmd.replace("\n",""))
   telestes="+,-,*,/,//,%,^,(,),|,&,<,>,=,==,<>,<=,>=,**".split(",")
   teldict,teli={},[]
   ss=pcmd
@@ -676,11 +516,10 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
     elif(teldict[teli[j]] != "^" and powblock):
       powblock=False
       ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]
-  #print(ss)
   if(ss[0]=="(" and ss[-1]==")"):
     ss=ss[1:-1]
   pcmd=ss
-  return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag and not swflag) else "") )
+  return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
 
 def isname(s):
   '''
@@ -696,52 +535,7 @@ def isname(s):
       return False
   return True
 
-def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False,test=False):
-  segment,segblock=True,False
-  with open(file,"r") as fin:     # ΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ -------------------------
-    for line in fin:
-      if(interS(["ΠΡΟΓΡΑΜΜΑ","ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ","ΣΥΝΑΡΤΗΣΗ","ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ","ΔΙΑΔΙΚΑΣΙΑ","ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"],line[:line.find("!")])!=[]):
-        segment=False
-  import importlib
-  global letters,Reserved
-  fin=open(file+"_",'w')
-  with open(file) as fraw:      #'&' στην αρχή πρότασης
-    lineG=(line for line in fraw)
-    line1=next(lineG)[:-1]
-    while(True):
-      try:
-        line2=next(lineG)[:-1]
-        if(line1.replace(" ","").replace("\n","")==""):
-          fin.write(line1+"\n")
-          line1=line2
-          continue
-        while(len(line2)>0 and line2[0]==' '):    # remove wspace from start
-          line2=line2[1:]
-        if(len(line2)>0 and line2[0]=='&'):  # merge 2+ lines
-          line1+=' '+line2[1:]
-        else:
-          fin.write(line1+"\n")
-          line1=line2[:]
-      except:
-        fin.write(line1+"\n")
-        break
-  fin.close()
-  fin=open(file+"_",'r')
-  fout=open(file+".py",'w') #import conflict
-  nsp=0
-  nl=0
-  PROname=fname=pline=""
-  swN=ifN=whN=dwhN=0
-  whv,whstep,whline,dwhline,ifline,swline,ALLblock,ALLline=[],[],[],[],[],[],[],[]
-  blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
-  blockdict2={"if":"ΕΠΙΛΟΓΗΣ","sw":"ΕΠΙΛΟΓΗΣ","wh":"ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΕΠΑΝΑΛΗΨΗΣ"}
-  cdict,vdict={},{}
-  intl=floatl=strl=booll=False
-  acounter=0
-  vblock=cblock=ablock=exe=tryblock=mblock=block=deblock=fblock=pblock=False
-  errmsg=""
-  vargs=[]
-  fout.write('''
+IGpreamble='''
 import random as r
 import math as m
 import numpy as np
@@ -905,23 +699,63 @@ def assign2(y,x,segment=False,nl=1):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-def assign(y,x):
-  tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
-  tt,j={},1
-  for i in [y,x]:
-    if(i not in tGL.keys()):
-      tt[j]=tGL[type(i)]
-    else:
-      tt[j]=tGL[i]
-    j+=1
-  if(tt[1]=="ΠΙΝΑΚΑΣ"):
-    raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας σε Πίνακα")
-  if(tt[2]==tt[1]):
-    return x
-  elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
-    return x
-  raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n'''+"#"*80+"\n")        
+\n'''+"#"*80+"\n"
+
+def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False,test=False):
+  segment,segblock=True,False
+  with open(file,"r") as fin:     # ΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ -------------------------
+    for line in fin:
+      strseg=False
+      linecl=""
+      for c in line:
+        if(c=="\'" and not strseg):
+          strseg=True
+        elif(c=="\'" and strseg):
+          strseg=False
+        elif(not strseg):
+          linecl+=c
+      if(interS(["ΠΡΟΓΡΑΜΜΑ","ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ","ΣΥΝΑΡΤΗΣΗ","ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ","ΔΙΑΔΙΚΑΣΙΑ","ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"],linecl[:linecl.find("!")])!=[]):
+        segment=False
+  import importlib
+  global letters,Reserved,IGpreamble
+  fin=open(file+"_",'w')
+  with open(file) as fraw:      #'&' στην αρχή πρότασης
+    lineG=(line for line in fraw)
+    line1=next(lineG)[:-1]
+    while(True):
+      try:
+        line2=next(lineG)[:-1]
+        if(line1.replace(" ","").replace("\n","")==""):
+          fin.write(line1+"\n")
+          line1=line2
+          continue
+        while(len(line2)>0 and line2[0]==' '):    # remove wspace from start
+          line2=line2[1:]
+        if(len(line2)>0 and line2[0]=='&'):  # merge 2+ lines
+          line1+=' '+line2[1:]
+        else:
+          fin.write(line1+"\n")
+          line1=line2[:]
+      except:
+        fin.write(line1+"\n")
+        break
+  fin.close()
+  fin=open(file+"_",'r')
+  fout=open(file+".py",'w') #import conflict
+  nsp=0
+  nl=0
+  PROname=fname=pline=""
+  swN=ifN=whN=dwhN=0
+  whv,whstep,whline,dwhline,ifline,swline,ALLblock,ALLline=[],[],[],[],[],[],[],[]
+  blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
+  blockdict2={"if":"ΕΠΙΛΟΓΗΣ","sw":"ΕΠΙΛΟΓΗΣ","wh":"ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΕΠΑΝΑΛΗΨΗΣ"}
+  cdict,vdict={},{}
+  intl=floatl=strl=booll=False
+  acounter=0
+  vblock=cblock=ablock=exe=tryblock=mblock=block=deblock=fblock=pblock=False
+  errmsg=""
+  vargs=[]
+  fout.write(IGpreamble)                       # PREAMBLE ^^^^^^^^^^^^^^^^^^^^^^
   if(segment and not segblock):      # ΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ ----------------------
     randIN=False
     segblock=True
@@ -1324,14 +1158,14 @@ def main():
           raise Exception
         block=True
         nsp-=2
-        pcmd="elif( (sw"+str(swN) #ΠΕΡΙΠΤΩΣΗ ~ elif
+        pcmd="elif( ( (sw"+str(swN) #ΠΕΡΙΠΤΩΣΗ ~ elif
         if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
           pcmd+=" in ("+xpr(cmd[10:],swflag=True)+",)) == B1):"
         elif(",..," in line):
           casepos=line.find(",..,")
           swRa=xpr(cmd[10:casepos],swflag=True)
           swRb=xpr(cmd[casepos+4:],swflag=True)
-          pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1):"
+          pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1) ):"
         else:
           pcmd+=" "+xpr(cmd[10:],swflag=True)+") == B1):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
