@@ -331,11 +331,6 @@ def eprint(*PP):
   print("")
 
 def pparser(ss):
-  '''
-  Επιστρέφει str, μια έκφραση, επιβάλλοντας προτεραιότητα στο '^' αν υπάρχει
-  ss
-    str που περιέχει την έκφραση
-  '''
   telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")+[","]
   teldict,teli={},[]
   for i in range(len(ss)-1):
@@ -346,35 +341,39 @@ def pparser(ss):
       teldict[i]=ss[i:i+1]
       teli.append(i)
   pstack=["x"]
-  
+
   if(len(teli)>0 and teldict[teli[-1]] == "^"): # reverse order because 'ss' grows
-    pstack.append("^")        # start pwblock  
+    pstack.append("^")        # start pwblock
     ss=ss+")"
 
   for j in range(len(teli)-1,-1,-1):
-    if(j>0 and teldict[teli[j-1]] == "^" and pstack[-1]=="x"):                  # start pwblock
-      pstack.append("^")                                                        
+    if(j>0 and teldict[teli[j-1]] == "^" and pstack[-1]=="x"):  # start pwblock
+      pstack.append("^")
       ss=ss[:teli[j]]+")"+ss[teli[j]:]  # ) before teli[j]
     elif(teldict[teli[j]] != "^" and teldict[teli[j]] not in "()[]" and pstack[-1]=="^"): # end pwblock
-      pstack.pop(-1)                                                            
+      pstack.pop(-1)
       ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]  # ( after teli[j]
-      if(j>0 and teldict[teli[j-1]] == "^" and pstack[-1]=="x"):                # start pwblock
-        pstack.append("^")                                                        
+      if(j>0 and teldict[teli[j-1]] == "^" and pstack[-1]=="x"):# start pwblock
+        pstack.append("^")
         ss=ss[:teli[j]]+")"+ss[teli[j]:]  # ) before teli[j]
-    elif(teldict[teli[j]] == "]" and pstack[-1] in "x^"):
+    elif(teldict[teli[j]] == "]"): # and pstack[-1] in "x^"
+      if(pstack[-1] in "x^"):
+        teliF=teli[j]
       pstack.append("]")
-      teliF=teli[j]
-    elif(teldict[teli[j]] == ")" and pstack[-1] in "x^"):
+    elif(teldict[teli[j]] == ")"):  # and pstack[-1] in "x^"
+      if(pstack[-1] in "x^"):
+        teliF=teli[j]
       pstack.append(")")
-      teliF=teli[j]
     elif(teldict[teli[j]] == "[" and pstack[-1]=="]"):
       pstack.pop(-1)
-      teliS=teli[j]
-      ss=ss[:teliS] + "["+pparser(ss[teliS+1:teliF])+ ss[teliF:]
+      if(pstack[-1] in "x^"):
+        teliS=teli[j]
+        ss=ss[:teliS] + "["+pparser(ss[teliS+1:teliF])+ ss[teliF:]
     elif(teldict[teli[j]] == "(" and pstack[-1]==")"):
       pstack.pop(-1)
-      teliS=teli[j]
-      ss=ss[:teliS] + "("+pparser(ss[teliS+1:teliF])+ ss[teliF:]                               # recursive call
+      if(pstack[-1] in "x^"):
+        teliS=teli[j]
+        ss=ss[:teliS] + "("+pparser(ss[teliS+1:teliF])+ ss[teliF:]              # recursive call
   if(len(pstack)>0 and pstack[-1]=="^"):
     ss="("+ss
   return ss
@@ -398,7 +397,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
   if(type(s)==str):
     s=list(s)
   buffer=" "
-  bflag=False
+  bflag=btwflag=False
   pcmd=""
   sarr=sfunc=False
   while(s!=[]):
@@ -442,12 +441,12 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
     elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+=") & B1 & ("
       s=s[3:]
-      bflag=True
+      btwflag=bflag=True
       buffer+="ΚΑΙ"
     elif(s[:1]==list("Ή") and (len(s)<2 or s[1] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
       pcmd+=") | B1 | ("
       s=s[1:]
-      bflag=True
+      btwflag=bflag=True
       buffer+="Ή"
     elif(s[:2]==list("<>")):
       pcmd+="!="
@@ -549,8 +548,11 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       if(s[0] in "<>"):
         bflag=True
       buffer+=s.pop(0)
-      
+  if(btwflag):
+    pcmd="("+pcmd+")"
+  #print(pcmd)      
   pcmd = pparser(pcmd) if ptype!="math" else pcmd
+  #print(pcmd)      
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
 
 def isname(s):
