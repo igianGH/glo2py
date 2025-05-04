@@ -54,7 +54,7 @@ def evaluate(code,ptype="ΓΛΩΣΣΑ"):                        # evaluate expre
   fOUT=open(fname+".py",'w')
   fOUT.write(IGpreamble)
   X=xpr(list(code),ptype=ptype)
-  fOUT.write("def main():\n  N1,N0,B1=NUM(1),NUM(0),myB()\n")
+  fOUT.write("def main():\n  Ne,N1,N0,B1=NUM(2),NUM(1),NUM(0),myB()\n")
   fOUT.write("  print("+X+')\n')
   fOUT.close()
   ##EXECUTION
@@ -448,18 +448,23 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       s=s[1:]
       btwflag=bflag=True
       buffer+="Ή"
-    elif(s[:2]==list("<>")):
-      pcmd+="!="
+    elif(s[0]=="="):                                      #eq
+      pcmd+="@Ne=="
+      s.pop(0)
+      bflag=True
+      buffer+="=="
+    elif(s[:2]==list("<>")):                              #ne
+      pcmd+="@Ne!="
       s=s[2:]
       bflag=True
       buffer+="<>"
     elif(s[:2]==list("<=")):
-      pcmd+="<="
+      pcmd+="@Ne<="
       s=s[2:]
       bflag=True
       buffer+="<="
     elif(s[:2]==list(">=")):
-      pcmd+=">="
+      pcmd+="@Ne>="
       s=s[2:]
       bflag=True
       buffer+=">="
@@ -467,6 +472,16 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       pcmd+="="
       s=s[3:]
       buffer+="<--"
+    elif(s[:1]==list("<")):                               #lt
+      pcmd+="@Ne<"
+      s=s[1:]
+      bflag=True
+      buffer+="<"
+    elif(s[:1]==list(">")):                               #gt
+      pcmd+="@Ne>"
+      s=s[1:]
+      bflag=True
+      buffer+=">"
     elif(s[0]=="+"):
       pcmd+="+N0+"
       s.pop(0)
@@ -483,11 +498,6 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       pcmd+="/N1/"
       s.pop(0)
       buffer+="/"
-    elif(s[0]=="="):
-      pcmd+="=="
-      s.pop(0)
-      bflag=True
-      buffer+="=="
     elif(s[0]=="^"):
       if(ptype=="math"):
         pcmd+="**N1**"
@@ -582,8 +592,58 @@ import sys
 import traceback
 from copy import deepcopy as cdc
 class NUM:
-  def __init__(self,value=1):
+  def __init__(self,value):
     self.value=value
+  def __rmatmul__(self,x): #x<..NUM
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("δεν ορίζεται το '<' στις ΛΟΓΙΚΕΣ τιμές")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    else:
+      return NUM(x)
+  def __lt__(self,x): #NUM<x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("δεν ορίζεται το '<' στις ΛΟΓΙΚΕΣ τιμές")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(type(x)==type(self.value) or type(x) != str):
+      return self.value<x
+    else:
+      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
+  def __gt__(self,x): #NUM>x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("δεν ορίζεται το '>' στις ΛΟΓΙΚΕΣ τιμές")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(type(x)==type(self.value) or type(x) != str):
+      return self.value>x
+    else:
+      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
+  def __le__(self,x): #NUM<=x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("δεν ορίζεται το '<=' στις ΛΟΓΙΚΕΣ τιμές")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(type(x)==type(self.value) or type(x) != str):
+      return self.value<=x
+    else:
+      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
+  def __ge__(self,x): #NUM>=x
+    if(type(x)==bool or hasattr(x,'Bvalue')):
+      raise SyntaxError("δεν ορίζεται το '>=' στις ΛΟΓΙΚΕΣ τιμές")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(type(x)==type(self.value) or type(x) != str):
+      return self.value>=x
+    else:
+      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
+  def __eq__(self,x): #NUM==x
+    if(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(type(x)==type(self.value) or type(x) != str):
+      return self.value==x
+    else:
+      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
   def __mul__(self,x):  #NUM*x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -873,7 +933,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False
     print("-"*75+"\nΤΜΗΜΑ ΠΡΟΓΡΑΜΜΑΤΟΣ:\n"+"-"*75)
     fout.write('''
 def main():
-  N1,N0,B1,A1=NUM(1),NUM(0),myB(),myA([1],int)
+  Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)
 \n''')
   try:
     for line in fin:
@@ -1462,7 +1522,7 @@ def main():
         acounter+=1
         tryblock=True
         exe=True
-        pcmd="def main():\n  N1,N0,B1,A1=NUM(1),NUM(0),myB(),myA([1],int)\n"
+        pcmd="def main():\n  Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)\n"
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):#END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
