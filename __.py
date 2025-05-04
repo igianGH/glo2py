@@ -40,11 +40,14 @@ def isindex(i):
   except:
     raise RuntimeError("Μη έγκυρος δείκτης πίνακα")
 
-def evaluate(code):
+def evaluate(code,ptype="ΓΛΩΣΣΑ"):
   '''
   Αποτιμά μεμονωμένη γραμμή κώδικα σε ΓΛΩΣΣΑ χωρίς μεταβλητές.
   code
     str με τον κώδικα του προγράμματος σε ΓΛΩΣΣΑ.
+  ptype
+    str, αν έχει τιμή 'math' τότε ακολουθείται 
+    η μαθηματική προτεραιότητα για τη δύναμη '^'
   '''
   global IGpreamble
   fname="source"
