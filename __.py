@@ -594,10 +594,8 @@ from copy import deepcopy as cdc
 class NUM:
   def __init__(self,value):
     self.value=value
-  def __rmatmul__(self,x): #x<..NUM
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("δεν ορίζεται το '<' στις ΛΟΓΙΚΕΣ τιμές")
-    elif(hasattr(x,'ΤΙΜΗ')):
+  def __rmatmul__(self,x): #x..NUM
+    if(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     else:
       return NUM(x)
