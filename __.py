@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205250120")
+  print("0405252320")
 
 def interS(l1,l2):
   '''
@@ -471,6 +471,10 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       pcmd+="+N0+"
       s.pop(0)
       buffer+="+"
+    elif(s[0]=="-"):
+      pcmd+="-N0-"
+      s.pop(0)
+      buffer+="-"
     elif(s[0]=="*"):
       pcmd+="*N1*"
       s.pop(0)
@@ -583,66 +587,132 @@ class NUM:
   def __mul__(self,x):  #NUM*x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής * στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value*x**1
   def __rmul__(self,x): #x*NUM
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής * στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __add__(self,x):  #NUM0+x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής + στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value+x**1
   def __radd__(self,x): #x+NUM0
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής + στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __sub__(self,x):  #NUM0-x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής - στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self+(-x)
+  def __neg__(self):  #-NUM0
+    return 0-self
   def __rsub__(self,x): #x-NUM0
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής - στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __truediv__(self,x):  #NUM1/x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής / στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value/x**1
   def __rtruediv__(self,x): #x/NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής / στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __floordiv__(self,x):  #NUM1//x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str or type(x)==float):
+      raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value//x**1
   def __rfloordiv__(self,x): #x//NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str or type(x)==float):
+      raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __mod__(self,x):  #NUM1%x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str or type(x)==float):
+      raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value%x**1
   def __rmod__(self,x): #x%NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str or type(x)==float):
+      raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __pow__(self,x):  #NUM1**x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής ^ στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
   def __rpow__(self,x): #x**NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής ^ στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return x**self.value
   def __xor__(self,x):  #NUM1**x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής ^ στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value**x
   def __rxor__(self,x): #x**NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    elif(type(x)==str):
+      raise SyntaxError("δεν ορίζεται ο τελεστής ^ στους ΧΑΡΑΚΤΗΡΕΣ")
+    elif(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
 class myA:
   def __init__(self,shape,typos):
