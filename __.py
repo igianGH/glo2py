@@ -330,6 +330,55 @@ def eprint(*PP):
     print(p,end=" ")
   print("")
 
+def pparser(ss):
+  '''
+  Επιστρέφει str, μια έκφραση, επιβάλλοντας προτεραιότητα στο '^' αν υπάρχει
+  ss
+    str που περιέχει την έκφραση
+  '''
+  telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")+[","]
+  teldict,teli={},[]
+  for i in range(len(ss)-1):
+    if( ss[i:i+2] in telestes ):
+      teldict[i]=ss[i:i+2]
+      teli.append(i)
+    elif( ss[i:i+1] in telestes ):
+      teldict[i]=ss[i:i+1]
+      teli.append(i)
+  pstack=["x"]
+  
+  if(len(teli)>0 and teldict[teli[-1]] == "^"): # reverse order because 'ss' grows
+    pstack.append("^")        # start pwblock  
+    ss=ss+")"
+
+  for j in range(len(teli)-1,-1,-1):
+    if(j>0 and teldict[teli[j-1]] == "^" and pstack[-1]=="x"):                  # start pwblock
+      pstack.append("^")                                                        
+      ss=ss[:teli[j]]+")"+ss[teli[j]:]  # ) before teli[j]
+    elif(teldict[teli[j]] != "^" and teldict[teli[j]] not in "()[]" and pstack[-1]=="^"): # end pwblock
+      pstack.pop(-1)                                                            
+      ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]  # ( after teli[j]
+      if(j>0 and teldict[teli[j-1]] == "^" and pstack[-1]=="x"):                # start pwblock
+        pstack.append("^")                                                        
+        ss=ss[:teli[j]]+")"+ss[teli[j]:]  # ) before teli[j]
+    elif(teldict[teli[j]] == "]" and pstack[-1] in "x^"):
+      pstack.append("]")
+      teliF=teli[j]
+    elif(teldict[teli[j]] == ")" and pstack[-1] in "x^"):
+      pstack.append(")")
+      teliF=teli[j]
+    elif(teldict[teli[j]] == "[" and pstack[-1]=="]"):
+      pstack.pop(-1)
+      teliS=teli[j]
+      ss=ss[:teliS] + "["+pparser(ss[teliS+1:teliF])+ ss[teliF:]
+    elif(teldict[teli[j]] == "(" and pstack[-1]==")"):
+      pstack.pop(-1)
+      teliS=teli[j]
+      ss=ss[:teliS] + "("+pparser(ss[teliS+1:teliF])+ ss[teliF:]                               # recursive call
+  if(len(pstack)>0 and pstack[-1]=="^"):
+    ss="("+ss
+  return ss
+
 def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression parser
   '''
   Μετατρέπει λίστα χαρακτήρων σε έγκυρη έκφραση της ΓΛΩΣΣΑΣ
@@ -349,7 +398,6 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
   if(type(s)==str):
     s=list(s)
   buffer=" "
-  s=["("]+s+[")"]
   bflag=False
   pcmd=""
   sarr=sfunc=False
@@ -501,42 +549,8 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       if(s[0] in "<>"):
         bflag=True
       buffer+=s.pop(0)
-  telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")+[","]
-  teldict,teli={},[]
-  ss=pcmd
-  for i in range(len(ss)-1):
-    if( ss[i:i+2] in telestes ):
-      teldict[i]=ss[i:i+2]
-      teli.append(i)
-    if( ss[i:i+1] in telestes ):
-      teldict[i]=ss[i:i+1]
-      teli.append(i)
-  pstack=list(range(10))
-  if(len(teli)>0 and teldict[teli[-1]] == "^"):
-    pstack.append("^")
-    ss=ss+")"
-  for j in range(len(teli)-1,0,-1):
-    if(teldict[teli[j-1]] == "^" and pstack[-1]!="^"):
-      pstack.append("^")                                                        
-      ss=ss[:teli[j]]+")"+ss[teli[j]:]
-    elif(teldict[teli[j]] != "^" and teldict[teli[j]] not in "()[]" and pstack[-1]=="^"):
-      pstack.pop(-1)                                                            
-      ss=ss[:teli[j]+len(teldict[teli[j]])]+"("+ss[teli[j]+len(teldict[teli[j]]):]
-      if(teldict[teli[j-1]] == "^" and pstack[-1]!="^"):
-        pstack.append("^")                                                        
-        ss=ss[:teli[j]]+")"+ss[teli[j]:]
-    elif(teldict[teli[j]] == "]"):
-      pstack.append("]")
-    elif(teldict[teli[j]] == ")"):
-      pstack.append(")")
-    elif(teldict[teli[j]] in "(["):
-      pstack.pop(-1)
-  if(len(pstack)>0 and pstack[-1]=="^"):
-    ss="("+ss
-  if(ptype!="math"):
-    pcmd=ss
-  if(len(pcmd)>0 and pcmd[0]=="(" and pcmd[-1]==")"):
-    pcmd=pcmd[1:-1]
+      
+  pcmd = pparser(pcmd) if ptype!="math" else pcmd
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
 
 def isname(s):
@@ -797,12 +811,12 @@ def main():
       if(pline!=""):
         line=pline+line
         pline=""
-      for cmpos in range(len(line)):    #COMMENTS
+      for cmpos in range(len(line)):                                   #COMMENTS
         if(line[cmpos]=="!" and line[:cmpos].count("\'")%2==0):
           comment=("   #"+line[cmpos+1:]).replace("\n","")
           line=line[:cmpos]
           break
-      for i in range(cmpos-1,-1,-1):     # SPACES tail #range(cmpos-1,5,-1):
+      for i in range(cmpos-1,-1,-1):                                #SPACES tail
         if(line[i] not in " \n"):
           line=line[:i+1]
           break
@@ -882,24 +896,24 @@ def main():
       cmd=[c for c in line]
 
       if(line in " \n"):
-        pcmd=xpr(cmd,pblock,vargs)
+        pcmd=""#xpr(cmd,pblock,vargs)
       elif(line[-1] not in letters+list("0123456789])\n\t\"\' ")):
         errmsg="\n> ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ ΓΡΑΜΜΗΣ"
         raise Exception 
-      elif(line in rword("ΣΤΑΘΕΡΕΣ") and (tryblock or fblock or pblock)):               #CONSTANTS
+      elif(line in rword("ΣΤΑΘΕΡΕΣ") and (tryblock or fblock or pblock)):       #CONSTANTS
         if(cblock+vblock+ablock):
           errmsg="\n> ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΣΤΑΘΕΡΩΝ"
           raise Exception
         cblock=True
         pcmd="#"+line
-      elif(line in rword("ΜΕΤΑΒΛΗΤΕΣ") and (tryblock or fblock or pblock)):            #VARIABLES
+      elif(line in rword("ΜΕΤΑΒΛΗΤΕΣ") and (tryblock or fblock or pblock)):     #VARIABLES
         if(vblock+ablock):
           errmsg="\n> ΑΝΤΙΚΑΝΟΝΙΚΗ ΕΝΑΡΞΗ ΔΗΛΩΤΙΚΟΥ ΤΜΗΜΑΤΟΣ ΜΕΤΑΒΛΗΤΩΝ"
           raise Exception
         cblock=False
         vblock=True
         pcmd="#"+line
-      elif(line in rword("ΑΡΧΗ") and (tryblock or fblock or pblock)):                     #ΑΡΧΗ
+      elif(line in rword("ΑΡΧΗ") and (tryblock or fblock or pblock)):      #ΑΡΧΗ
         cblock=vblock=False
         acounter-=1
         ablock=True
@@ -908,8 +922,8 @@ def main():
         if(test):
           print("ΥΠΟΠΡΟΓΡΑΜΜΑ:",fname,
                 "ΣΤΑΘΕΡΕΣ:",list(cdict[fname].keys()),
-                "ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))       #full variable report
-      elif(cblock and (tryblock or fblock or pblock)):                                            #CBLOCK
+                "ΜΕΤΑΒΛΗΤΕΣ:",list(vdict[fname].keys()))   #full variable report
+      elif(cblock and (tryblock or fblock or pblock)):                   #CBLOCK
         if(line.count('=')==1):
           eqpos=line.find('=')
           cname=line[:eqpos]
@@ -1024,7 +1038,7 @@ def main():
         errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
         raise Exception
 
-      elif(line.count("<--")==1 and ablock and                                  #ASSIGNMENT
+      elif(line.count("<--")==1 and ablock and                       #ASSIGNMENT
            not( fname==line[:len(fname)] 
            and line[len(fname)] not in letters+list("0123456789_") )):   #return handled elsewhere
         aspos=line.find("<--")
@@ -1044,7 +1058,7 @@ def main():
         if(not isname(vname)):
           errmsg="\n> ΕΚΧΩΡΗΣΗ επιτρέπεται ΜΟΝΟ σε ΜΕΤΑΒΛΗΤΗ"
           raise Exception
-        if(segment):                                # αν δεν έχει πάρει τιμή δεν ελέγχεται ο τύπος
+        if(segment):              # αν δεν έχει πάρει τιμή δεν ελέγχεται ο τύπος
           pcmd="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
@@ -1052,7 +1066,6 @@ def main():
           pcmd+=xpr(vname)+"="+xpr(cmd[aspos+3:])+"#<"+str(nl)+">#\n"+" "*(nsp+2)
           pcmd+="except Exception as e:\n"+" "*(nsp+4)
           pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")\n"+" "*(nsp) #//
-          #pcmd+=xpr(vname)+"="+xpr(cmd[aspos+3:])+"\n"+" "*(nsp)
 
         if(not segment and vname not in vdict[fname].keys()):# and vname!=fname):
           #vnamecl=vname[1:] if (vname[0]=='_' and vname[1] in letters[52:]) else vname
@@ -1071,9 +1084,9 @@ def main():
         pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
         pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")#<"+str(nl)+">#\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
-        pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")"        #TYPE CHECK
+        pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")"    #TYPE CHECK
 
-      elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                                  #PRINT
+      elif(cmd[:6]==list("ΓΡΑΨΕ ") and ablock):                           #PRINT
         if(fblock):
           errmsg="\n> η \'ΓΡΑΨΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
@@ -1107,9 +1120,7 @@ def main():
             vpr+=c
         vprlist.append(xpr(vpr))
         pcmd="_.eprint("+",".join(vprlist)+")"
-        #pcmd="_.eprint("+",".join([xpr(i) for i in line[6:].split(",")])+")"
-        #pcmd="_.eprint("+xpr(cmd[6:],pblock,vargs)+")"
-      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                                #INPUT
+      elif(cmd[:8]==list("ΔΙΑΒΑΣΕ ") and ablock):                         #INPUT
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
@@ -1119,7 +1130,7 @@ def main():
         temp=xpr(list(line[8:]))
         vars=temp.split(",")
         pcmd=",".join([(v) for v in vars])+"=" if not segment else ""
-        for v in vars:                        #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
+        for v in vars:                                                #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
           vname = str(v)                      # έχει προέλθει από xpr
           vnamecl=vname if vname[0]!='_' else vname[1:]
           if(".ΤΙΜΗ[" in vnamecl):
@@ -1150,7 +1161,7 @@ def main():
             pcmd+="except NameError:\n"+" "*(nsp+2)
             pcmd+=v+"=_.TCinput()#<"+str(nl)+">#\n"+" "*(nsp) #διότι είναι μέσα στη for
         pcmd=pcmd[:-1] if pcmd[-1]=="," else pcmd #delete comma..
-      elif(cmd[:3]==list("ΑΝ ") and ablock):                    #IF
+      elif(cmd[:3]==list("ΑΝ ") and ablock):                                 #IF
         ifN+=1
         ifline.append(str(nl))
         ALLline.append(str(nl))
@@ -1161,7 +1172,7 @@ def main():
           errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
         pcmd+=xpr(cmd[3:-4],pblock,vargs)+") == B1):"  #against tuple
-      elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):                  #ELIF
+      elif(cmd[:10]==list("ΑΛΛΙΩΣ_ΑΝ ") and ablock):                       #ELIF
         if(ifN<0):
           errmsg=("\n> unexpected \'ΑΛΛΙΩΣ_ΑΝ\' εκτός δομής επιλογής")
           raise Exception
@@ -1172,14 +1183,14 @@ def main():
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΤΟΤΕ"
           raise Exception
         pcmd+=xpr(cmd[10:-4],pblock,vargs)+") == B1):"
-      elif(line in rword("ΑΛΛΙΩΣ") and ablock):          #ELSE
+      elif(line in rword("ΑΛΛΙΩΣ") and ablock):                            #ELSE
         if(ifN<0):
           errmsg=("\n> unexpected \'ΑΛΛΙΩΣ\' εκτός δομής επιλογής")
           raise Exception          
         block=True
         nsp-=2
         pcmd="else:"
-      elif(line in rword("ΤΕΛΟΣ_ΑΝ") and ablock):    #ENDIF
+      elif(line in rword("ΤΕΛΟΣ_ΑΝ") and ablock):                         #ENDIF
         ifN-=1
         if(ifN<0):
           errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΑΝ\' εκτός δομής επιλογής")
@@ -1192,7 +1203,7 @@ def main():
         ifline.pop(-1)
         ALLline.pop(-1)
         deblock=True
-      elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):           #SWITCH
+      elif(cmd[:8]==list("ΕΠΙΛΕΞΕ ") and ablock):                        #SWITCH
         swN+=1
         swline.append(str(nl))
         ALLline.append(str(nl))
@@ -1207,7 +1218,7 @@ def main():
           raise Exception
         block=True
         nsp-=2
-        pcmd="elif( ( (sw"+str(swN) #ΠΕΡΙΠΤΩΣΗ ~ elif
+        pcmd="elif( ( (sw"+str(swN)                            #ΠΕΡΙΠΤΩΣΗ ~ elif
         if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
           pcmd+=" in ("+xpr(cmd[10:],swflag=True)+",)) == B1):"
         elif(",..," in line):
@@ -1217,14 +1228,14 @@ def main():
           pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1) ):"
         else:
           pcmd+=" "+xpr(cmd[10:],swflag=True)+") == B1):"
-      elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):           #CASE DEFAULT
+      elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):          #CASE DEFAULT
         if(swN<0):
           errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\' εκτός δομής επιλογής"
           raise Exception
         block=True
         nsp-=2
         pcmd="else:"
-      elif(line in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):    #ENDSWITCH
+      elif(line in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):               #ENDSWITCH
         swN-=1
         if(swN<0):
           errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\' εκτός δομής επιλογής")
@@ -1237,7 +1248,7 @@ def main():
         swline.pop(-1)
         ALLline.pop(-1)
         deblock=True
-      elif(cmd[:4]==list("ΟΣΟ ") and ablock):           #WHILE
+      elif(cmd[:4]==list("ΟΣΟ ") and ablock):                             #WHILE
         whN+=1
         ALLblock.append("wh")
         block=True
@@ -1251,7 +1262,7 @@ def main():
           errmsg="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ: λείπει η λέξη ΕΠΑΝΑΛΑΒΕ"
           raise Exception
         pcmd+=xpr(cmd[4:-10],pblock,vargs)+") == B1):"
-      elif(cmd[:4]==list("ΓΙΑ ") and ablock):           # FOR ΜΕΣΩ WHILE
+      elif(cmd[:4]==list("ΓΙΑ ") and ablock):                   # FOR ΜΕΣΩ WHILE
         whN+=1
         whline.append(str(nl))
         ALLline.append(str(nl))
@@ -1305,7 +1316,7 @@ def main():
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"*correction"+str(whN)+" <= "+xpr(cmd[pos2+6:pos3],pblock,vargs)+"*correction"+str(whN)+") == B1):"
         else:
           pcmd+=xpr(cmd[4:pos1],pblock,vargs)+"<= "+xpr(cmd[pos2+6:],pblock,vargs)+") == B1):\n"+" "*nsp
-      elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                                        #ENDFOR/WHILE
+      elif(line in rword("ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):          #ENDFOR/WHILE
         whN-=1
         if(whN<0):
           errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ\' εκτός δομής επανάληψης")
@@ -1319,14 +1330,14 @@ def main():
         ALLline.pop(-1)
         pcmd=whv.pop(-1)+"+="+whstep.pop(-1)   # for +
         deblock=True
-      elif(line in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):    #DO
+      elif(line in rword("ΑΡΧΗ_ΕΠΑΝΑΛΗΨΗΣ") and ablock):                     #DO
         dwhN+=1
         dwhline.append(str(nl))
         ALLline.append(str(nl))
         ALLblock.append("dwh")
         block=True
         pcmd="while(True):"
-      elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):  #_WHILE
+      elif(cmd[:12]==list("ΜΕΧΡΙΣ_ΟΤΟΥ ") and ablock):                   #_WHILE
         dwhN-=1
         if(dwhN<0):
           errmsg=("\n> unexpected \'ΜΕΧΡΙΣ_ΟΤΟΥ\' εκτός δομής επανάληψης")
@@ -1341,7 +1352,7 @@ def main():
         deblock=True
         pcmd="if( ("+xpr(list("".join(cmd[12:])),pblock,vargs)
         pcmd+=") == B1):#<"+str(nl)+">#\n"+" "*(nsp+2)+"break"  #//
-      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                     # MAIN  ---------------------------------------------------------------
+      elif(cmd[:10]==list("ΠΡΟΓΡΑΜΜΑ ")):                       #---- MAIN -----
         fname="_main_"
         PROname=line[10:]
         if(PROname[-1] in "\n "):
@@ -1380,7 +1391,7 @@ def main():
         tryblock=True
         exe=True
         pcmd="def main():\n  N1,N0,B1,A1=NUM(1),NUM(0),myB(),myA([1],int)\n"
-      elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):     #END MAIN
+      elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):#END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
           raise Exception
@@ -1407,7 +1418,7 @@ def main():
         ablock=False
         nsp=0
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
-      elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):           #FUNCTION
+      elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):                              #FUNCTION
         if(fblock):
           errmsg="\n> expected \'ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\'"  #"ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
           raise Exception
@@ -1463,7 +1474,7 @@ def main():
           ftypos="float"
         elif ftypos=="ΧΑΡΑΚΤΗΡΑΣ":
           ftypos="str"
-        elif ftypos=="ΛΟΓΙΚΗ":         #ΛΟΓΙΚΗ
+        elif ftypos=="ΛΟΓΙΚΗ":
           ftypos="bool"
         else:
           errmsg="ΜΗ ΕΓΚΥΡΟΣ ΤΥΠΟΣ ΣΥΝΑΡΤΗΣΗΣ"
@@ -1485,13 +1496,13 @@ def main():
         pcmd=pcmd[:-1]+"\n"
         pcmd+=" "*(nsp+2)+"N1,B1,A1=NUM(),myB(),myA([1],int)\n"
       elif(fname==line[:len(fname)] and ("<--"==line[len(fname):len(fname)+3] 
-        or " <--"==line[len(fname):len(fname)+4])):                                       #RETURN
+        or " <--"==line[len(fname):len(fname)+4])):                      #RETURN
         if(not fblock):
           errmsg="\n> αυτή η σύνταξη επιτρέπεται μόνο μέσα σε ΣΥΝΑΡΤΗΣΕΙΣ"
           raise Exception
         pcmd+="__"+xpr(fname)+xpr(list("<--"))+"assign2("+ftypos+","+xpr(cmd[len(fname)+3:])+")"
         nfvalue=False
-      elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):         #ENDFUNCTION
+      elif(line in rword("ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ")):                      #ENDFUNCTION
         if(not fblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\'"
           raise Exception
@@ -1526,7 +1537,7 @@ def main():
         fblock=False
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
-      elif(cmd[:11]==list("ΔΙΑΔΙΚΑΣΙΑ ")):           #PROCEDURE
+      elif(cmd[:11]==list("ΔΙΑΔΙΚΑΣΙΑ ")):                            #PROCEDURE
         if(fblock):
           errmsg="\n> expected \'ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\'"  #"ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
           raise Exception
@@ -1606,12 +1617,12 @@ def main():
         pcmd=pcmd[:-1]
         fname=""
         pcmd+="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
-      elif(cmd[:7]==list("ΚΑΛΕΣΕ ") and ablock):          #ΚΑΛΕΣΕ
+      elif(cmd[:7]==list("ΚΑΛΕΣΕ ") and ablock):                         #ΚΑΛΕΣΕ
         for posP in range(len(cmd)):
           if cmd[posP]=="(":
             break
         Xcmd=xpr(cmd)
-        nP=0              #number of open left(
+        nP=0 # number of open '('
         for i in range(len(Xcmd)):
           if(Xcmd[i]=='('):
             nP+=1
@@ -1646,6 +1657,7 @@ def main():
         if(pcmd[-1]=="\n"):
           pcmd=pcmd[:-1]
         fout.write(nsp*" "+pcmd+comment+"#<"+str(nl)+">#\n")  #//
+        #print(list(line),list(pcmd),list(comment))
       else:
         nl+=0
       if(block):
@@ -1697,7 +1709,7 @@ def main():
     print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
     return
 
-  #import source                 #EXECUTION
+  #import source                                             #EXECUTION  -------
   source=__import__(file)
   importlib.reload(source)
   if(exe):
