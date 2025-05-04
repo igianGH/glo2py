@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0405252320")
+  print("0205250120")
 
 def interS(l1,l2):
   '''
@@ -654,7 +654,7 @@ class NUM:
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     elif(type(x)==str or type(x)==float):
-      raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+      raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value//x**1
@@ -662,7 +662,7 @@ class NUM:
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     elif(type(x)==str or type(x)==float):
-      raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+      raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
@@ -670,7 +670,7 @@ class NUM:
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     elif(type(x)==str or type(x)==float):
-      raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+      raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return self.value%x**1
@@ -678,7 +678,7 @@ class NUM:
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
     elif(type(x)==str or type(x)==float):
-      raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+"ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ")
+      raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     return NUM(x**1)
