@@ -546,7 +546,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       s=s[2:]
       buffer+="Ε("
     else:
-      if(s[0] in letters[:52] and buffer[-1] not in letters[:52]):
+      if(s[0] in letters[:52] and buffer[-1] not in letters): #[:52]
         pcmd+="_"
       pcmd+=s[0]
       if(s[0] in "<>"):
