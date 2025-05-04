@@ -40,7 +40,7 @@ def isindex(i):
   except:
     raise RuntimeError("Μη έγκυρος δείκτης πίνακα")
 
-def evaluate(code,ptype="ΓΛΩΣΣΑ"):
+def evaluate(code,ptype="ΓΛΩΣΣΑ"):                        # evaluate expressions
   '''
   Αποτιμά μεμονωμένη γραμμή κώδικα σε ΓΛΩΣΣΑ χωρίς μεταβλητές.
   code
@@ -53,7 +53,7 @@ def evaluate(code,ptype="ΓΛΩΣΣΑ"):
   fname="source"
   fOUT=open(fname+".py",'w')
   fOUT.write(IGpreamble)
-  X=xpr(list(code))
+  X=xpr(list(code),ptype=ptype)
   fOUT.write("def main():\n  N1,N0,B1=NUM(1),NUM(0),myB()\n")
   fOUT.write("  print("+X+')\n')
   fOUT.close()
@@ -330,7 +330,7 @@ def eprint(*PP):
     print(p,end=" ")
   print("")
 
-def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
+def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression parser
   '''
   Μετατρέπει λίστα χαρακτήρων σε έγκυρη έκφραση της ΓΛΩΣΣΑΣ
   s
@@ -354,7 +354,6 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
   pcmd=""
   sarr=sfunc=False
   while(s!=[]):
-    #buffer+=s[0]
     if(s[0] in "\"\'"):
       pcmd+="\'"
       while(True):
@@ -534,9 +533,10 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):
       pstack.pop(-1)
   if(len(pstack)>0 and pstack[-1]=="^"):
     ss="("+ss
-  if(len(ss)>0 and ss[0]=="(" and ss[-1]==")"):
-    ss=ss[1:-1]
-  pcmd=ss
+  if(ptype!="math"):
+    pcmd=ss
+  if(len(pcmd)>0 and pcmd[0]=="(" and pcmd[-1]==")"):
+    pcmd=pcmd[1:-1]
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
 
 def isname(s):
