@@ -333,7 +333,7 @@ def eprint(*PP):
 def lparser(ss):
   telestes="|,&,(,),[,]".split(",")+[","]
   teldict,teli={},[]
-  for i in range(len(ss)-1):
+  for i in range(len(ss)):
     if( ss[i:i+2] in telestes ):
       teldict[i]=ss[i:i+2]
       teli.append(i)
@@ -341,11 +341,9 @@ def lparser(ss):
       teldict[i]=ss[i:i+1]
       teli.append(i)
   pstack=["x"]
+
   for j in range(len(teli)-1,-1,-1):
-    if(teldict[teli[j]] in "|&" and pstack[-1] not in "])"): # end cmpblock
-      ss=ss[:teli[j]]+")"+teldict[teli[j]]+"("+ss[teli[j]+1:]  # ...) &| ( ... 
-      pstack.append("l")
-    elif(teldict[teli[j]] == "]"): # and pstack[-1] in "x^"
+    if(teldict[teli[j]] == "]"): # and pstack[-1] in "x^"
       if(pstack[-1] in "xl"):
         teliF=teli[j]
       pstack.append("]")
@@ -353,6 +351,9 @@ def lparser(ss):
       if(pstack[-1] in "xl"):
         teliF=teli[j]
       pstack.append(")")
+    elif(teldict[teli[j]] in "|&" and pstack[-1] not in "])"): # end cmpblock
+      ss=ss[:teli[j]]+")"+teldict[teli[j]]+"("+ss[teli[j]+1:]  # ...) &| ( ... 
+      pstack.append("l")
     elif(teldict[teli[j]] == "[" and pstack[-1]=="]"):
       pstack.pop(-1)
       if(pstack[-1] in "xl"):
@@ -370,7 +371,7 @@ def lparser(ss):
 def pparser(ss):
   telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")+[","]
   teldict,teli={},[]
-  for i in range(len(ss)-1):
+  for i in range(len(ss)):  #<---------------------- ??
     if( ss[i:i+2] in telestes ):
       teldict[i]=ss[i:i+2]
       teli.append(i)
@@ -476,12 +477,12 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       bflag=True
       buffer+="ΟΧΙ"
     elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=") & B1 & ("
+      pcmd+=" & B1 & "
       s=s[3:]
       btwflag=bflag=True
       buffer+="ΚΑΙ"
     elif(s[:1]==list("Ή") and (len(s)<2 or s[1] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+=") | B1 | ("
+      pcmd+=" | B1 | "
       s=s[1:]
       btwflag=bflag=True
       buffer+="Ή"
@@ -599,12 +600,13 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       if(s[0] in "<>"):
         bflag=True
       buffer+=s.pop(0)
-  if(btwflag):
-    pcmd="("+pcmd+")"
+  #if(btwflag):
+    #pcmd="("+pcmd+")"
   #print(pcmd)      
   pcmd = pparser(pcmd) if ptype!="math" else pcmd
+  #print("pparser ----> ",pcmd)
   pcmd = lparser(pcmd) if bflag else pcmd
-  #print(pcmd)      
+  #print("lparser ----> ",pcmd)      
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
 
 def isname(s):
