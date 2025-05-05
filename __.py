@@ -330,6 +330,43 @@ def eprint(*PP):
     print(p,end=" ")
   print("")
 
+def lparser(ss):
+  telestes="|,&,(,),[,]".split(",")+[","]
+  teldict,teli={},[]
+  for i in range(len(ss)-1):
+    if( ss[i:i+2] in telestes ):
+      teldict[i]=ss[i:i+2]
+      teli.append(i)
+    elif( ss[i:i+1] in telestes ):
+      teldict[i]=ss[i:i+1]
+      teli.append(i)
+  pstack=["x"]
+  for j in range(len(teli)-1,-1,-1):
+    if(teldict[teli[j]] in "|&" and pstack[-1] not in "])"): # end cmpblock
+      ss=ss[:teli[j]]+")"+teldict[teli[j]]+"("+ss[teli[j]+1:]  # ...) &| ( ... 
+      pstack.append("l")
+    elif(teldict[teli[j]] == "]"): # and pstack[-1] in "x^"
+      if(pstack[-1] in "xl"):
+        teliF=teli[j]
+      pstack.append("]")
+    elif(teldict[teli[j]] == ")"):  # and pstack[-1] in "x^"
+      if(pstack[-1] in "xl"):
+        teliF=teli[j]
+      pstack.append(")")
+    elif(teldict[teli[j]] == "[" and pstack[-1]=="]"):
+      pstack.pop(-1)
+      if(pstack[-1] in "xl"):
+        teliS=teli[j]
+        ss=ss[:teliS] + "["+lparser(ss[teliS+1:teliF])+ ss[teliF:]
+    elif(teldict[teli[j]] == "(" and pstack[-1]==")"):
+      pstack.pop(-1)
+      if(pstack[-1] in "xl"):
+        teliS=teli[j]
+        ss=ss[:teliS] + "("+lparser(ss[teliS+1:teliF])+ ss[teliF:] 
+  if(len(pstack)>0 and pstack[-1]=="l"):
+    ss="( "+ss+" )"
+  return ss
+
 def pparser(ss):
   telestes="+,-,*,/,//,%,^,|,&,<,>,=,==,<>,<=,>=,**,(,),[,]".split(",")+[","]
   teldict,teli={},[]
@@ -566,6 +603,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
     pcmd="("+pcmd+")"
   #print(pcmd)      
   pcmd = pparser(pcmd) if ptype!="math" else pcmd
+  pcmd = lparser(pcmd) if bflag else pcmd
   #print(pcmd)      
   return( ("(" if (bflag and not swflag) else "") +pcmd+ (") == B1" if (bflag) else "") )  #and not swflag
 
@@ -1624,7 +1662,7 @@ def main():
         for a in vargs:
           pcmd+=xpr(a)+","
         pcmd=pcmd[:-1]+"\n"
-        pcmd+=" "*(nsp+2)+"N1,B1,A1=NUM(),myB(),myA([1],int)\n"
+        pcmd+=" "*(nsp+2)+"Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)\n"
       elif(fname==line[:len(fname)] and ("<--"==line[len(fname):len(fname)+3] 
         or " <--"==line[len(fname):len(fname)+4])):                      #RETURN
         if(not fblock):
@@ -1712,7 +1750,7 @@ def main():
         for a in vargs:
           pcmd+=xpr(a)+","
         pcmd=pcmd[:-1]+"):"+"\n"
-        pcmd+=" "*(nsp+2)+"N1,B1,A1=NUM(),myB(),myA([1],int)\n"
+        pcmd+=" "*(nsp+2)+"Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)\n"
       elif(line in rword("ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ")):                    #ENDPROCEDURE
         if(not pblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\'"
