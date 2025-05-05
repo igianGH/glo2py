@@ -958,7 +958,7 @@ def main():
           break
         dsp=line.find("  ")
         line=line[:dsp]+line[dsp+1:]
-      lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. ., "
+      lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. ., **, //, ^^"
       cflags+="[+ +] [* *] [/ /] [MOD MOD] [DIV DIV] -] [^ ^] "
       cflags+="(+ +) (* *) (/ /) (MOD MOD) (DIV DIV) -) (^ ^)"
       cflags=cflags.split(" ")
