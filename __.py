@@ -625,7 +625,7 @@ def isname(s):
       return False
   return True
 
-IGpreamble='''
+IGpreamble='''# ΠΡΟΓΡΑΜΜΑ #
 import random as r
 import math as m
 import numpy as np
