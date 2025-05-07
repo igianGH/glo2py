@@ -10,7 +10,7 @@ def testversion():
   Prints GHlib version
   '''
   print(">",end="")
-  print("0205250120")
+  print("0705252347")
 
 def interS(l1,l2):
   '''
@@ -49,13 +49,14 @@ def evaluate(code,ptype="ΓΛΩΣΣΑ"):                        # evaluate expre
     str, αν έχει τιμή 'math' τότε ακολουθείται 
     η μαθηματική προτεραιότητα για τη δύναμη '^'
   '''
-  global IGpreamble
+  global IGpreamble,IGclasses
   fname="source"
   fOUT=open(fname+".py",'w')
   fOUT.write(IGpreamble)
   X=xpr(list(code),ptype=ptype)
   fOUT.write("def main():\n  Ne,N1,N0,B1=NUM(2),NUM(1),NUM(0),myB()\n")
   fOUT.write("  print("+X+')\n')
+  fOUT.write("#"*80+"\n"+IGclasses)
   fOUT.close()
   ##EXECUTION
   source=__import__(fname)
@@ -431,11 +432,12 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
   ptype
     str, αν είναι 'math' τότε ακολουθείται η ΜΑΘΗΜΑΤΙΚΗ προτεραιότητα για το ^
   '''
+  s=s[:]
   global numbersP
   if(type(s)==str):
     s=list(s)
   buffer=" "
-  bflag=btwflag=False
+  bflag=" in " in s
   pcmd=""
   sarr=sfunc=False
   while(s!=[]):
@@ -487,22 +489,22 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       btwflag=bflag=True
       buffer+="Ή"
     elif(s[0]=="="):                                      #eq
-      pcmd+="@Ne=="
+      pcmd+="+Ne=="
       s.pop(0)
       bflag=True
       buffer+="=="
     elif(s[:2]==list("<>")):                              #ne
-      pcmd+="@Ne!="
+      pcmd+="+Ne!="
       s=s[2:]
       bflag=True
       buffer+="<>"
     elif(s[:2]==list("<=")):
-      pcmd+="@Ne<="
+      pcmd+="+Ne<="
       s=s[2:]
       bflag=True
       buffer+="<="
     elif(s[:2]==list(">=")):
-      pcmd+="@Ne>="
+      pcmd+="+Ne>="
       s=s[2:]
       bflag=True
       buffer+=">="
@@ -511,12 +513,12 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       s=s[3:]
       buffer+="<--"
     elif(s[:1]==list("<")):                               #lt
-      pcmd+="@Ne<"
+      pcmd+="+Ne<"
       s=s[1:]
       bflag=True
       buffer+="<"
     elif(s[:1]==list(">")):                               #gt
-      pcmd+="@Ne>"
+      pcmd+="+Ne>"
       s=s[1:]
       bflag=True
       buffer+=">"
@@ -631,6 +633,8 @@ import __ as _
 import sys
 import traceback
 from copy import deepcopy as cdc
+'''
+IGclasses='''
 class NUM:
   def __init__(self,value):
     self.value=value
@@ -644,8 +648,10 @@ class NUM:
       raise SyntaxError("δεν ορίζεται το '<' στις ΛΟΓΙΚΕΣ τιμές")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    elif(type(x)==type(self.value) or type(x) != str):
+    elif(type(x)==type(self.value) or {type(x),type(self.value)}=={int,float} ):
       return self.value<x
+    elif(hasattr(x,'value')):
+      return NUM(self.value<x.value)
     else:
       raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
   def __gt__(self,x): #NUM>x
@@ -653,8 +659,10 @@ class NUM:
       raise SyntaxError("δεν ορίζεται το '>' στις ΛΟΓΙΚΕΣ τιμές")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    elif(type(x)==type(self.value) or type(x) != str):
+    elif(type(x)==type(self.value) or {type(x),type(self.value)}=={int,float} ):
       return self.value>x
+    elif(hasattr(x,'value')):
+      return NUM(self.value>x.value)
     else:
       raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
   def __le__(self,x): #NUM<=x
@@ -662,24 +670,30 @@ class NUM:
       raise SyntaxError("δεν ορίζεται το '<=' στις ΛΟΓΙΚΕΣ τιμές")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    elif(type(x)==type(self.value) or type(x) != str):
+    elif( type(x)==type(self.value) or {type(x),type(self.value)}=={int,float} ):
       return self.value<=x
+    elif(hasattr(x,'value')):
+      return NUM(self.value<=x.value)
     else:
-      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
+      raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων: "+str(self.value)+", "+str(x))
   def __ge__(self,x): #NUM>=x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("δεν ορίζεται το '>=' στις ΛΟΓΙΚΕΣ τιμές")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    elif(type(x)==type(self.value) or type(x) != str):
+    elif(type(x)==type(self.value) or {type(x),type(self.value)}=={int,float} ):
       return self.value>=x
+    elif(hasattr(x,'value')):
+      return NUM(self.value>=x.value)
     else:
       raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
   def __eq__(self,x): #NUM==x
     if(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    elif(type(x)==type(self.value) or type(x) != str):
+    elif(type(x)==type(self.value) or {type(x),type(self.value)}=={int,float} ):
       return self.value==x
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")#return NUM(self.value==x.value)
     else:
       raise SyntaxError("πράξη μεταξύ ΑΣΥΜΒΑΤΩΝ αντικειμένων")
   def __mul__(self,x):  #NUM*x
@@ -689,7 +703,9 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής * στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return self.value*x**1
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
+    return self.value*x
   def __rmul__(self,x): #x*NUM
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -697,7 +713,7 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής * στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    return NUM(x)
   def __add__(self,x):  #NUM0+x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -705,15 +721,17 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής + στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return self.value+x**1
-  def __radd__(self,x): #x+NUM0
-    if(type(x)==bool or hasattr(x,'Bvalue')):
-      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
-    elif(type(x)==str):
-      raise SyntaxError("δεν ορίζεται ο τελεστής + στους ΧΑΡΑΚΤΗΡΕΣ")
-    elif(hasattr(x,'ΤΙΜΗ')):
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
+    return self.value+x
+  def __radd__(self,x): #x+NUM0 <-----------------------------------------------
+    #if(type(x)==bool or hasattr(x,'Bvalue')):
+      #raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
+    #elif(type(x)==str):
+      #raise SyntaxError("δεν ορίζεται ο τελεστής + στους ΧΑΡΑΚΤΗΡΕΣ")
+    if(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    return NUM(x)
   def __sub__(self,x):  #NUM0-x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -721,6 +739,8 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής - στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
     return self+(-x)
   def __neg__(self):  #-NUM0
     return 0-self
@@ -731,7 +751,9 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής - στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
+    return NUM(x)
   def __truediv__(self,x):  #NUM1/x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -739,7 +761,9 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής / στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return self.value/x**1
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
+    return self.value/x
   def __rtruediv__(self,x): #x/NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -747,7 +771,9 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής / στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
+    return NUM(x)
   def __floordiv__(self,x):  #NUM1//x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -755,7 +781,9 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return self.value//x**1
+    elif(hasattr(x,'value')):
+      raise SyntaxError("unexpected NwN")
+    return self.value//x
   def __rfloordiv__(self,x): #x//NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -763,7 +791,7 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής DIV στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    return NUM(x)
   def __mod__(self,x):  #NUM1%x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -771,7 +799,7 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return self.value%x**1
+    return self.value%x
   def __rmod__(self,x): #x%NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -779,7 +807,7 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής MOD στους "+("ΧΑΡΑΚΤΗΡΕΣ" if type(x)==str else "ΠΡΑΓΜΑΤΙΚΟΥΣ"))
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    return NUM(x)
   def __pow__(self,x):  #NUM1**x
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -787,7 +815,7 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής ^ στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    return NUM(x)
   def __rpow__(self,x): #x**NUM1
     if(type(x)==bool or hasattr(x,'Bvalue')):
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
@@ -811,7 +839,7 @@ class NUM:
       raise SyntaxError("δεν ορίζεται ο τελεστής ^ στους ΧΑΡΑΚΤΗΡΕΣ")
     elif(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
-    return NUM(x**1)
+    return NUM(x)
 class myA:
   def __init__(self,shape,typos):
     A=[typos for i in range(shape.pop(-1))]
@@ -901,7 +929,7 @@ def assign2(y,x,segment=False,nl=1):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n'''+"#"*80+"\n"
+\n'''#+"#"*80+"\n"
 
 def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False,test=False):
   segment,segblock=True,False
@@ -919,7 +947,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False
       if(interS(["ΠΡΟΓΡΑΜΜΑ","ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ","ΣΥΝΑΡΤΗΣΗ","ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ","ΔΙΑΔΙΚΑΣΙΑ","ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"],linecl[:linecl.find("!")])!=[]):
         segment=False
   import importlib
-  global letters,Reserved,IGpreamble
+  global letters,Reserved,IGpreamble,IGclasses
   fin=open(file+"_",'w')
   with open(file) as fraw:      #'&' στην αρχή πρότασης
     lineG=(line for line in fraw)
@@ -948,7 +976,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False
   nl=0
   PROname=fname=pline=""
   swN=ifN=whN=dwhN=0
-  whv,whstep,whline,dwhline,ifline,swline,ALLblock,ALLline=[],[],[],[],[],[],[],[]
+  swstack,whv,whstep,whline,dwhline,ifline,swline,ALLblock,ALLline=[],[],[],[],[],[],[],[],[]
   blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
   blockdict2={"if":"ΕΠΙΛΟΓΗΣ","sw":"ΕΠΙΛΟΓΗΣ","wh":"ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΕΠΑΝΑΛΗΨΗΣ"}
   cdict,vdict={},{}
@@ -1379,25 +1407,26 @@ def main():
         ALLline.append(str(nl))
         ALLblock.append("sw")
         block=True
-        pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"#<"+str(nl)+">#\n"+nsp*" " #//
-        pcmd+="if(False):\n"+nsp*" "
-        pcmd+="  0"
+        #pcmd="sw"+str(swN)+"="+xpr(cmd[8:],pblock,vargs)+"#<"+str(nl)+">#\n"+nsp*" " #//
+        swstack.append(cmd[8:])
+        pcmd="if(False):\n"+nsp*" "
+        pcmd+="  0==0"
       elif(cmd[:10]==list("ΠΕΡΙΠΤΩΣΗ ") and ("ΑΛΛΙΩΣ" not in line) and ablock):   #CASE
         if(swN<0):
           errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ\' εκτός δομής επιλογής"
           raise Exception
         block=True
         nsp-=2
-        pcmd="elif( ( (sw"+str(swN)                            #ΠΕΡΙΠΤΩΣΗ ~ elif
+        pcmd="elif( ("#( (sw"+str(swN)                            #ΠΕΡΙΠΤΩΣΗ ~ elif
         if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
-          pcmd+=" in ("+xpr(cmd[10:],swflag=True)+",)) == B1):"
+          pcmd+=xpr( swstack[-1] )+(" in (")+"".join(cmd[10:])+(",)")+" ) == B1):"
         elif(",..," in line):
           casepos=line.find(",..,")
           swRa=xpr(cmd[10:casepos],swflag=True)
           swRb=xpr(cmd[casepos+4:],swflag=True)
-          pcmd+=" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1) ):"
+          pcmd+="".join(swstack[-1])+" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1 ):"
         else:
-          pcmd+=" "+xpr(cmd[10:],swflag=True)+") == B1):"
+          pcmd+=xpr(["("]+swstack[-1]+[")"]+cmd[10:])+" ) == B1):"
       elif(line in rword("ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ") and ablock):          #CASE DEFAULT
         if(swN<0):
           errmsg="\n> unexpected \'ΠΕΡΙΠΤΩΣΗ ΑΛΛΙΩΣ\' εκτός δομής επιλογής"
@@ -1406,6 +1435,7 @@ def main():
         nsp-=2
         pcmd="else:"
       elif(line in rword("ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ") and ablock):               #ENDSWITCH
+        swstack.pop(-1)
         swN-=1
         if(swN<0):
           errmsg=("\n> unexpected \'ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ\' εκτός δομής επιλογής")
@@ -1827,7 +1857,6 @@ def main():
         if(pcmd[-1]=="\n"):
           pcmd=pcmd[:-1]
         fout.write(nsp*" "+pcmd+comment+"#<"+str(nl)+">#\n")  #//
-        #print(list(line),list(pcmd),list(comment))
       else:
         nl+=0
       if(block):
@@ -1839,6 +1868,7 @@ def main():
       if(mblock):
         nsp+=2
         mblock=False
+    fout.write("\n"+"#"*80+"\n"+IGclasses)
     # endfor line in file  -----------------------------------------------------
     if(segment):
       tryblock=0
