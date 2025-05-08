@@ -632,7 +632,7 @@ import numpy as np
 import __ as _
 import sys
 import traceback
-from copy import deepcopy as cdc
+from copy import deepcopy as cdc\n
 '''
 IGclasses='''
 class NUM:
@@ -980,7 +980,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False
   blockdict={"if":"ΤΕΛΟΣ_ΑΝ","sw":"ΤΕΛΟΣ_ΕΠΙΛΟΓΩΝ","wh":"ΤΕΛΟΣ_ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΜΕΧΡΙΣ_ΟΤΟΥ"}
   blockdict2={"if":"ΕΠΙΛΟΓΗΣ","sw":"ΕΠΙΛΟΓΗΣ","wh":"ΕΠΑΝΑΛΗΨΗΣ","dwh":"ΕΠΑΝΑΛΗΨΗΣ"}
   cdict,vdict={},{}
-  intl=floatl=strl=booll=False
+  endfunc=intl=floatl=strl=booll=False
   acounter=0
   vblock=cblock=ablock=exe=tryblock=mblock=block=deblock=fblock=pblock=False
   errmsg=""
@@ -1617,7 +1617,9 @@ def main():
           raise Exception
         ablock=False
         nsp=0
-        pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\n"
+        pcmd+=("  delete()")
+        pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
+        endfunc=True
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):                              #FUNCTION
         if(fblock):
           errmsg="\n> expected \'ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\'"  #"ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
@@ -1736,7 +1738,8 @@ def main():
         deblock=True
         fblock=False
         fname=""
-        pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\n"
+        pcmd+="\n#ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
+        endfunc=True
       elif(cmd[:11]==list("ΔΙΑΔΙΚΑΣΙΑ ")):                            #PROCEDURE
         if(fblock):
           errmsg="\n> expected \'ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ\'"  #"ΛΕΙΠΕΙ ΤΟ ΤΕΛΟΣ_ΣΥΝΑΡΤΗΣΗΣ"
@@ -1816,7 +1819,8 @@ def main():
           pcmd+=xpr(a)+','
         pcmd=pcmd[:-1]
         fname=""
-        pcmd+="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ\n"
+        pcmd+="\n#ΤΕΛΟΣ_ΔΙΑΔΙΚΑΣΙΑΣ"
+        endfunc=True
       elif(cmd[:7]==list("ΚΑΛΕΣΕ ") and ablock):                         #ΚΑΛΕΣΕ
         for posP in range(len(cmd)):
           if cmd[posP]=="(":
@@ -1857,6 +1861,9 @@ def main():
         if(pcmd[-1]=="\n"):
           pcmd=pcmd[:-1]
         fout.write(nsp*" "+pcmd+comment+"#<"+str(nl)+">#\n")  #//
+        if(endfunc):
+          fout.write("\n")
+          endfunc=False
       else:
         nl+=0
       if(block):
@@ -1868,6 +1875,13 @@ def main():
       if(mblock):
         nsp+=2
         mblock=False
+    flist=",".join([f for f in vdict.keys() if f!="_main_"])
+    if(flist!=""):
+      fout.write('''
+def delete():
+  global '''+flist)
+      fout.write('''
+  del '''+flist)
     fout.write("\n"+"#"*80+"\n"+IGclasses)
     # endfor line in file  -----------------------------------------------------
     if(segment):
@@ -1900,8 +1914,6 @@ def main():
     fin.close()
     fout.close()
   except Exception as e:
-    #if(acounter!=0 and errmsg==""):
-      #errmsg="ΛΕΙΠΕΙ Η ΛΕΞΗ ΑΡΧΗ"
     if(errmsg==""):
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
