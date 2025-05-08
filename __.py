@@ -1651,7 +1651,7 @@ def main():
         pcmd="def "
         cmd=cmd[10:]
         if(":" not in cmd):
-          errmsg="ΜΗ ΕΓΚΥΡΗ ΔΗΛΩΣΗ ΣΥΝΑΡΤΗΣΗΣ"
+          errmsg="\n> μη έγκυρη δήλωση ΣΥΝΑΡΤΗΣΗΣ, δεν έχει δηλωθεί ο τύπος"
           raise Exception
         for tpos in range(len(cmd)):
           if(cmd[tpos]==":"):
@@ -1662,7 +1662,7 @@ def main():
             break
           fname+=i
         if(not isname(fname)):
-          errmsg="\n> ΜΗ ΕΓΚΥΡΟ ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ: "+fname
+          errmsg="\n> μη έγκυρο ΟΝΟΜΑ ΥΠΟΠΡΟΓΡΑΜΜΑΤΟΣ: "+fname
           raise Exception
         cdict[fname],vdict[fname]=dict(),dict()
         ftypos="".join(cmd[tpos+1:])
@@ -1677,7 +1677,7 @@ def main():
         elif ftypos=="ΛΟΓΙΚΗ":
           ftypos="bool"
         else:
-          errmsg="ΜΗ ΕΓΚΥΡΟΣ ΤΥΠΟΣ ΣΥΝΑΡΤΗΣΗΣ"
+          errmsg="\n> μη έγκυρος ΤΥΠΟΣ ΣΥΝΑΡΤΗΣΗΣ"
           raise Exception
 
         pcmd+=xpr(fname)+"("
