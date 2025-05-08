@@ -156,7 +156,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       vname=trb[trb.find("name \'")+6:trb.find("\' is not defined")]
       vnamecl=vname if vname[0]!='_' else vname[1:]
-      errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ αντικείμενο \'"+vnamecl+"\'"
+      errmsg2+="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ όνομα \'"+vnamecl+"\'"
     elif("only concatenate" in trb):
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       errmsg2+="\n> μη επιτρεπτή πράξη σε ΧΑΡΑΚΤΗΡΕΣ"
