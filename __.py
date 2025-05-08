@@ -1879,9 +1879,9 @@ def main():
     if(flist!=""):
       fout.write('''
 def delete():
-  global '''+flist)
+  global '''+xpr(flist))
       fout.write('''
-  del '''+flist)
+  del '''+xpr(flist))
     fout.write("\n"+"#"*80+"\n"+IGclasses)
     # endfor line in file  -----------------------------------------------------
     if(segment):
