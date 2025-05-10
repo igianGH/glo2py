@@ -1622,7 +1622,7 @@ def main():
   try:
     delete()
   except:
-    0=0''')
+    0==0''')
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
         endfunc=True
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):                              #FUNCTION
