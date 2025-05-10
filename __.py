@@ -1617,7 +1617,12 @@ def main():
           raise Exception
         ablock=False
         nsp=0
-        pcmd+=("  delete()")
+        #pcmd+=("  delete()")
+        pcmd+=('''
+  try:
+    delete()
+  except:
+    0=0''')
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
         endfunc=True
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):                              #FUNCTION
