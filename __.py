@@ -632,7 +632,7 @@ import numpy as np
 import __ as _
 import sys
 import traceback
-from copy import deepcopy as cdc\n
+from copy import deepcopy as cdc
 '''
 IGclasses='''
 class NUM:
@@ -929,7 +929,7 @@ def assign2(y,x,segment=False,nl=1):
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
     return x
   raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
-\n'''#+"#"*80+"\n"
+'''#+"#"*80+"\n"
 
 def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False,test=False):
   segment,segblock=True,False
@@ -1000,7 +1000,7 @@ def interpretM(file="source",randIN=True,cmp=False,aa=1,smart=False,report=False
     fout.write('''
 def main():
   Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)
-\n''')
+''')
   try:
     for line in fin:
       nl+=1
@@ -1590,7 +1590,11 @@ def main():
         acounter+=1
         tryblock=True
         exe=True
-        pcmd="def main():\n  Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)\n"
+        pcmd='''
+def main():
+  Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)
+  try:\n'''
+        nsp+=2
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):#END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
@@ -1619,10 +1623,17 @@ def main():
         nsp=0
         #pcmd+=("  delete()")
         pcmd+=('''
-  try:
-    delete()
-  except:
-    0==0''')
+    try:
+      delete()
+    except:
+      pass
+  except Exception as e:
+    try:
+      delete()
+    except:
+      pass
+    raise Exception(e)
+''')
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
         endfunc=True
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):                              #FUNCTION
@@ -1937,6 +1948,6 @@ def delete():
     else:
       source.main()
       try:
-        0==0#source.main()
+        0==0 #source.main()
       except:
-        0==0#print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))#"\n<ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ>")#
+        pass #print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))#"\n<ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ>")#
