@@ -625,14 +625,14 @@ def isname(s):
       return False
   return True
 
-IGpreamble='''# ΠΡΟΓΡΑΜΜΑ #
+IGpreamble='''# ΒΙΒΛΙΟΘΗΚΕΣ #
 import random as r
 import math as m
 import numpy as np
 import __ as _
 import sys
 import traceback
-from copy import deepcopy as cdc
+from copy import deepcopy as cdc\n
 '''
 IGclasses='''
 class NUM:
@@ -1587,19 +1587,21 @@ def main():
           errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
           raise Exception
         block=True
+        mblock=True
         acounter+=1
         tryblock=True
         exe=True
-        pcmd='''
+        pcmd='''# ΠΡΟΓΡΑΜΜΑ #
 def main():
   Ne,N1,N0,B1,A1=NUM(2),NUM(1),NUM(0),myB(),myA([1],int)
   try:\n'''
-        nsp+=2
+        #nsp+=2 mblock
       elif(line in rword("ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ")+["ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ "+PROname]):#END MAIN
         if(not tryblock):
           errmsg="\n> unexpected \'ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ\'"
           raise Exception
         tryblock=False
+        mblock=False
         if(ifN!=0):
           errmsg=("ΑΝΟΙΧΤΗ ΔΟΜΗ ΕΠΙΛΟΓΗΣ in line "+ALLline.pop(-1))
           errmsg+=("\n> expected \'"+blockdict[ALLblock.pop(-1)]+"\'")
@@ -1621,7 +1623,6 @@ def main():
           raise Exception
         ablock=False
         nsp=0
-        #pcmd+=("  delete()")
         pcmd+=('''
     try:
       delete()
@@ -1632,8 +1633,7 @@ def main():
       delete()
     except:
       pass
-    raise Exception(e)
-''')
+    raise Exception(e)''')
         pcmd+="\n#ΤΕΛΟΣ_ΠΡΟΓΡΑΜΜΑΤΟΣ"
         endfunc=True
       elif(cmd[:10]==list("ΣΥΝΑΡΤΗΣΗ ")):                              #FUNCTION
@@ -1893,8 +1893,7 @@ def main():
         mblock=False
     flist=",".join([f for f in vdict.keys() if f!="_main_"])
     if(flist!=""):
-      fout.write('''
-def delete():
+      fout.write('''def delete():
   global '''+xpr(flist))
       fout.write('''
   del '''+xpr(flist))
@@ -1947,7 +1946,3 @@ def delete():
           source.main()
     else:
       source.main()
-      try:
-        0==0 #source.main()
-      except:
-        pass #print("το πηγαίο έχει τις εξής συναρτήσεις: "+dir(source))#"\n<ΑΝΤΙΚΑΝΟΝΙΚΟΣ ΤΕΡΜΑΤΙΣΜΟΣ>")#
