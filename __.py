@@ -1227,11 +1227,8 @@ def main():
           else:
             vdict[fname][vname]=vtype
             vdict[fname][vname+".ΤΙΜΗ"]=vtype
-          pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
-          pcmd+=xpr(vname)+"=="+xpr(vname)+"#<"+str(nl)+">#\n"+" "*(nsp+2)
-          pcmd+="assign2("+vtype+","+xpr(vname)+vsub+")#<"+str(nl)+">#\n"+" "*(nsp)
-          pcmd+="except NameError:\n"+" "*(nsp+2)
-          pcmd+=xpr(vname)+"="+vval+"\n"+" "*(nsp)
+          pcmd+=xpr(vname)+"="+vval+" if \'"+xpr(vname)+"\' not in locals() | globals() else"
+          pcmd+=" assign2("+vtype+","+xpr(vname)+vsub+")#<"+str(nl)+">#\n"+" "*(nsp)
       elif(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
         errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
         raise Exception
