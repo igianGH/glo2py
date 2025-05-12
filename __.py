@@ -909,7 +909,7 @@ class myB:
 class pholder:
   def __init__(self,typos):
     self.typos=typos
-def assign2(y,x,segment=False,nl=1):
+def assign2(y,x,segment=False,nl=1,decl=False):
   tGL={int:"ΑΚΕΡΑΙΑ",float:"ΠΡΑΓΜΑΤΙΚΗ",str:"ΧΑΡΑΚΤΗΡΑΣ",bool:"ΛΟΓΙΚΗ",myA:"ΠΙΝΑΚΑΣ"}
   tt,j={},1
   for i in [y,x]:
@@ -925,9 +925,9 @@ def assign2(y,x,segment=False,nl=1):
   if(tt[1]=="ΠΙΝΑΚΑΣ"):
     raise RuntimeError("> Δεν επιτρέπεται εκχώρηση απευθείας σε ΠΙΝΑΚΑ")
   if(tt[2]==tt[1]):
-    return x
+    return x if not decl else True
   elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
-    return x
+    return x if not decl else True
   raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
 '''#+"#"*80+"\n"
 
@@ -1227,8 +1227,8 @@ def main():
           else:
             vdict[fname][vname]=vtype
             vdict[fname][vname+".ΤΙΜΗ"]=vtype
-          pcmd+=xpr(vname)+"="+vval+" if \'"+xpr(vname)+"\' not in locals() | globals() else"
-          pcmd+=" assign2("+vtype+","+xpr(vname)+vsub+")#<"+str(nl)+">#\n"+" "*(nsp)
+          pcmd+=xpr(vname)+"="+vval+" if \'"+xpr(vname)+"\' not in locals() | globals() else ("
+          pcmd+=xpr(vname)+" if assign2("+vtype+","+xpr(vname)+vsub+",decl=True) else 0) #<"+str(nl)+">#\n"+" "*(nsp)
       elif(":" in lineNS and not vblock and len(line)>9 and "ΣΥΝΑΡΤΗΣΗ "!=line[:10]):
         errmsg="\n> unexpected ':' εκτός δήλωσης ΜΕΤΑΒΛΗΤΩΝ"
         raise Exception
