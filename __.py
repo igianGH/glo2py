@@ -5,12 +5,16 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
+
+
+
+
 def testversion():
   '''
   Prints GHlib version
   '''
   print(">",end="")
-  print("0705252347")
+  print("07052gfuggjgg52347")
 
 def interS(l1,l2):
   '''
