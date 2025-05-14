@@ -1265,7 +1265,7 @@ def main():
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+4)
-          pcmd+=xpr(vname)+"= ("+xpr(cmd[aspos+3:])+") #<"+str(nl)+">#\n"+" "*(nsp+2)
+          pcmd+=xpr(vname)+" = +xpr(cmd[aspos+3:])+" #<"+str(nl)+">#\n"+" "*(nsp+2)
           pcmd+="except Exception as e:\n"+" "*(nsp+4)
           pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")\n"+" "*(nsp) #//
 
@@ -1284,7 +1284,7 @@ def main():
             print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
-        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",")+cmd[aspos+3:],pblock,vargs)+")#<"+str(nl)+">#\n"+" "*(nsp)
+        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",(")+cmd[aspos+3:]+")")+")#<"+str(nl)+">#\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
         pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")"    #TYPE CHECK
 
