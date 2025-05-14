@@ -474,7 +474,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       s.pop(0)
       buffer+=","
     elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="not "
+      pcmd+="not B1@ "
       s=s[3:]
       bflag=True
       buffer+="ΟΧΙ"
@@ -873,6 +873,13 @@ class myA:
 class myB:
   def __init__(self,value=True):
     self.Bvalue=value
+  def __matmul__(self,x): #B1@x
+    if(hasattr(x,'ΤΙΜΗ')):
+      raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
+    elif(type(x)==bool):
+      return myB(x)
+    else:
+      raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
   def __and__(self,other):
     if(type(other)==bool):
       return self.Bvalue and other
