@@ -1284,7 +1284,9 @@ def main():
             print("το ΥΠΟΠΡΟΓΡΑΜΜΑ \'"+fname+"\' έχει ΜΕΤΑΒΛΗΤΕΣ:",[i for i in vdict[fname].keys() if "." not in i]) #ΤΙΜΗ
           raise Exception
         pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
-        pcmd+=xpr(list(line[:aspos]+"<--"))+"assign2("+xpr(list(line[:aspos]+",(")+cmd[aspos+3:]+[")"])+")#<"+str(nl)+">#\n"+" "*(nsp)
+        pcmd+=xpr(line[:aspos])+"="
+        pcmd+="assign2("+xpr(line[:aspos]
+        pcmd+=",("+xpr(cmd[aspos+3:]+[")"])+")#<"+str(nl)+">#\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
         pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")"    #TYPE CHECK
 
