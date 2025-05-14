@@ -1269,7 +1269,7 @@ def main():
           pcmd+=xpr(vname)+"=="+xpr(vname)+"\n"+" "*(nsp)
           pcmd+="except NameError:\n"+" "*(nsp+2)
           pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+4)
-          pcmd+=xpr(vname)+" = +xpr(cmd[aspos+3:])+" #<"+str(nl)+">#\n"+" "*(nsp+2)
+          pcmd+=xpr(vname)+" = "+xpr(cmd[aspos+3:])+" #<"+str(nl)+">#\n"+" "*(nsp+2)
           pcmd+="except Exception as e:\n"+" "*(nsp+4)
           pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")\n"+" "*(nsp) #//
 
