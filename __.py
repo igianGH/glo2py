@@ -5,16 +5,12 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
-
-
-
-
 def testversion():
   '''
   Prints GHlib version
   '''
   print(">",end="")
-  print("07052gfuggjgg52347")
+  print("1405252147")
 
 def interS(l1,l2):
   '''
@@ -1322,7 +1318,7 @@ def main():
               vstack.pop(-1)
           elif(c=="," and vstack[-1] not in "([\'"):
             vprlist.append(xpr(vpr))
-            vstack=[""]
+            vstack=["0"]
             vpr=""
           else:
             vpr+=c
