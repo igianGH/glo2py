@@ -881,7 +881,7 @@ class myB:
     if(hasattr(x,'ΤΙΜΗ')):
       raise SyntaxError("δεν ορίζεται πράξη απευθείας σε ΠΙΝΑΚΕΣ")
     elif(type(x)==bool):
-      return myB(x)
+      return x #myB(x)
     else:
       raise SyntaxError("μη έγκυρη ΛΟΓΙΚΗ έκφραση")
   def __and__(self,other):
