@@ -1285,7 +1285,7 @@ def main():
           raise Exception
         pcmd+="try:#<"+str(nl)+">#\n"+" "*(nsp+2)  #//
         pcmd+=xpr(line[:aspos])+"="
-        pcmd+="assign2("+xpr(line[:aspos]
+        pcmd+="assign2("+xpr(line[:aspos])
         pcmd+=",("+xpr(cmd[aspos+3:]+[")"])+")#<"+str(nl)+">#\n"+" "*(nsp)
         pcmd+="except Exception as e:\n"+" "*(nsp+2)
         pcmd+="raise RuntimeError(str(e)+\"\\n#<"+str(nl)+">#\")"    #TYPE CHECK
