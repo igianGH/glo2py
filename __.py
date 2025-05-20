@@ -934,7 +934,7 @@ def assign2(y,x,segment=False,nl=1,decl=False):
   if(tt[2]==tt[1]):
     return x if not decl else True
   #elif(tt[1]=="ΠΡΑΓΜΑΤΙΚΗ" and tt[2]=="ΑΚΕΡΑΙΑ"):
-    #return x if not decl else True
+    #return float(x) if not decl else True
   raise RuntimeError("> Δεν επιτρέπεται εκχώρηση τιμής τύπου "+tt[2]+" σε μεταβλητή τύπου "+tt[1])
 '''#+"#"*80+"\n"
 
