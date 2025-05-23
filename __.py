@@ -1,4 +1,4 @@
-[⚠️ Suspicious Content] import difflib as dfl
+import difflib as dfl
 import traceback
 import sys
 import random as r
