@@ -1052,8 +1052,8 @@ def main():
         pos1=lineNS.find("\'")
         pos2=lineNS[pos1+1:].find("\'")+pos1+1
         lineNS=lineNS[:pos1]+"_"+lineNS[pos2+1:]
-      if("ΠΕΡΙΠΤΩΣΗ" in lineNS and ",..," in lineNS):
-        lineNS=lineNS[:lineNS.find(",..,")]+lineNS[lineNS.find(",..,")+4:]
+      if("ΠΕΡΙΠΤΩΣΗ" in lineNS and ".." in lineNS):
+        lineNS=lineNS[:lineNS.find("..")]+lineNS[lineNS.find(",..,")+2:]
       for i in cflags:
         if(i in lineNS):
           errmsg="\n> ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
@@ -1428,12 +1428,12 @@ def main():
         block=True
         nsp-=2
         pcmd="elif( ("#( (sw"+str(swN)                            #ΠΕΡΙΠΤΩΣΗ ~ elif
-        if("<" not in line and "=" not in line and ">" not in line and ",..," not in line):
+        if("<" not in line and "=" not in line and ">" not in line and ".." not in line):  # ,..,
           pcmd+=xpr( swstack[-1] )+(" in (")+"".join(cmd[10:])+(",)")+" ) == B1):"
-        elif(",..," in line):
-          casepos=line.find(",..,")
+        elif(".." in line):
+          casepos=line.find("..")
           swRa=xpr(cmd[10:casepos],swflag=True)
-          swRb=xpr(cmd[casepos+4:],swflag=True)
+          swRb=xpr(cmd[casepos+2:],swflag=True)
           pcmd+="".join(swstack[-1])+" in list(range("+swRa+","+swRb+"+("+swRa+"<="+swRb+")))+list(range("+swRb+","+swRa+"+("+swRa+">"+swRb+")))) == B1 ):"
         else:
           pcmd+=xpr(["("]+swstack[-1]+[")"]+cmd[10:])+" ) == B1):"
