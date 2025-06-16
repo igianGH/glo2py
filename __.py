@@ -1053,7 +1053,7 @@ def main():
         pos2=lineNS[pos1+1:].find("\'")+pos1+1
         lineNS=lineNS[:pos1]+"_"+lineNS[pos2+1:]
       if("ΠΕΡΙΠΤΩΣΗ" in lineNS and ".." in lineNS):
-        lineNS=lineNS[:lineNS.find("..")]+lineNS[lineNS.find(",..,")+2:]
+        lineNS=lineNS[:lineNS.find("..")]+lineNS[lineNS.find("..")+2:]
       for i in cflags:
         if(i in lineNS):
           errmsg="\n> ΜΗΠΩΣ ΞΕΧΑΣΑΤΕ ΚΑΠΟΙΟ ΟΡΙΣΜΑ?"
