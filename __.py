@@ -170,6 +170,9 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
     elif("no attribute \'ΤΙΜΗ\'" in trb):
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΠΙΝΑΚΑΣ"
+    elif("no attribute \'typos\'" in trb):
+      errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
+      errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΜΕΤΑΒΛΗΤΗ"
     elif("object is not callable" in trb):
       errmsg2+="ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ:"
       errmsg2+="\n> ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ, αυτό το αντικείμενο δεν είναι ΣΥΝΑΡΤΗΣΗ"
