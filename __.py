@@ -442,7 +442,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
   buffer=" "
   bflag=" in " in s
   pcmd=""
-  sarr=sfunc=False
+  notflag=sarr=sfunc=False
   while(s!=[]):
     if(s[0] in "\"\'"):
       pcmd+="\'"
@@ -480,13 +480,20 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       pcmd+="not B1@ "
       s=s[3:]
       bflag=True
+      notflag+=1
       buffer+="ΟΧΙ"
     elif(s[:3]==list("ΚΑΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      if(notflag>0):
+        pcmd+=" )"
+        notflag-=1
       pcmd+=" & B1 & "
       s=s[3:]
       btwflag=bflag=True
       buffer+="ΚΑΙ"
     elif(s[:1]==list("Ή") and (len(s)<2 or s[1] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
+      if(notflag>0):
+        pcmd+=" )"
+        notflag-=1
       pcmd+=" | B1 | "
       s=s[1:]
       btwflag=bflag=True
@@ -607,7 +614,11 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       buffer+=s.pop(0)
   #if(btwflag):
     #pcmd="("+pcmd+")"
-  #print(pcmd)      
+  #print(pcmd)   
+  while(notflag>0):
+    #print(pcmd)
+    pcmd+=" )"
+    notflag-=1    
   pcmd = pparser(pcmd) if ptype!="math" else pcmd
   #print("pparser ----> ",pcmd)
   pcmd = lparser(pcmd) if bflag else pcmd
