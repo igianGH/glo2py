@@ -477,7 +477,7 @@ def xpr(s,pblock=False,v=[],swflag=False,ptype="ΓΛΩΣΣΑ"):    # expression 
       s.pop(0)
       buffer+=","
     elif(s[:3]==list("ΟΧΙ") and (len(s)<4 or s[3] not in letters+["_"]) and (len(buffer)<1 or buffer[-1] not in letters+["_"])):
-      pcmd+="not B1@ "
+      pcmd+="not( "#"not B1@ "
       s=s[3:]
       bflag=True
       notflag+=1
