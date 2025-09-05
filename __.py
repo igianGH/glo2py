@@ -182,6 +182,9 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
     elif("invalid literal for int" in trb or "bad operand type for abs" in trb or "must be real number" in trb):
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
       errmsg2+="\n> το όρισμα έπρεπε να είναι ΑΡΙΘΜΗΤΙΚΗ ΤΙΜΗ"
+    elif("bad operand type" in trb):
+      errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
+      errmsg2+="\n> μη έγκυρη χρήση τελεστή"
     elif("index" in trb and "out of bounds" in trb or "valid indices" in trb
       or "indices must be integers" in trb or "index out of range" in trb):
       errmsg2+="ΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:"
@@ -1050,7 +1053,8 @@ def main():
         line=line[:dsp]+line[dsp+1:]
       lineNS,cflags=line.replace(" ",""),"[] [, ,] (, ,) ,, .. ,. ., ** // ^^"
       cflags+="[+ +] [* *] [/ /] [MOD MOD] [DIV DIV] -] [^ ^] "
-      cflags+="(+ +) (* *) (/ /) (MOD MOD) (DIV DIV) -) (^ ^)"
+      cflags+="(+ +) (* *) (/ /) (MOD MOD) (DIV DIV) -) (^ ^) "
+      cflags+="=> =< ><"
       cflags=cflags.split(" ")
       if(line.count('\"')>0 or line.count('\'')%2==1):
         errmsg="\n> ΜΗ ΕΓΚΥΡΗ χρήση ΕΙΣΑΓΩΓΙΚΩΝ"
