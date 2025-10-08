@@ -5,12 +5,13 @@ import random as r
 import importlib  #reload module
 from contextlib import redirect_stdout
 
-def testversion():
-  '''
-  Prints GHlib version
-  '''
-  print(">",end="")
-  print("1405252147")
+def decap(line):
+  caps="ABEHIKMNOPTXYZ"
+  smll="abehikmnoptxyz"
+  for i in range(len(line)):
+    if(line[i] in caps):
+      line=line[:i]+smll[caps.find(line[i])]+line[i+1:]
+  return line
 
 def interS(l1,l2):
   '''
@@ -239,7 +240,7 @@ def interpreter(file="source",developer=False,dline=True,smart=True,report=False
             if(dline):
               line=next(lines)
               snl+=1
-              print("----> "+str(snl+0-linecorr)+". ",line[:])
+              print("----> "+str(snl+0-linecorr)+". ",decap(line[:]))
             break
       except StopIteration:
         print(errmsg+"\n..\n"+errmsg2)
@@ -1968,7 +1969,7 @@ def delete():
       errmsg=getattr(e, 'message', repr(e))
       if("invalid syntax" in errmsg):
         errmsg="ΜΗ ΕΓΚΥΡΗ ΣΥΝΤΑΞΗ"
-    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+line)   #str(nl+1)
+    print("-"*75+'\n'+"ΣΥΝΤΑΚΤΙΚΟ ΣΦΑΛΜΑ: "+errmsg.replace("Exception()","\n> μη έγκυρη σύνταξη")+"\n----> "+str(nl)+". "+decap(line))   #str(nl+1)
     return
 
   #import source                                             #EXECUTION  -------
