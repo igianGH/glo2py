@@ -331,10 +331,10 @@ def eprint(*PP):
   Καλεί την print εκτός αν κάποια τιμή είναι type ή myA, οπότε διακόπτει την εκτέλεση
   '''
   for p in PP:
-    if(hasattr(p,'typos')):
-      raise RuntimeError("> κάποια μεταβλητή δεν έχει λάβει τιμή")
     if(hasattr(p,'ΤΙΜΗ')):
       raise SyntaxError("δεν επιτρέπεται να δοθεί όρισμα ΠΙΝΑΚΑΣ στη ΓΡΑΨΕ")
+    if(hasattr(p,'typos')):
+      raise RuntimeError("> κάποια μεταβλητή δεν έχει λάβει τιμή")
     print(p,end=" ")
   print("")
 
