@@ -1351,11 +1351,11 @@ def main():
         if(fblock):
           errmsg="\n> η \'ΔΙΑΒΑΣΕ\' δεν επιτρέπεται μέσα σε ΣΥΝΑΡΤΗΣΗ"
           raise Exception
-        if(False): #and interS("+,-,*,/,%, and , or , not , True , False ".split(","),xpr(line))!=[] or "(" in line):
-          errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ")
-          raise Exception
+        #if(False): #and interS("+,-,*,/,%, and , or , not , True , False ".split(","),xpr(line))!=[] or "(" in line):
+          #errmsg=("\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ")
+          #raise Exception
         temp=xpr(list(line[8:]))
-        vars=temp.split(",")
+        vars=temp.replace(" ","").split(",")
         pcmd=",".join([(v) for v in vars])+"=" if not segment else ""
         for v in vars:                                                #ΕΛΕΓΧΟΣ ΔΗΛΩΣΗΣ ΜΕΤ/ΤΩΝ ΣΤΗΝ ΕΙΣΟΔΟ
           vname = str(v)                      # έχει προέλθει από xpr
@@ -1365,7 +1365,7 @@ def main():
             vnamecl=vnamecl[:lbrpos-1] if vnamecl[lbrpos-1] == " " else vnamecl[:lbrpos]
           if(not segment and vnamecl not in vdict[fname].keys() and vnamecl!=fname):
             if(interS(list("+-*/^")+[" ΚΑΙ "," Ή "," ΟΧΙ "],vnamecl)!=[]):
-              errmsg="\n> δεν επιτρέπεται να εκχωρηθεί τιμή σε ΕΚΦΡΑΣΗ"
+              errmsg="\n> δεν επιτρέπεται να δοθεί ΕΚΦΡΑΣΗ ως όρισμα στη ΔΙΑΒΑΣΕ"
               raise Exception
             if("(" not in line):
               errmsg="\n> ΔΕΝ ΕΧΕΙ ΔΗΛΩΘΕΙ Η ΜΕΤΑΒΛΗΤΗ \'"+vnamecl+"\'"
