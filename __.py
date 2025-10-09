@@ -298,7 +298,7 @@ def Rinput(v,report=False,smartV=""):
         v2=[j for j in smartV.split(",") if [i for i in names.keys() if names[i] in j]==[]]
         v = v if (r.randrange(1,101)>5 or v2==[]) else r.choice(v2)
   elif(hasattr(v,'ΤΙΜΗ')):
-    raise RuntimeError("> δεν επιτρέπεται να δοθεί όρισμα ΠΙΝΑΚΑΣ στη ΔΙΑΒΑΣΕ")
+    raise SyntaxError("> δεν επιτρέπεται να δοθεί όρισμα ΠΙΝΑΚΑΣ στη ΔΙΑΒΑΣΕ")
   if(report):
     print(">διαβάστηκε το",v)
   return v
